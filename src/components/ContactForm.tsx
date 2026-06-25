@@ -1,22 +1,36 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
-import { site } from "@/content/site";
 
 /**
  * Contact form (TASK.md §5 /contact). Client-side validation, accessible
  * labels + error wiring, and a success/error state written in the interface's
- * own voice (no fake apology copy).
+ * own voice (no fake apology copy). All microcopy + the recipient are fed from
+ * the CMS via the `form` prop.
  *
- * TODO(endpoint): submit currently composes a mailto: to {site.email}. Replace
- * with a real endpoint (Resend / Formspree) — swap the body of `submit()`.
+ * TODO(endpoint): submit currently composes a mailto: to form.recipientEmail.
+ * Replace with a real endpoint (Resend / Formspree) — swap the body of submit().
  */
+type FormConfig = {
+  recipientEmail: string;
+  submitLabel: string;
+  successHeading: string;
+  successBody: string;
+  errorSummary: string;
+  fieldErrors: {
+    nameRequired: string;
+    emailRequired: string;
+    emailInvalid: string;
+    messageRequired: string;
+  };
+};
+
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
 type Status = "idle" | "error" | "success";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function ContactForm() {
+export default function ContactForm({ form }: { form: FormConfig }) {
   const uid = useId();
   const [values, setValues] = useState({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState<Errors>({});
@@ -25,11 +39,11 @@ export default function ContactForm() {
 
   const validate = (v: typeof values): Errors => {
     const e: Errors = {};
-    if (!v.name.trim()) e.name = "Tell us who you are.";
-    if (!v.email.trim()) e.email = "We need an email to reply to.";
+    if (!v.name.trim()) e.name = form.fieldErrors.nameRequired;
+    if (!v.email.trim()) e.email = form.fieldErrors.emailRequired;
     else if (!EMAIL_RE.test(v.email.trim()))
-      e.email = "That email doesn't look right.";
-    if (!v.message.trim()) e.message = "Add a line about what you're making.";
+      e.email = form.fieldErrors.emailInvalid;
+    if (!v.message.trim()) e.message = form.fieldErrors.messageRequired;
     return e;
   };
 
@@ -54,7 +68,7 @@ export default function ContactForm() {
     const body = encodeURIComponent(
       `${values.message}\n\n— ${values.name}\n${values.email}`,
     );
-    window.location.href = `mailto:${site.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${form.recipientEmail}?subject=${subject}&body=${body}`;
     setStatus("success");
     setValues({ name: "", email: "", message: "" });
   };
@@ -69,12 +83,9 @@ export default function ContactForm() {
         className="border-rebel-red/40 flex flex-col items-start gap-4 border-l-2 py-6 pl-6"
       >
         <p className="font-display text-cream text-2xl italic">
-          Got it. Your message is on its way.
+          {form.successHeading}
         </p>
-        <p className="font-body text-cream-dim text-sm">
-          We read everything ourselves and reply in our own words — usually
-          within a couple of days.
-        </p>
+        <p className="font-body text-cream-dim text-sm">{form.successBody}</p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
@@ -95,7 +106,7 @@ export default function ContactForm() {
           role="alert"
           className="font-body text-rebel-red text-sm"
         >
-          A couple of fields need a look before this can send.
+          {form.errorSummary}
         </p>
       )}
 
@@ -159,7 +170,7 @@ export default function ContactForm() {
         type="submit"
         className="group border-cream/25 hover:border-rebel-red hover:text-rebel-red mt-2 flex w-fit cursor-pointer items-center gap-3 border px-6 py-3 transition-colors"
       >
-        <span className="font-display text-lg italic">Send it</span>
+        <span className="font-display text-lg italic">{form.submitLabel}</span>
         <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">
           →
         </span>

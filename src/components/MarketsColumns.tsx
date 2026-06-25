@@ -1,7 +1,13 @@
-import { markets } from "@/content/markets";
+export type Market = {
+  name: string;
+  sectors: string[];
+  line: string;
+  contact: string;
+  home?: boolean;
+};
 
 /** The four market columns (Egyptian in red). Shared by Home + Contact. */
-export default function MarketsColumns() {
+export default function MarketsColumns({ markets }: { markets: Market[] }) {
   return (
     <ul className="grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-2">
       {markets.map((m) => {

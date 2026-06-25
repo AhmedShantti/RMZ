@@ -4,15 +4,28 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { mainNav, legalNav } from "@/content/nav";
-import { site } from "@/content/site";
+import { legalNav } from "@/content/nav";
 import AccentBlocks from "./AccentBlocks";
 
-type Props = { open: boolean; onClose: () => void };
+export type MenuItem = { label: string; href: string };
+
+type Props = {
+  open: boolean;
+  onClose: () => void;
+  menuItems: MenuItem[];
+  tagline: string;
+  shortName: string;
+};
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function MenuOverlay({ open, onClose }: Props) {
+export default function MenuOverlay({
+  open,
+  onClose,
+  menuItems,
+  tagline,
+  shortName,
+}: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
@@ -90,7 +103,7 @@ export default function MenuOverlay({ open, onClose }: Props) {
 
           <div className="relative flex items-center justify-between px-5 py-5 sm:px-8">
             <span className="font-display text-cream-dim text-sm italic">
-              {site.shortName} — menu
+              {shortName} — menu
             </span>
             <button
               type="button"
@@ -105,7 +118,7 @@ export default function MenuOverlay({ open, onClose }: Props) {
             aria-label="Primary"
             className="relative flex flex-1 flex-col justify-center gap-1 px-5 sm:px-8"
           >
-            {mainNav.map((item, i) => {
+            {menuItems.map((item, i) => {
               const active = pathname === item.href;
               return (
                 <motion.div
@@ -124,7 +137,7 @@ export default function MenuOverlay({ open, onClose }: Props) {
                     className="group flex items-baseline gap-4 py-1"
                   >
                     <span className="font-body text-cream-dim w-8 text-xs tabular-nums">
-                      {item.index}
+                      {String(i + 1).padStart(2, "0")}
                     </span>
                     <span
                       className="font-display text-[clamp(2.4rem,9vw,5.5rem)] italic leading-[0.95] transition-colors"
@@ -144,7 +157,7 @@ export default function MenuOverlay({ open, onClose }: Props) {
             <div className="flex items-center gap-4">
               <AccentBlocks size={10} />
               <span className="font-body text-cream-dim text-xs">
-                Creative Rebellion is not chaos.
+                {tagline}.
               </span>
             </div>
             <div className="font-body text-cream-dim flex gap-5 text-xs">

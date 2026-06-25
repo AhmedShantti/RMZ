@@ -1,15 +1,22 @@
 import Link from "next/link";
-import { site } from "@/content/site";
 import { legalNav } from "@/content/nav";
 import AccentBlocks from "./AccentBlocks";
+
+type Social = { label: string; href: string };
 
 /**
  * Global footer chrome (TASK.md §4):
  *  - bottom-left "Contact us here" → /contact
  *  - bottom-right © credit (exact storyboard credit; year dynamic)
- *  - legal row (Privacy / Terms) + socials
+ *  - legal row (Privacy / Terms) + socials. Data fed from the CMS via props.
  */
-export default function Footer() {
+export default function Footer({
+  socials,
+  footerCredit,
+}: {
+  socials: Social[];
+  footerCredit: string;
+}) {
   const year = new Date().getFullYear();
 
   return (
@@ -28,7 +35,7 @@ export default function Footer() {
           </Link>
           <div className="font-body text-cream-dim flex flex-wrap items-center gap-4 text-xs">
             <AccentBlocks size={8} />
-            {site.socials.map((s) => (
+            {socials.map((s) => (
               <a
                 key={s.label}
                 href={s.href}
@@ -55,7 +62,7 @@ export default function Footer() {
             ))}
           </div>
           <p className="font-body text-cream-dim text-xs">
-            © {year} {site.footerCredit}
+            © {year} {footerCredit}
           </p>
         </div>
       </div>

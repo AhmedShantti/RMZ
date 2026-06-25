@@ -20,7 +20,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 // storyboard order: green / orange / yellow
 const TRIO = ["var(--acc-green)", "var(--acc-orange)", "var(--acc-yellow)"];
 
-export default function IntroLoader() {
+export default function IntroLoader({ enabled = true }: { enabled?: boolean }) {
   const reduce = useReducedMotion();
   const [show, setShow] = useState(false);
   const [done, setDone] = useState(false);
@@ -32,6 +32,7 @@ export default function IntroLoader() {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return; // CMS toggle: loader disabled
     const seen =
       typeof window !== "undefined" && sessionStorage.getItem(KEY) === "1";
     if (seen) return;
@@ -50,7 +51,7 @@ export default function IntroLoader() {
 
     const t = setTimeout(finish, 1750);
     return () => clearTimeout(t);
-  }, [reduce, finish]);
+  }, [enabled, reduce, finish]);
 
   useEffect(() => {
     if (!show) return;
