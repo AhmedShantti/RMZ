@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
-    "build": "next build",
+    "build": "node scripts/db-push.mts && next build",
     "start": "next start",
     "lint": "eslint",
     "payload": "payload",
