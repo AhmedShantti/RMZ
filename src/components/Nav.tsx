@@ -2,13 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import MenuOverlay from "./MenuOverlay";
+import MenuOverlay, { type MenuItem } from "./MenuOverlay";
 
 /**
  * Global top chrome (TASK.md §4): ≡ Menu (top-left, italic serif) opens the
- * full-screen overlay; Let's chat (top-right, italic serif) → /contact.
+ * full-screen overlay; Let's chat (top-right, italic serif) → contact.
+ * Data (menu items, labels, tagline) is fed from the CMS via props.
  */
-export default function Nav() {
+type Props = {
+  menuItems: MenuItem[];
+  letsChatLabel: string;
+  letsChatHref: string;
+  tagline: string;
+  shortName: string;
+};
+
+export default function Nav({
+  menuItems,
+  letsChatLabel,
+  letsChatHref,
+  tagline,
+  shortName,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,14 +46,20 @@ export default function Nav() {
         </button>
 
         <Link
-          href="/contact"
+          href={letsChatHref}
           className="font-display hover:text-rebel-red text-lg italic transition-colors"
         >
-          Let&rsquo;s chat
+          {letsChatLabel}
         </Link>
       </header>
 
-      <MenuOverlay open={open} onClose={() => setOpen(false)} />
+      <MenuOverlay
+        open={open}
+        onClose={() => setOpen(false)}
+        menuItems={menuItems}
+        tagline={tagline}
+        shortName={shortName}
+      />
     </>
   );
 }

@@ -2,18 +2,24 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { services } from "@/content/services";
 import { useReducedMotion } from "@/lib/reducedMotion";
+
+type RailService = {
+  index: string;
+  title: string;
+  blurb: string;
+  items: string[];
+};
 
 /**
  * Services rail (TASK.md §5 /services, storyboard p.5–6): a numbered left rail
  * selects the active service. The active title is sharp cream with a crisp
  * sub-list; behind it the sub-items render large + blurred (the defocused-text
- * look). Inactive rail items dim.
+ * look). Inactive rail items dim. Data fed from the CMS via props.
  */
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-export default function ServiceRail() {
+export default function ServiceRail({ services }: { services: RailService[] }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const svc = services[active];

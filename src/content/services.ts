@@ -1,3 +1,17 @@
+import type { Run } from "@/components/RunsText";
+
+/** Services page header — default + seed source. */
+export const servicesPage = {
+  pageTitle: [
+    { text: "Six disciplines,", style: "normal", tone: "cream" },
+    { text: "one", style: "italic", tone: "cream" },
+    { text: "disciplined", style: "normal", tone: "cream" },
+    { text: "mind", style: "italic", tone: "red" },
+    { text: ".", style: "normal", tone: "cream", noSpaceBefore: true },
+  ] as Run[],
+  lede: "Pick a number. Each offering is a focused practice — sharp where it counts, quiet everywhere else.",
+};
+
 /** Six numbered offerings (TASK.md §5 /services). */
 export type Service = {
   index: string;

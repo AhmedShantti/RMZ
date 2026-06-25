@@ -11,6 +11,14 @@ import {
 import { useReducedMotion } from "@/lib/reducedMotion";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import AccentBlocks from "./AccentBlocks";
+import RunsText, { type Run } from "./RunsText";
+import { homeContent } from "@/content/home";
+
+type HeroProps = {
+  kicker?: string;
+  statement?: Run[];
+  subline?: string;
+};
 
 /**
  * The signature moment (TASK.md §6). The hero composition reacts to the cursor:
@@ -26,7 +34,11 @@ import AccentBlocks from "./AccentBlocks";
  * refs, never React state. Touch / no-fine-pointer → gentle ambient autoplay.
  * prefers-reduced-motion → static composition (no canvas, no parallax).
  */
-export default function HeroCursorField() {
+export default function HeroCursorField({
+  kicker = homeContent.heroKicker,
+  statement = homeContent.heroStatement,
+  subline = homeContent.heroSubline,
+}: HeroProps = {}) {
   const reduce = useReducedMotion();
   // Parallax only on a fine pointer (mouse). Touch keeps the ambient glow +
   // grain but no layout-shifting parallax (which could clip at the edges).
@@ -237,24 +249,16 @@ export default function HeroCursorField() {
           </motion.span>
           <span className="hairline flex-1" />
           <span className="font-body text-cream-dim text-[0.7rem] uppercase tracking-[0.35em]">
-            Creative Rebellion
+            {kicker}
           </span>
         </motion.div>
 
-        {/* the editorial statement (mixed roman/italic/weight) */}
+        {/* the editorial statement (mixed roman/italic/weight — structured runs) */}
         <motion.h1
           style={interactive ? { x: stmtX, y: stmtY } : undefined}
           className="display-statement text-cream max-w-5xl text-[clamp(2.6rem,8.2vw,7rem)]"
         >
-          <span className="font-normal uppercase tracking-[-0.01em]">
-            Color palette
-          </span>{" "}
-          <span className="text-cream-dim italic">balances</span>{" "}
-          <span className="font-black uppercase text-rebel-red">
-            bold expression
-          </span>{" "}
-          <span className="text-cream-dim italic">with</span>{" "}
-          <span className="italic">Professional Presence.</span>
+          <RunsText runs={statement} />
         </motion.h1>
 
         {/* bottom hairline + second accent (deeper parallax) */}
@@ -263,8 +267,7 @@ export default function HeroCursorField() {
           className="mt-12 flex items-center gap-5"
         >
           <span className="font-body text-cream-dim max-w-xs text-sm">
-            A creative studio for brands with the courage to challenge the
-            ordinary.
+            {subline}
           </span>
           <span className="hairline flex-1" />
           <motion.span style={interactive ? { x: trioBX, y: trioBY } : undefined}>

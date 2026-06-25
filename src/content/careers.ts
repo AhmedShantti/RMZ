@@ -1,3 +1,19 @@
+import type { Run } from "@/components/RunsText";
+import { site } from "./site.ts";
+
+/** Careers page header + open-application CTA — default + seed source. */
+export const careersPage = {
+  pageTitle: [
+    { text: "Creative", style: "normal", tone: "cream" },
+    { text: "rebels", style: "italic", tone: "cream" },
+    { text: "welcome.", style: "normal", tone: "cream" },
+  ] as Run[],
+  lede: "We hire for point of view and the discipline to back it up. If you challenge the brief to make it better — not just louder — we should talk.",
+  openApplicationHeading: "Don’t see your role? Make the case anyway.",
+  ctaLabel: "Send an open application",
+  ctaTarget: `mailto:${site.email}?subject=Open application — RMZ`,
+};
+
 /**
  * PLACEHOLDER careers roles (TASK.md §5 /careers) — clearly marked, replace
  * with real openings. See NOTES.md.

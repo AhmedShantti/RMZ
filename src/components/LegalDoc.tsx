@@ -12,21 +12,30 @@ type Props = {
   updated: string;
   intro: string;
   sections: LegalSection[];
+  showNotice?: boolean;
 };
 
-export default function LegalDoc({ title, updated, intro, sections }: Props) {
+export default function LegalDoc({
+  title,
+  updated,
+  intro,
+  sections,
+  showNotice = true,
+}: Props) {
   return (
     <article className="px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
       <div className="mx-auto max-w-[68ch]">
         {/* Prominent template-text notice */}
-        <p
-          role="note"
-          className="border-rebel-red/50 text-cream mb-12 border-l-2 bg-ink-soft px-5 py-4 text-sm leading-relaxed"
-        >
-          <strong className="font-semibold">Template text</strong> — review with
-          legal counsel before publishing. The copy below is placeholder
-          boilerplate, not final legal language.
-        </p>
+        {showNotice && (
+          <p
+            role="note"
+            className="border-rebel-red/50 text-cream mb-12 border-l-2 bg-ink-soft px-5 py-4 text-sm leading-relaxed"
+          >
+            <strong className="font-semibold">Template text</strong> — review
+            with legal counsel before publishing. The copy below is placeholder
+            boilerplate, not final legal language.
+          </p>
+        )}
 
         <h1 className="font-display text-cream text-[clamp(2.4rem,6vw,4rem)] italic leading-none">
           {title}

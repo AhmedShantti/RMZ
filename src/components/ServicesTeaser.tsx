@@ -1,9 +1,14 @@
 import Link from "next/link";
-import { services } from "@/content/services";
 import Reveal from "./Reveal";
 
+type TeaserService = { index: string; title: string; blurb: string };
+
 /** Home services teaser (TASK.md §5.4) — short list, links into /services. */
-export default function ServicesTeaser() {
+export default function ServicesTeaser({
+  services,
+}: {
+  services: TeaserService[];
+}) {
   return (
     <section
       aria-label="What we do"

@@ -1,3 +1,15 @@
+import type { Run } from "@/components/RunsText";
+
+/** Portfolio page header — default + seed source. */
+export const portfolioPage = {
+  pageTitle: [
+    { text: "We solved the problems of", style: "normal", tone: "cream" },
+    { text: "dozens", style: "italic", tone: "cream" },
+    { text: "of clients.", style: "normal", tone: "cream" },
+  ] as Run[],
+  lede: "A few of the stories we've built. (Placeholder work shown until the real case studies land.)",
+};
+
 /**
  * PLACEHOLDER portfolio (TASK.md §5 /portfolio) — invented projects, clearly
  * marked, until Ahmad supplies real case studies. See NOTES.md.

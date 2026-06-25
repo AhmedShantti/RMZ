@@ -1,27 +1,35 @@
 import Link from "next/link";
-import { site } from "@/content/site";
 import AccentBlocks from "./AccentBlocks";
-import MarketsColumns from "./MarketsColumns";
+import MarketsColumns, { type Market } from "./MarketsColumns";
+import RunsText, { type Run } from "./RunsText";
 import Reveal from "./Reveal";
 
 /**
  * Markets / CTA block (TASK.md §5, storyboard p.7) — the big
  * "Let's create a new STORY.." statement + the four market columns. The
  * Egyptian market is the home/active market, rendered in red.
- *
- * Used full on /contact and as a teaser on the Home page.
+ * Used as a teaser on the Home page. Data fed from the CMS via props.
  */
+type Social = { label: string; href: string };
+
 type Props = {
-  /** Home teaser links the heading to /contact; the contact page does not. */
   asTeaser?: boolean;
+  story: Run[];
+  markets: Market[];
+  socials: Social[];
+  ctaLabel?: string;
 };
 
-export default function MarketsBlock({ asTeaser = false }: Props) {
+export default function MarketsBlock({
+  asTeaser = false,
+  story,
+  markets,
+  socials,
+  ctaLabel = "Start a project",
+}: Props) {
   const Heading = (
     <h2 className="display-statement text-cream text-[clamp(2.4rem,7vw,6rem)]">
-      Let&rsquo;s create a new{" "}
-      <span className="italic">STORY</span>
-      <span className="text-rebel-red">..</span>
+      <RunsText runs={story} />
     </h2>
   );
 
@@ -38,7 +46,7 @@ export default function MarketsBlock({ asTeaser = false }: Props) {
               <Link href="/contact" className="group w-fit">
                 {Heading}
                 <span className="font-body text-cream-dim group-hover:text-rebel-red mt-6 inline-flex items-center gap-2 text-sm transition-colors">
-                  Start a project
+                  {ctaLabel}
                   <span aria-hidden="true">→</span>
                 </span>
               </Link>
@@ -46,7 +54,7 @@ export default function MarketsBlock({ asTeaser = false }: Props) {
               Heading
             )}
             <div className="font-body text-cream-dim mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              {site.socials.map((s) => (
+              {socials.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
@@ -62,7 +70,7 @@ export default function MarketsBlock({ asTeaser = false }: Props) {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <MarketsColumns />
+          <MarketsColumns markets={markets} />
         </Reveal>
       </div>
     </section>
