@@ -1,26 +1,195 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Rebel Mind Zone — brand tokens (TASK.md §2)
+   Hex sampled from rasterized PDF exports. PLACEHOLDER until
+   Ahmad confirms exact vector hex — see NOTES.md.
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #000000; /* primary background / stage          */
+  --ink-soft: #0a0a0a; /* raised surfaces, section seams       */
+  --cream: #efe5cc; /* primary text on dark, the "paper"    */
+  --cream-dim: #c9c0aa; /* secondary text, captions             */
+  --rebel-red: #e12e1c; /* the brand red — light, links, active */
+  --red-deep: #8e1a10; /* darker end of red-light gradient     */
+  --acc-yellow: #fdc82f; /* accent trio                          */
+  --acc-orange: #e85d1e; /* accent trio                          */
+  --acc-green: #8dc63f; /* accent trio                          */
+
+  /* z-index scale */
+  --z-redlight: 0;
+  --z-grain: 5;
+  --z-content: 10;
+  --z-chrome: 40;
+  --z-overlay: 60;
+  --z-loader: 80;
+
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-cream: var(--cream);
+  --color-cream-dim: var(--cream-dim);
+  --color-rebel-red: var(--rebel-red);
+  --color-red-deep: var(--red-deep);
+  --color-acc-yellow: var(--acc-yellow);
+  --color-acc-orange: var(--acc-orange);
+  --color-acc-green: var(--acc-green);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* The stage sits above the fixed red-light + grain layers. */
+  position: relative;
+}
+
+/* Lenis smooth-scroll wiring */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---- Display serif helpers ---- */
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+/* Tighter editorial leading for large display statements */
+.display-statement {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* ---- Focus visibility (a11y, TASK.md §8) ---- */
+:focus-visible {
+  outline: 2px solid var(--rebel-red);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+/* Don't double-paint focus rings on the body wrapper */
+body:focus-visible {
+  outline: none;
+}
+
+::selection {
+  background: var(--rebel-red);
+  color: var(--cream);
+}
+
+/* Accessible skip link */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: var(--z-loader);
+  transform: translateY(-150%);
+  background: var(--cream);
+  color: var(--ink);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 2px;
+  transition: transform 150ms ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ---- Form inputs ---- */
+.rmz-input {
+  width: 100%;
+  background: var(--ink-soft);
+  border: 1px solid color-mix(in srgb, var(--cream-dim) 22%, transparent);
+  color: var(--cream);
+  font-family: var(--font-body), sans-serif;
+  font-size: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 2px;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
+}
+.rmz-input::placeholder {
+  color: color-mix(in srgb, var(--cream-dim) 60%, transparent);
+}
+.rmz-input:hover {
+  border-color: color-mix(in srgb, var(--cream-dim) 40%, transparent);
+}
+.rmz-input:focus {
+  outline: none;
+  border-color: var(--rebel-red);
+  background: #111;
+}
+.rmz-input[aria-invalid="true"] {
+  border-color: var(--rebel-red);
+}
+
+/* hairline rule in cream-dim */
+.hairline {
+  height: 1px;
+  background: color-mix(in srgb, var(--cream-dim) 35%, transparent);
+}
+
+/* ---- Ambient grain shimmer (cheap, stepped; killed by reduced-motion) ---- */
+.grain-layer {
+  animation: grain-shift 1.2s steps(4) infinite;
+}
+@keyframes grain-shift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(-3%, 2%, 0);
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0);
+  }
+  75% {
+    transform: translate3d(-2%, -3%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ---- Reduced motion: kill non-essential animation (TASK.md §8) ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
