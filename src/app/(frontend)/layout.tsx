@@ -7,6 +7,7 @@ import RedLight from "@/components/RedLight";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -68,6 +69,7 @@ export default async function RootLayout({
           </main>
           <Footer socials={s.socials} footerCredit={s.footerCredit} />
         </div>
+        <Analytics />
       </body>
     </html>
   );
