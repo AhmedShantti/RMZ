@@ -182,6 +182,124 @@ body:focus-visible {
   }
 }
 
+/* ============================================================
+   Intro loader — 3-phase choreographed square sequence
+   (animation-prompt.md / animation-task.md). JS only toggles
+   [data-phase]; CSS owns every visual state. All motion is
+   transform/opacity only; positions are viewport-relative.
+   ============================================================ */
+.intro-loader {
+  background: var(--ink);
+
+  /* size + spacing */
+  --S: clamp(80px, 10vw, 120px);
+  --gap: calc(var(--S) * 0.25); /* quarter-square gap (Phase 1) */
+  --step: calc(var(--S) + var(--gap)); /* centre-to-centre in Phase 1 */
+
+  /* Phase 2 scatter targets (viewport-relative) */
+  --green-scatter-x: 22vw; /* green: left edge here, centred on Y */
+  --yellow-scatter-x: 68vw; /* yellow: left edge here */
+  --yellow-scatter-y: calc(50vh - var(--S)); /* top edge → bottom sits on 50vh */
+  --orange-scatter-x: 68vw; /* orange: same X as yellow */
+  --orange-scatter-y: calc(50vh + var(--S)); /* top = yellow bottom + S */
+
+  /* exit reveal (wipe up) */
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.intro-loader[data-exiting="true"] {
+  clip-path: inset(0 0 100% 0);
+}
+
+.intro-redlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    90% 90% at 100% 100%,
+    color-mix(in srgb, var(--rebel-red) 34%, transparent),
+    transparent 55%
+  );
+}
+
+.intro-block {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--S);
+  height: var(--S);
+  will-change: transform, opacity;
+  /* Phase 2 scatter easing (Phase 1 has no transform change to animate) */
+  transition: transform 900ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Phase 1 entry — staggered fade-in */
+  opacity: 0;
+  animation: intro-block-in 600ms ease-out forwards;
+}
+@keyframes intro-block-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.intro-block-green {
+  background: var(--acc-green);
+  animation-delay: 0ms;
+}
+.intro-block-orange {
+  background: var(--acc-orange);
+  animation-delay: 150ms;
+}
+.intro-block-yellow {
+  background: var(--acc-yellow);
+  animation-delay: 300ms;
+}
+
+/* Phase 1 — initial: side by side, centred as a group (Green · Orange · Yellow) */
+.intro-loader[data-phase="initial"] .intro-block-green {
+  transform: translate(calc(-50% - var(--step)), -50%);
+}
+.intro-loader[data-phase="initial"] .intro-block-orange {
+  transform: translate(-50%, -50%);
+}
+.intro-loader[data-phase="initial"] .intro-block-yellow {
+  transform: translate(calc(-50% + var(--step)), -50%);
+}
+
+/* Phase 2/3 — scatter (held through final) */
+.intro-loader[data-phase="scatter"] .intro-block-green,
+.intro-loader[data-phase="final"] .intro-block-green {
+  transform: translate(calc(var(--green-scatter-x) - 50vw), -50%);
+}
+.intro-loader[data-phase="scatter"] .intro-block-yellow,
+.intro-loader[data-phase="final"] .intro-block-yellow {
+  transform: translate(
+    calc(var(--yellow-scatter-x) - 50vw),
+    calc(var(--yellow-scatter-y) - 50vh)
+  );
+}
+.intro-loader[data-phase="scatter"] .intro-block-orange,
+.intro-loader[data-phase="final"] .intro-block-orange {
+  transform: translate(
+    calc(var(--orange-scatter-x) - 50vw),
+    calc(var(--orange-scatter-y) - 50vh)
+  );
+}
+
+/* Phase 3 — brand label fades in, centred (clear of the scattered squares) */
+.intro-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 600ms ease-in-out;
+}
+.intro-loader[data-phase="final"] .intro-label {
+  opacity: 0.8;
+}
+
 /* ---- Reduced motion: kill non-essential animation (TASK.md §8) ---- */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -187,6 +187,28 @@ Node 20 + 22 were installed via Homebrew during debugging; the app runs on the d
 
 ---
 
+## Intro animation refactor (animation-prompt.md / animation-task.md)
+
+Refactored the first-visit intro loader from per-square Framer Motion into a **3-phase
+choreographed sequence** driven by `data-phase` + CSS (per the prompt's required structure):
+
+- **`IntroLoader.tsx`** is now a phase controller only — it toggles
+  `data-phase="initial" → "scatter" → "final"` on `setTimeout` timing (entry 600 / hold 800 /
+  scatter 900 / final 600 ms), then wipes the curtain up to reveal the site. Still once-per-session,
+  skippable (click/key), CMS-toggleable (`enabled`), reduced-motion safe.
+- **`globals.css`** owns every visual state via `[data-phase]` selectors using `transform:
+  translate()` only (never left/top/width/height) and CSS custom properties for all positions/sizes
+  (`--S: clamp(80px,10vw,120px)`, `--green-scatter-x`, `--yellow-scatter-y`, …). Viewport-relative.
+- **Geometry verified** (measured in-browser): Phase 1 = centered G·O·Y group, gap = S×0.25;
+  Phase 2/3 = green left-centre @22vw (centre on 50vh), yellow @68vw (bottom on 50vh), orange below
+  yellow @68vw with gap = S (orange top = 50vh + S). Mobile @375px: no overflow. Reduced motion
+  jumps straight to final. `npm run build` + `eslint` clean.
+- **Square colors:** the prompt's hexes (`#7DC242/#E8451A/#F9C020`) are labelled "approximate" in
+  animation-task.md, so the squares use the **exact brand accent tokens** (`--acc-green/-orange/
+  -yellow`) for site consistency. Swap to the literal hexes if Ahmad prefers (3-line change).
+
+---
+
 ### Known follow-ups (non-blocking)
 - Logo is a faithful HTML/SVG placeholder; tiles sit centered above the wordmark (≈ above the
   `m`). Replace with Ahmad's vector for exact letterforms.
