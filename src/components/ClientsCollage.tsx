@@ -20,20 +20,20 @@ type Photo = {
 
 const PHOTOS: Photo[] = [
   {
-    label: "[ CLIENT PHOTO 1 ]",
+    label: "[ CLIENT PHOTO 1 — REPLACE ]",
     deskClasses: "md:translate-y-8 md:rotate-[-2deg] md:-mr-6",
     z: "z-20",
     width: "md:w-[260px]",
     badge: { name: "CLIENT NAME", color: "var(--acc-orange)", rotate: "-6deg" },
   },
   {
-    label: "[ CLIENT PHOTO 2 ]",
+    label: "[ CLIENT PHOTO 2 — REPLACE ]",
     deskClasses: "md:-translate-y-8 md:rotate-0",
     z: "z-30",
     width: "md:w-[300px]",
   },
   {
-    label: "[ CLIENT PHOTO 3 ]",
+    label: "[ CLIENT PHOTO 3 — REPLACE ]",
     deskClasses: "md:translate-y-8 md:rotate-[2deg] md:-ml-6",
     z: "z-20",
     width: "md:w-[260px]",
@@ -71,9 +71,9 @@ export default function ClientsCollage() {
             key={p.label}
             className={`relative aspect-[3/4] w-full max-w-[300px] ${p.width} ${p.deskClasses} ${p.z}`}
           >
-            {/* placeholder photo */}
-            <div className="flex h-full w-full items-center justify-center border border-white/10 bg-[#161616]">
-              <span className="font-body text-[0.7rem] uppercase tracking-[0.2em] text-[#666]">
+            {/* TODO: Replace with real client photo */}
+            <div className="flex h-full w-full items-center justify-center border border-white/10 bg-[#1a1a1a]">
+              <span className="font-body text-sm uppercase tracking-[0.2em] text-[#666]">
                 {p.label}
               </span>
             </div>

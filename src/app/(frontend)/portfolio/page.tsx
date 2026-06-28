@@ -50,7 +50,7 @@ export default async function PortfolioPage() {
                   >
                     {/* image placeholder — fills + scales on hover */}
                     <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a] transition-transform duration-300 ease-out group-hover:scale-[1.03]">
-                      <span className="font-body text-xs text-[#666]">
+                      <span className="font-body text-sm text-[#666]">
                         [ PROJECT IMAGE — REPLACE ]
                       </span>
                     </div>
