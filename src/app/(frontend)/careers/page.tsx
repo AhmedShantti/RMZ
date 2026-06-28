@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PageIntro from "@/components/PageIntro";
+import FloatingSquares from "@/components/FloatingSquares";
+import AccentBlocks from "@/components/AccentBlocks";
 import Reveal from "@/components/Reveal";
 import RunsText from "@/components/RunsText";
 import { getCareers, getCareerRoles, getMeta } from "@/lib/cms";
@@ -23,11 +24,33 @@ export default async function CareersPage() {
 
   return (
     <>
-      <PageIntro
-        kicker="Careers"
-        title={<RunsText runs={careers.pageTitle} />}
-        lede={careers.lede}
-      />
+      {/* Hero — job title framed by the reusable FloatingSquares (Stage 8) */}
+      <header className="relative px-5 pb-12 pt-32 sm:px-8 sm:pb-16 sm:pt-40">
+        <div className="mx-auto max-w-6xl">
+          <Reveal className="mb-6 flex items-center gap-4">
+            <AccentBlocks size={12} />
+            <span className="font-body text-cream-dim text-xs uppercase tracking-[0.35em]">
+              Careers
+            </span>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <div className="relative w-fit">
+              <FloatingSquares
+                size={70}
+                className="-left-5 -top-9 hidden sm:block"
+              />
+              <h1 className="display-statement text-cream relative z-10 max-w-4xl text-[clamp(2.6rem,7vw,5.5rem)]">
+                <RunsText runs={careers.pageTitle} />
+              </h1>
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <p className="font-body text-cream-dim mt-8 max-w-xl text-lg leading-relaxed">
+              {careers.lede}
+            </p>
+          </Reveal>
+        </div>
+      </header>
 
       <section className="px-5 pb-28 sm:px-8 sm:pb-36">
         <div className="mx-auto max-w-6xl">
