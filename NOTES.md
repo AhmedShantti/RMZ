@@ -245,6 +245,7 @@ The contact form now stores each message in the CMS instead of opening a `mailto
 ---
 
 ### Known follow-ups (non-blocking)
-- Logo is a faithful HTML/SVG placeholder; tiles sit centered above the wordmark (≈ above the
-  `m`). Replace with Ahmad's vector for exact letterforms.
+- ✅ Logo replaced: `Logo.tsx` now renders the real brand vector `public/LOGO.svg` (red `rmz`
+  + accent squares + ®) via `next/image` (`unoptimized`). The favicon (`app/icon.svg`) is still
+  the earlier placeholder — swap it too if a favicon-specific asset is provided.
 - Lenis intercepts programmatic `scrollTo`, which only affects test tooling, not users.

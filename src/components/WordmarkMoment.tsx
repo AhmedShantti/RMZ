@@ -40,10 +40,10 @@ export default function WordmarkMoment() {
       />
       <motion.div
         style={reduce ? undefined : { y, opacity }}
-        className="relative scale-[0.62] sm:scale-90 md:scale-110 lg:scale-125"
+        className="relative w-[clamp(260px,52vw,620px)]"
       >
-        {/* Large centred rmz signature lockup */}
-        <Logo variant="signature" size={150} />
+        {/* Large centred rmz signature lockup (real brand SVG) */}
+        <Logo variant="signature" className="w-full" />
       </motion.div>
     </section>
   );
