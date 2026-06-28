@@ -8,8 +8,8 @@ import { useId, useRef, useState } from "react";
  * own voice (no fake apology copy). All microcopy + the recipient are fed from
  * the CMS via the `form` prop.
  *
- * TODO(endpoint): submit currently composes a mailto: to form.recipientEmail.
- * Replace with a real endpoint (Resend / Formspree) — swap the body of submit().
+ * Submit POSTs to the Payload REST endpoint `/api/contact-submissions`, so each
+ * message is stored in the CMS and appears in the admin dashboard.
  */
 type FormConfig = {
   recipientEmail: string;
@@ -26,7 +26,7 @@ type FormConfig = {
 };
 
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
-type Status = "idle" | "error" | "success";
+type Status = "idle" | "loading" | "error" | "success";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,8 +54,9 @@ export default function ContactForm({ form }: { form: FormConfig }) {
     if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (status === "loading") return; // guard against double-submit
     const e2 = validate(values);
     setErrors(e2);
     if (Object.keys(e2).length > 0) {
@@ -63,14 +64,25 @@ export default function ContactForm({ form }: { form: FormConfig }) {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
-    // --- placeholder submit: compose a mailto: (see TODO above) ---
-    const subject = encodeURIComponent(`New project — ${values.name}`);
-    const body = encodeURIComponent(
-      `${values.message}\n\n— ${values.name}\n${values.email}`,
-    );
-    window.location.href = `mailto:${form.recipientEmail}?subject=${subject}&body=${body}`;
-    setStatus("success");
-    setValues({ name: "", email: "", message: "" });
+    // Store the submission in Payload CMS (visible in the admin dashboard).
+    setStatus("loading");
+    try {
+      const response = await fetch("/api/contact-submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          message: values.message,
+        }),
+      });
+      if (!response.ok) throw new Error("Submission failed");
+      setStatus("success");
+      setValues({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error("Contact form error:", err);
+      setStatus("error");
+    }
   };
 
   const id = (k: string) => `${uid}-${k}`;

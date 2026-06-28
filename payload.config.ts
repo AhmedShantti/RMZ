@@ -11,6 +11,7 @@ import { Users } from "./src/payload/collections/Users.ts";
 import { Media } from "./src/payload/collections/Media.ts";
 import { PortfolioProjects } from "./src/payload/collections/PortfolioProjects.ts";
 import { CareerRoles } from "./src/payload/collections/CareerRoles.ts";
+import { ContactSubmissions } from "./src/payload/collections/ContactSubmissions.ts";
 import { SiteSettings } from "./src/payload/globals/SiteSettings.ts";
 import { HomeContent } from "./src/payload/globals/HomeContent.ts";
 import { AboutContent } from "./src/payload/globals/AboutContent.ts";
@@ -50,7 +51,13 @@ export default buildConfig({
       titleSuffix: "— RMZ Studio",
     },
   },
-  collections: [Users, Media, PortfolioProjects, CareerRoles],
+  collections: [
+    Users,
+    Media,
+    PortfolioProjects,
+    CareerRoles,
+    ContactSubmissions,
+  ],
   globals: [
     SiteSettings,
     HomeContent,

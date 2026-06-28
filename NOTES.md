@@ -224,6 +224,26 @@ display and body/utility roles — replacing Fraunces (display) + Inter (body).
 
 ---
 
+## Contact form → Payload (stored submissions)
+
+The contact form now stores each message in the CMS instead of opening a `mailto:`
+(contact-form-Prompt.md).
+
+- New collection `src/payload/collections/ContactSubmissions.ts` (slug `contact-submissions`,
+  fields name/email/message + timestamps; `create` public, read/update/delete admin-only).
+  Adapted the spec's v2 `payload/types` default-export snippet to this project's **Payload v3
+  named-export** convention so it compiles; schema kept exactly as specified.
+- Registered in `payload.config.ts` `collections` array (other collections untouched).
+- `ContactForm.tsx`: **only the submit handler changed** — `mailto:` replaced with
+  `fetch('/api/contact-submissions', POST {name,email,message})`, reusing the existing
+  status state (+`loading`). No JSX/styling/validation changes.
+- Verified: REST POST → **201** + row stored; form UI submit → success state, no Mail app;
+  both rows confirmed in the DB (then cleared). `tsc`/`build` clean.
+- Submissions appear in the admin at **`/studio/collections/contact-submissions`** (this app's
+  admin path is `/studio`, not `/admin`). The prod build's schema-push creates the table.
+
+---
+
 ### Known follow-ups (non-blocking)
 - Logo is a faithful HTML/SVG placeholder; tiles sit centered above the wordmark (≈ above the
   `m`). Replace with Ahmad's vector for exact letterforms.
