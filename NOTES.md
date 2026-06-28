@@ -209,6 +209,21 @@ choreographed sequence** driven by `data-phase` + CSS (per the prompt's required
 
 ---
 
+## Typeface swap → IvarDisplay (whole site)
+
+The entire public site now uses **IvarDisplay** (self-hosted OTF in `public/fonts/`) for both the
+display and body/utility roles — replacing Fraunces (display) + Inter (body).
+
+- `src/lib/fonts.ts`: one `localFont` with 8 faces (Regular/Medium/SemiBold/Bold + italics =
+  weights 400/500/600/700), exposing `--font-display`.
+- `globals.css`: `--font-body` aliased to `--font-display`, body fallback stack switched to serif.
+- **Weights unchanged** — every existing weight class stays as-is; requests above 700 (e.g. the
+  hero `font-black`/Logo 800) match the heaviest real face (700) since `font-synthesis-weight: none`.
+- Fraunces/Inter `.woff2` left in `public/fonts/` (unreferenced) — safe to delete later.
+- Verified in-browser (home + about render fully in Ivar) and `npm run build` clean.
+
+---
+
 ### Known follow-ups (non-blocking)
 - Logo is a faithful HTML/SVG placeholder; tiles sit centered above the wordmark (≈ above the
   `m`). Replace with Ahmad's vector for exact letterforms.

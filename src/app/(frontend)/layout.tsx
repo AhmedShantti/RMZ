@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { fraunces, inter } from "@/lib/fonts";
+import { ivarDisplay } from "@/lib/fonts";
 import { site } from "@/content/site";
 import { getSiteSettings } from "@/lib/cms";
 import Grain from "@/components/Grain";
@@ -41,7 +41,7 @@ export default async function RootLayout({
   const s = await getSiteSettings();
 
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable} h-full`}>
+    <html lang="en" className={`${ivarDisplay.variable} h-full`}>
       <body className="text-cream min-h-full">
         <a href="#main" className="skip-link">
           Skip to content

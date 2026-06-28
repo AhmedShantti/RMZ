@@ -49,12 +49,14 @@
 html {
   background: var(--ink);
   -webkit-text-size-adjust: 100%;
+  /* Whole site uses IvarDisplay: body/utility role aliases the display family. */
+  --font-body: var(--font-display);
 }
 
 body {
   background: var(--ink);
   color: var(--cream);
-  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-body), ui-serif, Georgia, serif;
   font-synthesis-weight: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
