@@ -20,28 +20,26 @@ export default function FloatingSquares({ size = 80, className = "" }: Props) {
       className={`pointer-events-none absolute ${className}`}
       style={{ zIndex: 0, width: size * 1.6, height: size * 1.6 }}
     >
-      {/* orange — rotated 15deg, upper-left */}
+      {/* orange — rotated 15deg, upper-left, slow float */}
       <span
-        className="absolute block"
+        className="rmz-float-a absolute block"
         style={{
           width: size,
           height: size,
           top: 0,
           left: 0,
           backgroundColor: "var(--acc-orange)",
-          transform: "rotate(15deg)",
         }}
       />
-      {/* green — rotated -10deg, overlapping down-right */}
+      {/* green — rotated -10deg, overlapping down-right, slow float */}
       <span
-        className="absolute block"
+        className="rmz-float-b absolute block"
         style={{
           width: size,
           height: size,
           top: size * 0.5,
           left: size * 0.55,
           backgroundColor: "var(--acc-green)",
-          transform: "rotate(-10deg)",
         }}
       />
     </div>

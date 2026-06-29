@@ -1,4 +1,5 @@
 import SectionWatermark from "./SectionWatermark";
+import Reveal from "./Reveal";
 
 /**
  * VideoSection (Redesigning Stage 2) — a video placeholder flanked by two
@@ -19,13 +20,13 @@ export default function VideoSection() {
     >
       <SectionWatermark text="CLIENTS" />
 
-      <div className="relative z-10 mx-auto flex max-w-5xl flex-col px-5 sm:px-8 md:flex-row md:items-stretch">
+      <Reveal className="relative z-10 mx-auto flex max-w-5xl flex-col px-5 sm:px-8 md:flex-row md:items-stretch">
         {/* left strip — green, reads bottom→top */}
         <div
-          className="flex h-[50px] w-full items-center justify-center md:h-auto md:w-[92px]"
+          className="flex h-[44px] w-full items-center justify-center md:h-auto md:w-[58px]"
           style={{ backgroundColor: "var(--acc-green)" }}
         >
-          <span className="font-body text-sm font-bold uppercase tracking-wider text-white md:rotate-180 md:[writing-mode:vertical-rl]">
+          <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:rotate-180 md:[writing-mode:vertical-rl]">
             How to Success
           </span>
         </div>
@@ -43,6 +44,7 @@ export default function VideoSection() {
               viewBox="0 0 80 80"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="rmz-pulse"
             >
               <circle cx="40" cy="40" r="39" stroke="white" strokeWidth="1.5" />
               <path d="M33 26 L57 40 L33 54 Z" fill="white" />
@@ -52,14 +54,14 @@ export default function VideoSection() {
 
         {/* right strip — orange, reads top→bottom */}
         <div
-          className="flex h-[50px] w-full items-center justify-center md:h-auto md:w-[92px]"
+          className="flex h-[44px] w-full items-center justify-center md:h-auto md:w-[58px]"
           style={{ backgroundColor: "var(--acc-orange)" }}
         >
-          <span className="font-body text-sm font-bold uppercase tracking-wider text-white md:[writing-mode:vertical-rl]">
+          <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:[writing-mode:vertical-rl]">
             How to be Rebel
           </span>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

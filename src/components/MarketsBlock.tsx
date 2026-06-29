@@ -35,7 +35,7 @@ export default function MarketsBlock({
   const lead = splitIdx > 0 ? story.slice(0, splitIdx) : story;
   const tail = splitIdx > 0 ? story.slice(splitIdx) : [];
   const Heading = (
-    <h2 className="display-statement text-cream text-[clamp(2.2rem,5.5vw,4.5rem)] uppercase leading-[0.95]">
+    <h2 className="display-statement text-cream text-[clamp(2.4rem,6vw,5rem)] leading-[0.98]">
       <RunsText runs={lead} />
       {tail.length > 0 && <br />}
       <RunsText runs={tail} />

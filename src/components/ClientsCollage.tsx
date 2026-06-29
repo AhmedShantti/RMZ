@@ -1,4 +1,8 @@
+"use client";
+
+import { motion } from "motion/react";
 import SectionWatermark from "./SectionWatermark";
+import { useReducedMotion } from "@/lib/reducedMotion";
 
 /**
  * ClientsCollage (Redesigning Stage 1) — three portrait client photos in an
@@ -42,6 +46,7 @@ const PHOTOS: Photo[] = [
 ];
 
 export default function ClientsCollage() {
+  const reduce = useReducedMotion();
   return (
     <section
       aria-labelledby="clients-heading"
@@ -66,10 +71,14 @@ export default function ClientsCollage() {
 
       {/* collage */}
       <div className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-8 px-5 md:flex-row md:justify-center md:gap-0 sm:px-8">
-        {PHOTOS.map((p) => (
-          <div
+        {PHOTOS.map((p, i) => (
+          <motion.div
             key={p.label}
             className={`relative aspect-[3/4] w-full max-w-[300px] ${p.width} ${p.deskClasses} ${p.z}`}
+            initial={reduce ? false : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-10% 0px" }}
+            transition={{ duration: 0.6, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* TODO: Replace with real client photo */}
             <div className="flex h-full w-full items-center justify-center border border-white/10 bg-[#1a1a1a]">
@@ -81,7 +90,7 @@ export default function ClientsCollage() {
             {/* sticker badge (photos 1 & 3) */}
             {p.badge && (
               <span
-                className="font-body absolute bottom-10 left-1/2 z-20 px-3 py-1.5 text-[0.7rem] font-bold uppercase tracking-wider"
+                className="font-body absolute bottom-10 left-1/2 z-20 px-2.5 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.15em]"
                 style={{
                   backgroundColor: p.badge.color,
                   color: "var(--ink)",
@@ -91,7 +100,7 @@ export default function ClientsCollage() {
                 {p.badge.name}
               </span>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
     </section>
