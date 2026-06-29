@@ -175,7 +175,9 @@ export default function AboutScrollSquares() {
     <div
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 overflow-hidden"
-      style={{ zIndex: 50 }}
+      // Behind the section content (sections are z-index 1), above the page
+      // background, with a soft blur.
+      style={{ zIndex: 0, filter: "blur(2px)" }}
     >
       <div
         ref={greenRef}

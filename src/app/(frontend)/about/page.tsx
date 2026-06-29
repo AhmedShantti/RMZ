@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import AboutScrollSquares from "@/components/AboutScrollSquares";
-import ScrollExploreBadge from "@/components/ScrollExploreBadge";
-import SectionNav from "@/components/SectionNav";
-import Logo from "@/components/Logo";
+import ColorPaletteSection from "@/components/ColorPaletteSection";
 import { getMeta } from "@/lib/cms";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -53,13 +51,13 @@ function ContentCard({
 }) {
   return (
     <div
-      className="absolute top-[15vh] w-[88%] sm:w-[52%]"
-      style={{ zIndex: 3, [side]: "2vw" } as React.CSSProperties}
+      className="absolute top-[18vh] w-[86%] max-w-[440px] sm:w-[40%]"
+      style={{ zIndex: 3, [side]: "3vw" } as React.CSSProperties}
     >
-      <ImgPlaceholder label={imageLabel} className="h-[45vh] w-full" />
-      <div className="px-6 py-5" style={{ background: "rgba(100,30,20,0.7)" }}>
+      <ImgPlaceholder label={imageLabel} className="h-[26vh] w-full sm:h-[32vh]" />
+      <div className="px-5 py-4" style={{ background: "rgba(100,30,20,0.7)" }}>
         <p
-          className="font-body text-[15px] leading-[1.7]"
+          className="font-body text-[13px] leading-[1.6] sm:text-[14px]"
           style={{ color: CREAM }}
         >
           {TAGLINE}
@@ -87,121 +85,18 @@ export default function AboutPage() {
         background:
           "radial-gradient(ellipse at bottom right, #5c0000 0%, #1a0000 40%, #000000 100%)",
         color: CREAM,
-        overflowX: "hidden",
       }}
     >
       {/* Animated squares overlay (fixed, z-50) + hero badge (z-60) */}
       <AboutScrollSquares />
-      <ScrollExploreBadge />
 
       {/* SECTION 1 — Hero (squares' Stage 1 stage; no text) */}
       <section id="about-hero" className="relative min-h-screen" />
 
-      {/* SECTION 2 — Color Palette Statement (static decorative squares + lines) */}
-      <section
-        id="about-colorpalette"
-        className="relative min-h-screen"
-        style={{ zIndex: 1 }}
-      >
-        {/* Line 1 — yellow square (left edge) — "COLORPALATTE balances" */}
-        <div className="absolute" style={{ left: 0, top: "35vh" }}>
-          <Sq color={YELLOW} size={55} />
-        </div>
-        <div
-          className="absolute hidden sm:block"
-          style={{
-            left: 55,
-            top: "calc(35vh + 27px)",
-            width: "calc(12vw - 55px)",
-            height: 1,
-            background: "rgba(255,255,255,0.6)",
-          }}
-        />
-        <p
-          className="font-body absolute"
-          style={{
-            left: "12vw",
-            top: "calc(35vh + 6px)",
-            fontSize: "clamp(18px,2.5vw,28px)",
-            fontWeight: 400,
-            color: CREAM,
-          }}
-        >
-          COLORPALATTE balances
-        </p>
+      {/* SECTION 2 — Color Palette Statement (scroll-driven reveal + freeze) */}
+      <ColorPaletteSection />
 
-        {/* Line 2 — "BOLD EXPRESSION" — green square (right edge) */}
-        <p
-          className="font-body absolute"
-          style={{
-            left: "18vw",
-            top: "calc(45vh + 6px)",
-            fontSize: "clamp(18px,2.5vw,28px)",
-          }}
-        >
-          <span style={{ fontWeight: 900, fontStyle: "italic", color: CREAM }}>
-            BOLD
-          </span>{" "}
-          <span style={{ fontWeight: 400, letterSpacing: "0.08em" }}>
-            EXPRESSION
-          </span>
-        </p>
-        <div
-          className="absolute hidden sm:block"
-          style={{
-            right: 55,
-            top: "calc(45vh + 27px)",
-            width: "10vw",
-            height: 1,
-            background: "rgba(255,255,255,0.6)",
-          }}
-        />
-        <div className="absolute" style={{ right: 0, top: "45vh" }}>
-          <Sq color={GREEN} size={55} />
-        </div>
-
-        {/* Line 3 — red square (left) — "with Professional Presence" */}
-        <div className="absolute" style={{ left: "2vw", top: "58vh" }}>
-          <Sq color={RED} size={55} />
-        </div>
-        <div
-          className="absolute hidden sm:block"
-          style={{
-            left: "calc(2vw + 55px)",
-            top: "calc(58vh + 27px)",
-            width: "calc(10vw - 55px)",
-            height: 1,
-            background: "rgba(255,255,255,0.6)",
-          }}
-        />
-        <p
-          className="font-body absolute"
-          style={{
-            left: "12vw",
-            top: "calc(58vh + 6px)",
-            fontSize: "clamp(18px,2.5vw,28px)",
-            fontWeight: 400,
-            color: CREAM,
-          }}
-        >
-          with Professional Presence
-        </p>
-      </section>
-
-      {/* SECTION 3 — Logo Reveal (squares converge into it) */}
-      <section id="about-logo" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <div
-          className="absolute"
-          style={{
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%,-50%)",
-            width: "clamp(180px,30vw,380px)",
-          }}
-        >
-          <Logo className="w-full" />
-        </div>
-      </section>
+      
 
       {/* SECTION 4 — About Us Intro (two columns) */}
       <section id="about-us" className="relative min-h-screen px-[8vw]" style={{ zIndex: 1 }}>
@@ -240,85 +135,31 @@ export default function AboutPage() {
 
       {/* SECTIONS 5–7 — Service cards (content right, squares float left) */}
       <section id="about-service-1" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <SectionNav />
+        
         <ContentCard side="right" imageLabel="[ TEAM PHOTO — REPLACE ]" />
       </section>
       <section id="about-service-2" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <SectionNav />
+        
         <ContentCard side="right" imageLabel="[ WORKSPACE — REPLACE ]" />
       </section>
       <section id="about-service-3" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <SectionNav />
+        
         <ContentCard side="right" imageLabel="[ TEAM PHOTO — REPLACE ]" />
       </section>
 
       {/* SECTION 8 — Chaos (content LEFT, squares spread right) */}
       <section id="about-chaos" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <SectionNav />
+        
         <ContentCard side="left" imageLabel="[ WORKSPACE — REPLACE ]" />
       </section>
 
       {/* SECTION 9 — Reset (content LEFT, squares reset to a row on the right) */}
       <section id="about-reset" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        <SectionNav />
+        
         <ContentCard side="left" imageLabel="[ DESK / LAPTOP — REPLACE ]" />
       </section>
 
-      {/* SECTION 10 — Last Work preview + CLIENTS watermark */}
-      <section
-        id="about-lastwork"
-        className="relative min-h-screen overflow-hidden"
-        style={{ zIndex: 1 }}
-      >
-        <div
-          className="font-body absolute flex items-center gap-2 uppercase"
-          style={{
-            right: "4vw",
-            top: "3vh",
-            fontSize: 13,
-            letterSpacing: "0.1em",
-            color: "rgba(245,240,232,0.6)",
-          }}
-        >
-          Last Work
-          <span className="flex gap-[5px]">
-            <Sq color={YELLOW} size={16} />
-            <Sq color={RED} size={16} />
-            <Sq color={GREEN} size={16} />
-          </span>
-        </div>
 
-        {/* image mosaic, anchored to the bottom (slight crop) */}
-        <div className="absolute bottom-0 left-0 flex w-full">
-          {["Work 1", "Work 2", "Work 3", "Work 4"].map((w) => (
-            <ImgPlaceholder
-              key={w}
-              label={`[ ${w} — REPLACE ]`}
-              className="h-[35vh] w-[25vw]"
-            />
-          ))}
-        </div>
-
-        {/* giant CLIENTS watermark (stroke only) */}
-        <span
-          aria-hidden="true"
-          className="font-display absolute"
-          style={{
-            bottom: "-2vh",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 2,
-            fontSize: "clamp(80px,14vw,180px)",
-            fontWeight: 900,
-            letterSpacing: "0.05em",
-            color: "transparent",
-            WebkitTextStroke: "1px rgba(245,240,232,0.15)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          CLIENTS
-        </span>
-      </section>
     </div>
   );
 }
