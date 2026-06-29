@@ -42,7 +42,7 @@ export default async function ContactPage() {
           <div className="relative mt-14 flex flex-col items-center text-center">
             <FloatingSquares
               size={80}
-              className="-top-6 left-2 hidden sm:block"
+              className="-top-6 right-2 hidden sm:block"
             />
             <h1 className="display-statement text-cream relative z-10 text-[clamp(2.6rem,7vw,5.5rem)]">
               <RunsText runs={contact.heroStory} />

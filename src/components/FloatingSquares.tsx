@@ -18,7 +18,12 @@ export default function FloatingSquares({ size = 80, className = "" }: Props) {
     <div
       aria-hidden="true"
       className={`pointer-events-none absolute ${className}`}
-      style={{ zIndex: 0, width: size * 1.6, height: size * 1.6 }}
+      style={{
+        zIndex: 0,
+        width: size * 1.6,
+        height: size * 1.6,
+        filter: "blur(4px)",
+      }}
     >
       {/* orange — rotated 15deg, upper-left, slow float */}
       <span

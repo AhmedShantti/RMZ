@@ -37,7 +37,7 @@ export default async function CareersPage() {
             <div className="relative w-fit">
               <FloatingSquares
                 size={70}
-                className="-left-5 -top-9 hidden sm:block"
+                className="-right-5 -top-9 hidden sm:block"
               />
               <h1 className="display-statement text-cream relative z-10 max-w-4xl text-[clamp(2.6rem,7vw,5.5rem)]">
                 <RunsText runs={careers.pageTitle} />
