@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AboutScrollSquares from "@/components/AboutScrollSquares";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import AccentBlocks from "@/components/AccentBlocks";
@@ -23,6 +24,7 @@ export default async function AboutPage() {
 
   return (
     <>
+      <AboutScrollSquares />
       <PageIntro
         kicker="About"
         title={<RunsText runs={about.pageTitle} />}
