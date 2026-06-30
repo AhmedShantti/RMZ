@@ -64,13 +64,18 @@ export default function ColorPaletteSection() {
     }
 
     let raf = 0;
+    let lastP = -1;
     const loop = () => {
       const sec = sectionRef.current;
       if (sec) {
         const rect = sec.getBoundingClientRect();
         const travel = rect.height - window.innerHeight;
         const p = travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 0;
-        apply(p);
+        // Skip writes when the scroll position is unchanged (idle frames).
+        if (Math.abs(p - lastP) > 0.0001) {
+          lastP = p;
+          apply(p);
+        }
       }
       raf = requestAnimationFrame(loop);
     };

@@ -128,11 +128,12 @@ export default function AboutScrollSquares() {
       [yellowRef.current, YELLOW],
     ];
 
+    // Transform-only (translate + scale + rotate) so the browser composites on
+    // the GPU — no per-frame layout/paint (animating width/height would thrash
+    // layout and stutter the smooth scroll). Base size is 100px; scale to size.
     const write = (el: HTMLDivElement | null, s: State) => {
       if (!el) return;
-      el.style.width = `${s.size}px`;
-      el.style.height = `${s.size}px`;
-      el.style.transform = `translate3d(${s.x}px, ${s.y}px, 0) rotate(${s.rotate}deg)`;
+      el.style.transform = `translate3d(${s.x}px, ${s.y}px, 0) scale(${s.size / 100}) rotate(${s.rotate}deg)`;
     };
 
     const render = (p: number) => {
@@ -150,11 +151,17 @@ export default function AboutScrollSquares() {
     }
 
     let raf = 0;
+    let lastP = -1;
     const loop = () => {
       const max =
         document.documentElement.scrollHeight - window.innerHeight;
       const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      render(p);
+      // Only repaint when the scroll position actually moved — when idle, leave
+      // the GPU layers untouched so the rAF loop costs nothing.
+      if (Math.abs(p - lastP) > 0.0001) {
+        lastP = p;
+        render(p);
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -165,9 +172,13 @@ export default function AboutScrollSquares() {
     position: "absolute",
     top: 0,
     left: 0,
-    width: 110,
-    height: 110,
+    width: 100,
+    height: 100,
+    transformOrigin: "0 0",
     borderRadius: 0,
+    // Blur the small square (cheap, GPU-cached) rather than the full-viewport
+    // container (which would re-rasterise every frame).
+    filter: "blur(2px)",
     willChange: "transform",
   };
 
@@ -176,8 +187,9 @@ export default function AboutScrollSquares() {
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 overflow-hidden"
       // Behind the section content (sections are z-index 1), above the page
-      // background, with a soft blur.
-      style={{ zIndex: 0, filter: "blur(2px)" }}
+      // background. Blur lives on each square (cheaper than blurring the whole
+      // fixed layer every frame).
+      style={{ zIndex: 0 }}
     >
       <div
         ref={greenRef}
