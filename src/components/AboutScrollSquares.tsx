@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
+import { useAboutProgress } from "./AboutAnimationContext";
 
 /**
  * AboutScrollSquares — a scroll-driven, 7-stage animation of the three brand
@@ -28,16 +29,21 @@ import { prefersReducedMotion } from "@/lib/reducedMotion";
  *   7 (95→100%)   snap back to a composed centred row, 105px, Yellow·Red·Green
  *
  * prefers-reduced-motion → render Stage 1 permanently (no scroll animation).
+ *
+ * NOTE: KF, State, GREEN, RED, YELLOW, and sample() are exported so other
+ * components (e.g. ColorPaletteSection) can read the exact same keyframe
+ * data and position themselves relative to the real square positions at any
+ * given scroll progress, instead of duplicating/guessing positions.
  */
 
-const COLORS = {
+export const COLORS = {
   green: "#8dc63f",
   red: "#e85d1e",
   yellow: "#fdc82f",
 } as const;
 
-type Vec = { x: number; y: number };
-type KF = {
+export type Vec = { x: number; y: number };
+export type KF = {
   at: number; // scroll progress 0..1
   size: number; // px
   rotate: number; // deg
@@ -60,7 +66,7 @@ const row = (
 // ── Keyframes per square ──────────────────────────────────────────────────
 // Order in stage 1 row: Green(0) Red(1) Yellow(2). In stage 7: Yellow(0) Red(1) Green(2).
 
-const GREEN: KF[] = [
+export const GREEN: KF[] = [
   { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: w - 0.02 * w - 70, y: 0.18 * h }) },
   { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 0) },
@@ -71,7 +77,7 @@ const GREEN: KF[] = [
   { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 2) },
 ];
 
-const RED: KF[] = [
+export const RED: KF[] = [
   { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.38 * h }) },
   { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 1) },
@@ -82,7 +88,7 @@ const RED: KF[] = [
   { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 1) },
 ];
 
-const YELLOW: KF[] = [
+export const YELLOW: KF[] = [
   { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.08 * h }) },
   { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 2) },
@@ -93,12 +99,12 @@ const YELLOW: KF[] = [
   { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 0) },
 ];
 
-type State = { x: number; y: number; size: number; rotate: number };
+export type State = { x: number; y: number; size: number; rotate: number };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** Sample a keyframe track at progress p, smoothstep-eased between keyframes. */
-function sample(kfs: KF[], p: number, vw: number, vh: number): State {
+export function sample(kfs: KF[], p: number, vw: number, vh: number): State {
   let i = 0;
   while (i < kfs.length - 2 && p > kfs[i + 1].at) i++;
   const k0 = kfs[i];
@@ -120,6 +126,9 @@ export default function AboutScrollSquares() {
   const greenRef = useRef<HTMLDivElement>(null);
   const redRef = useRef<HTMLDivElement>(null);
   const yellowRef = useRef<HTMLDivElement>(null);
+
+  // Hooks must always be called unconditionally, at the top level.
+  const progress = useAboutProgress();
 
   useEffect(() => {
     const pairs: [HTMLDivElement | null, KF[]][] = [
@@ -150,23 +159,8 @@ export default function AboutScrollSquares() {
       return () => window.removeEventListener("resize", onResize);
     }
 
-    let raf = 0;
-    let lastP = -1;
-    const loop = () => {
-      const max =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      // Only repaint when the scroll position actually moved — when idle, leave
-      // the GPU layers untouched so the rAF loop costs nothing.
-      if (Math.abs(p - lastP) > 0.0001) {
-        lastP = p;
-        render(p);
-      }
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, []);
+    render(progress);
+  }, [progress]);
 
   const base: React.CSSProperties = {
     position: "absolute",
@@ -176,9 +170,6 @@ export default function AboutScrollSquares() {
     height: 100,
     transformOrigin: "0 0",
     borderRadius: 0,
-    // Blur the small square (cheap, GPU-cached) rather than the full-viewport
-    // container (which would re-rasterise every frame).
-    filter: "blur(2px)",
     willChange: "transform",
   };
 

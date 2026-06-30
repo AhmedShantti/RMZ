@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import AboutScrollSquares from "@/components/AboutScrollSquares";
 import ColorPaletteSection from "@/components/ColorPaletteSection";
+import FadeInSection from "@/components/FadeInSection";
 import { getMeta } from "@/lib/cms";
+import AboutAnimationController from "@/components/AboutAnimationController";
+import PageIntro from "@/components/PageIntro";
+import Reveal from "@/components/Reveal";
+import AccentBlocks from "@/components/AccentBlocks";
+import RunsText from "@/components/RunsText";
+import { getAbout } from "@/lib/cms"
+
 
 export async function generateMetadata(): Promise<Metadata> {
   const m = await getMeta("aboutContent", {
@@ -26,17 +34,7 @@ const MUTED = "rgba(245,240,232,0.7)";
 
 const TAGLINE =
   "Through strategy, creativity, and smart marketing solutions, we help brands grow, stand out, and connect with their audience.";
-const ABOUT_BODY =
-  "Powered by Creativity. We are a full-service digital agency blending strategy with bold design to help brands stand out, connect deeply, and grow with purpose in a fast-moving world.";
 
-/** Project thumbnail labels (placeholders — swap for real photos). */
-const WORK_CARDS = [
-  "[ TEAM PHOTO — REPLACE ]",
-  "[ WORKSPACE — REPLACE ]",
-  "[ TEAM PHOTO — REPLACE ]",
-  "[ WORKSPACE — REPLACE ]",
-  "[ DESK / LAPTOP — REPLACE ]",
-];
 
 /** Labeled dark image placeholder (project convention; swap for real assets). */
 function ImgPlaceholder({ label, className = "" }: { label: string; className?: string }) {
@@ -88,77 +86,88 @@ function Sq({ color, size = 22 }: { color: string; size?: number }) {
   );
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const about = await getAbout();
   return (
+    <AboutAnimationController>
     <div
       className="relative"
       style={{
         background:
           "radial-gradient(ellipse at bottom right, #5c0000 0%, #1a0000 40%, #000000 100%)",
         color: CREAM,
-      }}
-    >
+      }}>
+    
       {/* Animated squares overlay (fixed, z-50) + hero badge (z-60) */}
       <AboutScrollSquares />
 
       {/* SECTION 1 — Hero (squares' Stage 1 stage; no text) */}
       <section id="about-hero" className="relative min-h-screen" />
 
-      {/* SECTION 2 — Color Palette Statement (scroll-driven reveal + freeze) */}
+      {/* SECTION 2 — Color Palette Statement (scroll-driven reveal + freeze).
+          Trimmed from 190vh: the text now fades out by ~20% of total scroll
+          progress (see ColorPaletteSection's HARD_CUTOFF), so the old height
+          left a long stretch of dead scrolling before the content below. */}
       <ColorPaletteSection />
 
-      
+      <PageIntro
+        kicker="About"
+        title={<RunsText runs={about.pageTitle} />}
+        lede={about.lede}
+      />
 
-      {/* SECTION 4 — About Us Intro (two columns) */}
-      <section id="about-us" className="relative min-h-screen px-[8vw]" style={{ zIndex: 1 }}>
-        {/* Left column */}
-        <div className="absolute left-[8vw] w-[45%]" style={{ top: "20vh" }}>
-          <div className="flex items-center gap-3">
-            <h2
-              className="font-body"
-              style={{ fontSize: "clamp(24px,3vw,36px)", fontWeight: 700, color: CREAM }}
-            >
-              About Us
-            </h2>
-            <span className="flex gap-1.5">
-              <Sq color={YELLOW} /> <Sq color={RED} /> <Sq color={GREEN} />
-            </span>
-          </div>
-          <p
-            className="font-body mt-[10vh] max-w-[420px]"
-            style={{ fontSize: 14, lineHeight: 1.8, color: MUTED }}
-          >
-            {ABOUT_BODY}
-          </p>
-        </div>
-
-        {/* Right column — kept below the square zone (top 0–30vh left clear) */}
-        <div className="absolute left-1/2 w-[45%]" style={{ top: "35vh" }}>
-          <p
-            className="font-body max-w-[420px]"
-            style={{ fontSize: 14, lineHeight: 1.8, color: MUTED }}
-          >
-            {TAGLINE} We challenge ideas to improve them, not to disrupt — and we
-            connect people, perspectives and possibilities into work that lasts.
-          </p>
-        </div>
-      </section>
-
-      {/* SECTIONS 5–9 — Project thumbnails in a consistent responsive grid
-          (1 col mobile, 2 col desktop; equal-size 16/9 cards, even gaps). */}
-      <section
-        id="about-work"
-        className="relative px-[8vw] py-24 sm:py-32"
-        style={{ zIndex: 1 }}
-      >
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-          {WORK_CARDS.map((label, i) => (
-            <ContentCard key={`${label}-${i}`} imageLabel={label} />
+      <div className="px-5 pb-12 sm:px-8" style={{ zIndex: 2 }}>
+        <div className="mx-auto flex max-w-6xl flex-col">
+          {about.sections.map((s, i) => (
+            <Reveal key={s.kicker}>
+              <section className="grid gap-6 border-t border-cream-dim/15 py-14 sm:py-20 lg:grid-cols-[280px_1fr] lg:gap-16">
+                <div className="flex items-start gap-4">
+                  <span className="font-body text-rebel-red text-xs tabular-nums">
+                    0{i + 1}
+                  </span>
+                  <span className="font-body text-cream-dim text-xs uppercase tracking-[0.3em]">
+                    {s.kicker}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-6">
+                  <h2 className="font-display text-cream text-[clamp(1.9rem,4.5vw,3.2rem)] italic leading-tight">
+                    {s.title}
+                  </h2>
+                  {s.body.map((p) => (
+                    <p
+                      key={p.slice(0, 24)}
+                      className="font-body text-cream-dim max-w-2xl text-lg leading-relaxed"
+                    >
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              </section>
+            </Reveal>
           ))}
         </div>
+      </div>
+
+      {/* full-bleed editorial closer (logo deck p.9) */}
+      <section className="relative overflow-hidden px-5 py-28 sm:px-8 sm:py-40">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(90% 90% at 100% 100%, color-mix(in srgb, var(--rebel-red) 28%, transparent), transparent 55%)",
+          }}
+        />
+        <Reveal className="relative mx-auto max-w-5xl">
+          <AccentBlocks size={14} gap={8} className="mb-8" />
+          <p className="display-statement text-cream text-[clamp(2.2rem,6vw,4.8rem)]">
+            <RunsText runs={about.closingStatement} />
+          </p>
+        </Reveal>
       </section>
 
 
     </div>
+    </AboutAnimationController>
   );
 }
