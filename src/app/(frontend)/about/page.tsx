@@ -29,6 +29,15 @@ const TAGLINE =
 const ABOUT_BODY =
   "Powered by Creativity. We are a full-service digital agency blending strategy with bold design to help brands stand out, connect deeply, and grow with purpose in a fast-moving world.";
 
+/** Project thumbnail labels (placeholders — swap for real photos). */
+const WORK_CARDS = [
+  "[ TEAM PHOTO — REPLACE ]",
+  "[ WORKSPACE — REPLACE ]",
+  "[ TEAM PHOTO — REPLACE ]",
+  "[ WORKSPACE — REPLACE ]",
+  "[ DESK / LAPTOP — REPLACE ]",
+];
+
 /** Labeled dark image placeholder (project convention; swap for real assets). */
 function ImgPlaceholder({ label, className = "" }: { label: string; className?: string }) {
   return (
@@ -41,23 +50,25 @@ function ImgPlaceholder({ label, className = "" }: { label: string; className?: 
   );
 }
 
-/** Image + dark-red caption card used in sections 5–9. */
-function ContentCard({
-  side,
-  imageLabel,
-}: {
-  side: "left" | "right";
-  imageLabel: string;
-}) {
+/**
+ * Project thumbnail card — identical 16/9 image box + fixed-height caption so
+ * every card is the same shape and equal height in the grid.
+ */
+function ContentCard({ imageLabel }: { imageLabel: string }) {
   return (
-    <div
-      className="absolute top-[18vh] w-[86%] max-w-[440px] sm:w-[40%]"
-      style={{ zIndex: 3, [side]: "3vw" } as React.CSSProperties}
-    >
-      <ImgPlaceholder label={imageLabel} className="h-[26vh] w-full sm:h-[32vh]" />
-      <div className="px-5 py-4" style={{ background: "rgba(100,30,20,0.7)" }}>
+    <div className="flex h-full flex-col overflow-hidden rounded-lg">
+      {/* 16/9 image box. For a real photo, replace <ImgPlaceholder> with:
+          <Image src={…} alt={…} fill className="object-cover"
+                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw" /> */}
+      <div className="relative aspect-[16/9] w-full">
+        <ImgPlaceholder label={imageLabel} className="absolute inset-0" />
+      </div>
+      <div
+        className="flex min-h-[88px] flex-1 flex-col justify-center p-6"
+        style={{ background: "rgba(100,30,20,0.7)" }}
+      >
         <p
-          className="font-body text-[13px] leading-[1.6] sm:text-[14px]"
+          className="font-body line-clamp-3 text-[14px] leading-[1.6]"
           style={{ color: CREAM }}
         >
           {TAGLINE}
@@ -133,30 +144,18 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* SECTIONS 5–7 — Service cards (content right, squares float left) */}
-      <section id="about-service-1" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        
-        <ContentCard side="right" imageLabel="[ TEAM PHOTO — REPLACE ]" />
-      </section>
-      <section id="about-service-2" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        
-        <ContentCard side="right" imageLabel="[ WORKSPACE — REPLACE ]" />
-      </section>
-      <section id="about-service-3" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        
-        <ContentCard side="right" imageLabel="[ TEAM PHOTO — REPLACE ]" />
-      </section>
-
-      {/* SECTION 8 — Chaos (content LEFT, squares spread right) */}
-      <section id="about-chaos" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        
-        <ContentCard side="left" imageLabel="[ WORKSPACE — REPLACE ]" />
-      </section>
-
-      {/* SECTION 9 — Reset (content LEFT, squares reset to a row on the right) */}
-      <section id="about-reset" className="relative min-h-screen" style={{ zIndex: 1 }}>
-        
-        <ContentCard side="left" imageLabel="[ DESK / LAPTOP — REPLACE ]" />
+      {/* SECTIONS 5–9 — Project thumbnails in a consistent responsive grid
+          (1 col mobile, 2 col desktop; equal-size 16/9 cards, even gaps). */}
+      <section
+        id="about-work"
+        className="relative px-[8vw] py-24 sm:py-32"
+        style={{ zIndex: 1 }}
+      >
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+          {WORK_CARDS.map((label, i) => (
+            <ContentCard key={`${label}-${i}`} imageLabel={label} />
+          ))}
+        </div>
       </section>
 
 
