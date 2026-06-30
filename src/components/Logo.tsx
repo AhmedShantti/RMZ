@@ -20,7 +20,7 @@ export default function Logo({ variant = "mark", className = "" }: Props) {
   return (
     <span className={`inline-flex flex-col items-center ${className}`}>
       <Image
-        src="/LOGO.svg"
+        src="/LOGO-b.svg"
         alt="Rebel Mind Zone"
         width={550}
         height={178}

@@ -251,6 +251,9 @@ export interface ContactSubmission {
   name: string;
   email: string;
   message: string;
+  company?: string | null;
+  phone?: string | null;
+  country?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -420,6 +423,9 @@ export interface ContactSubmissionsSelect<T extends boolean = true> {
   name?: T;
   email?: T;
   message?: T;
+  company?: T;
+  phone?: T;
+  country?: T;
   updatedAt?: T;
   createdAt?: T;
 }

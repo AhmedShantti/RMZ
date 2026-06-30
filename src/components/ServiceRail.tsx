@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useReducedMotion } from "@/lib/reducedMotion";
 
@@ -143,6 +144,22 @@ export default function ServiceRail({ services }: { services: RailService[] }) {
                 </li>
               ))}
             </ul>
+
+            {/* Explore button — sharp rectangle (radius 0), dark red (Stage 6) */}
+            <Link
+              href="/contact"
+              className="font-body text-cream bg-rebel-red mt-10 inline-flex w-fit items-center gap-2 rounded-none px-7 py-3 text-sm uppercase tracking-wider transition-opacity hover:opacity-90"
+            >
+              Explore
+              <span aria-hidden="true">→</span>
+            </Link>
+
+            {/* TODO: Replace with real client work photo */}
+            <div className="mt-8 flex aspect-video w-full max-w-md items-center justify-center bg-[#1a1a1a]">
+              <span className="font-body text-sm text-[#666]">
+                [ REPLACE WITH REAL WORK IMAGE ]
+              </span>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>

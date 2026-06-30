@@ -249,3 +249,33 @@ The contact form now stores each message in the CMS instead of opening a `mailto
   + accent squares + ®) via `next/image` (`unoptimized`). The favicon (`app/icon.svg`) is still
   the earlier placeholder — swap it too if a favicon-specific asset is provided.
 - Lenis intercepts programmatic `scrollTo`, which only affects test tooling, not users.
+
+---
+
+## Figma blend redesign (branch `Redesigned`, 10 stages)
+
+Blended the site with the Figma references (text specs — the `/RMZ-figma/` images were not in
+the repo). Kept all brand colors (existing `--acc-*` tokens) + fonts; changed only layouts,
+components, and imagery.
+
+- **S1 ClientsCollage** (home) — 3 overlapping rotated portrait placeholders + sticker badges
+  over a faded `CLIENTS` watermark (`SectionWatermark`). Above markets/CTA.
+- **S2 VideoSection** (home) — 16:9 video placeholder flanked by green/orange vertical-text
+  strips, shared watermark. Mobile: strips → 50px horizontal bars.
+- **S3 MarketsBlock** (home) — 40/60 two-column: stacked uppercase "LET'S CREATE A NEW / STORY"
+  + 3 sharp accent squares (left) / 2×2 markets (right).
+- **S4 Contact + `FloatingSquares`** — centred logo, squares framing the heading, info bar
+  (address · email · arrow), 2-col form (+Company/Phone/Country, stored), cream pill submit.
+- **S5 Services hero** — full-bleed dark image placeholder, overlay gradient, title bottom-left.
+- **S6 ServiceRail** — Explore button squared-off (radius 0); stock image → labeled placeholder.
+- **S7 Portfolio** — varied-height CSS-multi-column masonry; name overlay; hover scale + darken.
+- **S8 Careers hero** — reuses `FloatingSquares` to frame the title.
+- **S9 Image audit** — no real stock photos exist (only `LOGO.svg`); standardized every
+  placeholder to #1a1a1a / #666 / 14px + TODO + "— REPLACE" labels.
+- **S10 Responsive + cleanup** — swept 375 / 768 / 1280 on every page: no horizontal scroll
+  anywhere (watermarks clipped by `overflow-hidden`), collage fits at 768, contact form 2-col at
+  768, markets 2×2 at 768. No `console.log`, eslint clean, `npm run build` clean. No fixes needed.
+
+**Redesign placeholders still to supply:** client photos ×3, showreel video, service hero image,
+service work image, portfolio project images (all labeled). Contact office address is hardcoded
+(`OFFICE_ADDRESS` in `contact/page.tsx`) with a TODO to move into `siteSettings`.

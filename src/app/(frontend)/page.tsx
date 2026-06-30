@@ -2,6 +2,8 @@ import IntroLoader from "@/components/IntroLoader";
 import HeroCursorField from "@/components/HeroCursorField";
 import WordmarkMoment from "@/components/WordmarkMoment";
 import ServicesTeaser from "@/components/ServicesTeaser";
+import ClientsCollage from "@/components/ClientsCollage";
+import VideoSection from "@/components/VideoSection";
 import MarketsBlock from "@/components/MarketsBlock";
 import { getHome, getServices, getContact, getSiteSettings } from "@/lib/cms";
 
@@ -33,6 +35,8 @@ export default async function Home() {
       />
       <WordmarkMoment />
       <ServicesTeaser services={featured} />
+      <ClientsCollage />
+      <VideoSection />
       <MarketsBlock
         asTeaser
         story={contact.heroStory}

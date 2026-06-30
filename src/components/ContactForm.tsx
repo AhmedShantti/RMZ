@@ -3,13 +3,13 @@
 import { useId, useRef, useState } from "react";
 
 /**
- * Contact form (TASK.md §5 /contact). Client-side validation, accessible
- * labels + error wiring, and a success/error state written in the interface's
- * own voice (no fake apology copy). All microcopy + the recipient are fed from
- * the CMS via the `form` prop.
+ * Contact form (Redesigning Stage 4) — a 2-column "Book A Meeting" layout:
+ *   Full Name (full width) · Email | Company · Phone | Country · Brief (full).
+ * Full-width cream pill submit button.
  *
- * Submit POSTs to the Payload REST endpoint `/api/contact-submissions`, so each
- * message is stored in the CMS and appears in the admin dashboard.
+ * Required + validated: name, email, message (existing rules + CMS microcopy).
+ * Company / phone / country are optional. Submit POSTs to the Payload REST
+ * endpoint `/api/contact-submissions`, so each message is stored in the CMS.
  */
 type FormConfig = {
   recipientEmail: string;
@@ -25,19 +25,49 @@ type FormConfig = {
   };
 };
 
+type Values = {
+  name: string;
+  email: string;
+  company: string;
+  phone: string;
+  country: string;
+  message: string;
+};
 type Errors = Partial<Record<"name" | "email" | "message", string>>;
 type Status = "idle" | "loading" | "error" | "success";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const COUNTRIES = [
+  "Egypt",
+  "Saudi Arabia",
+  "United Arab Emirates",
+  "Kuwait",
+  "Qatar",
+  "Bahrain",
+  "Oman",
+  "Jordan",
+  "Lebanon",
+  "Other",
+];
+
+const EMPTY: Values = {
+  name: "",
+  email: "",
+  company: "",
+  phone: "",
+  country: "",
+  message: "",
+};
+
 export default function ContactForm({ form }: { form: FormConfig }) {
   const uid = useId();
-  const [values, setValues] = useState({ name: "", email: "", message: "" });
+  const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
   const summaryRef = useRef<HTMLParagraphElement>(null);
 
-  const validate = (v: typeof values): Errors => {
+  const validate = (v: Values): Errors => {
     const e: Errors = {};
     if (!v.name.trim()) e.name = form.fieldErrors.nameRequired;
     if (!v.email.trim()) e.email = form.fieldErrors.emailRequired;
@@ -47,12 +77,17 @@ export default function ContactForm({ form }: { form: FormConfig }) {
     return e;
   };
 
-  const field = (k: keyof typeof values) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setValues((p) => ({ ...p, [k]: e.target.value }));
-    if (errors[k]) setErrors((p) => ({ ...p, [k]: undefined }));
-  };
+  const field =
+    (k: keyof Values) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >,
+    ) => {
+      setValues((p) => ({ ...p, [k]: e.target.value }));
+      if (k in errors && errors[k as keyof Errors])
+        setErrors((p) => ({ ...p, [k]: undefined }));
+    };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,12 +108,15 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         body: JSON.stringify({
           name: values.name,
           email: values.email,
+          company: values.company,
+          phone: values.phone,
+          country: values.country,
           message: values.message,
         }),
       });
       if (!response.ok) throw new Error("Submission failed");
       setStatus("success");
-      setValues({ name: "", email: "", message: "" });
+      setValues(EMPTY);
     } catch (err) {
       console.error("Contact form error:", err);
       setStatus("error");
@@ -110,23 +148,28 @@ export default function ContactForm({ form }: { form: FormConfig }) {
   }
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-6">
+    <form
+      noValidate
+      onSubmit={submit}
+      className="grid grid-cols-1 gap-6 md:grid-cols-2"
+    >
       {status === "error" && (
         <p
           ref={summaryRef}
           tabIndex={-1}
           role="alert"
-          className="font-body text-rebel-red text-sm"
+          className="font-body text-rebel-red text-sm md:col-span-2"
         >
           {form.errorSummary}
         </p>
       )}
 
       <Field
-        label="Name"
+        label="Full Name"
         id={id("name")}
         errId={errId("name")}
         error={errors.name}
+        className="md:col-span-2"
       >
         <input
           id={id("name")}
@@ -160,11 +203,53 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         />
       </Field>
 
+      <Field label="Company Name" id={id("company")} errId={errId("company")}>
+        <input
+          id={id("company")}
+          name="company"
+          type="text"
+          autoComplete="organization"
+          value={values.company}
+          onChange={field("company")}
+          className="rmz-input"
+        />
+      </Field>
+
+      <Field label="Phone Number" id={id("phone")} errId={errId("phone")}>
+        <input
+          id={id("phone")}
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          value={values.phone}
+          onChange={field("phone")}
+          className="rmz-input"
+        />
+      </Field>
+
+      <Field label="Country" id={id("country")} errId={errId("country")}>
+        <select
+          id={id("country")}
+          name="country"
+          value={values.country}
+          onChange={field("country")}
+          className="rmz-input"
+        >
+          <option value="">Select country</option>
+          {COUNTRIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </Field>
+
       <Field
-        label="Message"
+        label="Give us a brief about your project"
         id={id("message")}
         errId={errId("message")}
         error={errors.message}
+        className="md:col-span-2"
       >
         <textarea
           id={id("message")}
@@ -180,12 +265,11 @@ export default function ContactForm({ form }: { form: FormConfig }) {
 
       <button
         type="submit"
-        className="group border-cream/25 hover:border-rebel-red hover:text-rebel-red mt-2 flex w-fit cursor-pointer items-center gap-3 border px-6 py-3 transition-colors"
+        disabled={status === "loading"}
+        aria-busy={status === "loading"}
+        className="font-body bg-cream text-ink mt-2 h-[64px] w-full cursor-pointer rounded-full text-base font-semibold uppercase tracking-wider transition-opacity hover:opacity-90 disabled:opacity-60 md:col-span-2"
       >
-        <span className="font-display text-lg italic">{form.submitLabel}</span>
-        <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">
-          →
-        </span>
+        {status === "loading" ? "Sending…" : form.submitLabel}
       </button>
     </form>
   );
@@ -197,15 +281,17 @@ function Field({
   errId,
   error,
   children,
+  className = "",
 }: {
   label: string;
   id: string;
   errId: string;
   error?: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex flex-col gap-2 ${className}`}>
       <label
         htmlFor={id}
         className="font-body text-cream-dim text-xs uppercase tracking-[0.2em]"

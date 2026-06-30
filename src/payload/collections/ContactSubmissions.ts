@@ -40,6 +40,10 @@ export const ContactSubmissions: CollectionConfig = {
       required: true,
       label: "Message",
     },
+    // Optional fields added with the contact form redesign (Stage 4).
+    { name: "company", type: "text", label: "Company Name" },
+    { name: "phone", type: "text", label: "Phone Number" },
+    { name: "country", type: "text", label: "Country" },
   ],
   timestamps: true,
 };
