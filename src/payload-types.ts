@@ -100,6 +100,7 @@ export interface Config {
     servicesContent: ServicesContent;
     contactContent: ContactContent;
     careersContent: CareersContent;
+    portfolioContent: PortfolioContent;
     legalPrivacy: LegalPrivacy;
     legalTerms: LegalTerm;
   };
@@ -110,6 +111,7 @@ export interface Config {
     servicesContent: ServicesContentSelect<false> | ServicesContentSelect<true>;
     contactContent: ContactContentSelect<false> | ContactContentSelect<true>;
     careersContent: CareersContentSelect<false> | CareersContentSelect<true>;
+    portfolioContent: PortfolioContentSelect<false> | PortfolioContentSelect<true>;
     legalPrivacy: LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     legalTerms: LegalTermsSelect<false> | LegalTermsSelect<true>;
   };
@@ -543,6 +545,22 @@ export interface HomeContent {
    * The small line under the hero statement.
    */
   heroSubline?: string | null;
+  showreelLeftLabel?: string | null;
+  showreelRightLabel?: string | null;
+  /**
+   * Portrait client photos with optional sticker badges. Leave empty to use the built-in placeholders.
+   */
+  clients?:
+    | {
+        /**
+         * Shown until a real photo replaces the placeholder.
+         */
+        label?: string | null;
+        badgeName?: string | null;
+        badgeAccent?: ('none' | 'orange' | 'green') | null;
+        id?: string | null;
+      }[]
+    | null;
   teaserCtaLabel?: string | null;
   /**
    * Optional overrides for this page's metadata. Blank = defaults.
@@ -822,6 +840,49 @@ export interface CareersContent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolioContent".
+ */
+export interface PortfolioContent {
+  id: number;
+  /**
+   * Each row is one styled fragment of the line, in order. Space is added between runs unless 'No space before' is set.
+   */
+  pageTitle?:
+    | {
+        text: string;
+        style: 'normal' | 'italic' | 'bold' | 'bold-italic';
+        tone: 'cream' | 'dim' | 'red';
+        upper?: boolean | null;
+        noSpaceBefore?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The intro line under the page title.
+   */
+  lede?: string | null;
+  /**
+   * Optional overrides for this page's metadata. Blank = defaults.
+   */
+  seo?: {
+    /**
+     * Overrides the <title>.
+     */
+    title?: string | null;
+    /**
+     * Overrides the meta description / OG description.
+     */
+    description?: string | null;
+    /**
+     * Overrides the Open Graph image.
+     */
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legalPrivacy".
  */
 export interface LegalPrivacy {
@@ -975,6 +1036,16 @@ export interface HomeContentSelect<T extends boolean = true> {
         id?: T;
       };
   heroSubline?: T;
+  showreelLeftLabel?: T;
+  showreelRightLabel?: T;
+  clients?:
+    | T
+    | {
+        label?: T;
+        badgeName?: T;
+        badgeAccent?: T;
+        id?: T;
+      };
   teaserCtaLabel?: T;
   seo?:
     | T
@@ -1157,6 +1228,33 @@ export interface CareersContentSelect<T extends boolean = true> {
   openApplicationHeading?: T;
   ctaLabel?: T;
   ctaTarget?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolioContent_select".
+ */
+export interface PortfolioContentSelect<T extends boolean = true> {
+  pageTitle?:
+    | T
+    | {
+        text?: T;
+        style?: T;
+        tone?: T;
+        upper?: T;
+        noSpaceBefore?: T;
+        id?: T;
+      };
+  lede?: T;
   seo?:
     | T
     | {

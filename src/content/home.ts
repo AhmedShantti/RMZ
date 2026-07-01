@@ -1,5 +1,11 @@
 import type { Run } from "@/components/RunsText";
 
+export type ClientPhoto = {
+  label: string;
+  badgeName: string;
+  badgeAccent: "orange" | "green" | "none";
+};
+
 /**
  * Home page content — the canonical default (matches what the page rendered
  * before the CMS). Used as the component fallback AND as the seed source for
@@ -19,4 +25,16 @@ export const homeContent = {
   heroSubline:
     "A creative studio for brands with the courage to challenge the ordinary.",
   teaserCtaLabel: "Start a project",
+  // Showreel section — the two coloured vertical-text strips flanking the video.
+  showreel: {
+    leftLabel: "How to Success",
+    rightLabel: "How to be Rebel",
+  },
+  // Clients collage — three portrait photos with optional sticker badges. Photos
+  // stay placeholder until real imagery lands; the labels/badges are editable.
+  clients: [
+    { label: "[ CLIENT PHOTO 1 — REPLACE ]", badgeName: "CLIENT NAME", badgeAccent: "orange" },
+    { label: "[ CLIENT PHOTO 2 — REPLACE ]", badgeName: "", badgeAccent: "none" },
+    { label: "[ CLIENT PHOTO 3 — REPLACE ]", badgeName: "CLIENT NAME", badgeAccent: "green" },
+  ] as ClientPhoto[],
 };

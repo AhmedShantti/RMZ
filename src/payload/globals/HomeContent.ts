@@ -37,6 +37,58 @@ export const HomeContent: GlobalConfig = {
       ],
     },
     {
+      type: "collapsible",
+      label: "Showreel",
+      admin: {
+        description: "The two coloured vertical-text strips beside the video.",
+      },
+      fields: [
+        {
+          name: "showreelLeftLabel",
+          type: "text",
+          label: "Left strip (green)",
+          defaultValue: "How to Success",
+        },
+        {
+          name: "showreelRightLabel",
+          type: "text",
+          label: "Right strip (orange)",
+          defaultValue: "How to be Rebel",
+        },
+      ],
+    },
+    {
+      name: "clients",
+      type: "array",
+      label: "Clients collage",
+      admin: {
+        description:
+          "Portrait client photos with optional sticker badges. Leave empty to use the built-in placeholders.",
+      },
+      fields: [
+        {
+          name: "label",
+          type: "text",
+          label: "Placeholder caption",
+          admin: {
+            description: "Shown until a real photo replaces the placeholder.",
+          },
+        },
+        { name: "badgeName", type: "text", label: "Badge name (optional)" },
+        {
+          name: "badgeAccent",
+          type: "select",
+          label: "Badge colour",
+          defaultValue: "none",
+          options: [
+            { label: "None", value: "none" },
+            { label: "Orange", value: "orange" },
+            { label: "Green", value: "green" },
+          ],
+        },
+      ],
+    },
+    {
       name: "teaserCtaLabel",
       type: "text",
       label: "Markets teaser CTA label",

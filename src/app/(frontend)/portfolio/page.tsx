@@ -3,8 +3,7 @@ import Link from "next/link";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import RunsText from "@/components/RunsText";
-import { portfolioPage } from "@/content/portfolio";
-import { getPortfolio } from "@/lib/cms";
+import { getPortfolio, getPortfolioPage, getMeta } from "@/lib/cms";
 
 // Tile heights — equal 300px on mobile, varied on desktop for the editorial
 // masonry feel (no two adjacent tiles share a height).
@@ -14,22 +13,31 @@ const PORTFOLIO_HEIGHTS = [
   "h-[300px] sm:h-[360px]",
 ];
 
-// Portfolio is a collection with no page-header global — metadata stays static.
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description:
-    "Selected work from Rebel Mind Zone — brand identity, campaigns, packaging and content across the region.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const m = await getMeta("portfolioContent", {
+    title: "Portfolio",
+    description:
+      "Selected work from Rebel Mind Zone — brand identity, campaigns, packaging and content across the region.",
+  });
+  return {
+    title: m.title,
+    description: m.description,
+    ...(m.ogImageUrl ? { openGraph: { images: [m.ogImageUrl] } } : {}),
+  };
+}
 
 export default async function PortfolioPage() {
-  const projects = await getPortfolio();
+  const [page, projects] = await Promise.all([
+    getPortfolioPage(),
+    getPortfolio(),
+  ]);
 
   return (
     <>
       <PageIntro
         kicker="Portfolio"
-        title={<RunsText runs={portfolioPage.pageTitle} />}
-        lede={portfolioPage.lede}
+        title={<RunsText runs={page.pageTitle} />}
+        lede={page.lede}
       />
 
       <section className="px-5 pb-28 sm:px-8 sm:pb-36">

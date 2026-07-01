@@ -35,8 +35,11 @@ export default async function Home() {
       />
       <WordmarkMoment />
       <ServicesTeaser services={featured} />
-      <ClientsCollage />
-      <VideoSection />
+      <ClientsCollage photos={home.clients} />
+      <VideoSection
+        leftLabel={home.showreel.leftLabel}
+        rightLabel={home.showreel.rightLabel}
+      />
       <MarketsBlock
         asTeaser
         story={contact.heroStory}

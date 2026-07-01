@@ -16,7 +16,7 @@ import { servicesPage as servicesPageDefault, services as servicesDefault } from
 import { markets as marketsDefault } from "@/content/markets";
 import { contactContent as contactDefault } from "@/content/contact";
 import { careersPage as careersDefault, roles as rolesDefault } from "@/content/careers";
-import { projects as projectsDefault } from "@/content/portfolio";
+import { projects as projectsDefault, portfolioPage as portfolioPageDefault } from "@/content/portfolio";
 import { privacyContent, termsContent } from "@/content/legal";
 
 /** Per-request Payload client (deduped). */
@@ -65,6 +65,7 @@ type SeoSlug =
   | "servicesContent"
   | "contactContent"
   | "careersContent"
+  | "portfolioContent"
   | "legalPrivacy"
   | "legalTerms";
 
@@ -160,6 +161,20 @@ export const getHome = cache(() =>
         heroStatement: runs(g.heroStatement, homeDefault.heroStatement),
         heroSubline: f(g.heroSubline, homeDefault.heroSubline),
         teaserCtaLabel: f(g.teaserCtaLabel, homeDefault.teaserCtaLabel),
+        showreel: {
+          leftLabel: f(g.showreelLeftLabel, homeDefault.showreel.leftLabel),
+          rightLabel: f(g.showreelRightLabel, homeDefault.showreel.rightLabel),
+        },
+        clients: g.clients?.length
+          ? g.clients.map((c) => ({
+              label: f(c.label, ""),
+              badgeName: f(c.badgeName, ""),
+              badgeAccent: (c.badgeAccent ?? "none") as
+                | "orange"
+                | "green"
+                | "none",
+            }))
+          : homeDefault.clients,
       };
     },
     {
@@ -168,6 +183,8 @@ export const getHome = cache(() =>
       heroStatement: homeDefault.heroStatement,
       heroSubline: homeDefault.heroSubline,
       teaserCtaLabel: homeDefault.teaserCtaLabel,
+      showreel: homeDefault.showreel,
+      clients: homeDefault.clients,
     },
   ),
 );
@@ -341,6 +358,23 @@ export const getLegal = cache((which: "privacy" | "terms") => {
 });
 
 // ── Collections ──────────────────────────────────────────────────────────────
+
+export const getPortfolioPage = cache(() =>
+  safe(
+    "portfolioPage",
+    async (p) => {
+      const g = await p.findGlobal({ slug: "portfolioContent", depth: 0 });
+      return {
+        pageTitle: runs(g.pageTitle, portfolioPageDefault.pageTitle),
+        lede: f(g.lede, portfolioPageDefault.lede),
+      };
+    },
+    {
+      pageTitle: portfolioPageDefault.pageTitle,
+      lede: portfolioPageDefault.lede,
+    },
+  ),
+);
 
 export const getPortfolio = cache(() =>
   safe(

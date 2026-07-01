@@ -152,6 +152,14 @@ await updateGlobal("homeContent", {
   heroStatement: homeContent.heroStatement,
   heroSubline: homeContent.heroSubline,
   teaserCtaLabel: homeContent.teaserCtaLabel,
+  showreelLeftLabel: homeContent.showreel.leftLabel,
+  showreelRightLabel: homeContent.showreel.rightLabel,
+  clients: homeContent.clients,
+});
+
+await updateGlobal("portfolioContent", {
+  pageTitle: portfolioPage.pageTitle,
+  lede: portfolioPage.lede,
 });
 
 await updateGlobal("aboutContent", {
