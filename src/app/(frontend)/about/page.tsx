@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import AboutScrollSquares from "@/components/AboutScrollSquares";
 import ColorPaletteSection from "@/components/ColorPaletteSection";
-import FadeInSection from "@/components/FadeInSection";
 import { getMeta } from "@/lib/cms";
 import AboutAnimationController from "@/components/AboutAnimationController";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import AccentBlocks from "@/components/AccentBlocks";
 import RunsText from "@/components/RunsText";
-import { getAbout } from "@/lib/cms"
+import { getAbout } from "@/lib/cms";
+import ScrollIndicator from "@/components/ScrollIndecator";
+
 
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -88,16 +89,23 @@ function Sq({ color, size = 22 }: { color: string; size?: number }) {
 
 export default async function AboutPage() {
   const about = await getAbout();
+ 
   return (
+    
     <AboutAnimationController>
+      
     <div
       className="relative"
       style={{
         background:
           "radial-gradient(ellipse at bottom right, #5c0000 0%, #1a0000 40%, #000000 100%)",
         color: CREAM,
+        isolation: "isolate",
       }}>
-    
+        
+      
+      
+      <section><ScrollIndicator /></section>
       {/* Animated squares overlay (fixed, z-50) + hero badge (z-60) */}
       <AboutScrollSquares />
 

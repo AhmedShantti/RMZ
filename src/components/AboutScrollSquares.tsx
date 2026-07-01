@@ -180,7 +180,7 @@ export default function AboutScrollSquares() {
       // Behind the section content (sections are z-index 1), above the page
       // background. Blur lives on each square (cheaper than blurring the whole
       // fixed layer every frame).
-      style={{ zIndex: 0 }}
+      style={{ zIndex: -1 }}
     >
       <div
         ref={greenRef}
