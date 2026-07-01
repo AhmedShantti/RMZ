@@ -116,7 +116,7 @@ export default async function AboutPage() {
           Trimmed from 190vh: the text now fades out by ~20% of total scroll
           progress (see ColorPaletteSection's HARD_CUTOFF), so the old height
           left a long stretch of dead scrolling before the content below. */}
-      <ColorPaletteSection />
+      <ColorPaletteSection copy={about.colorPalette} />
 
       <PageIntro
         kicker="About"

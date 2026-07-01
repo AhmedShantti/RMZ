@@ -602,6 +602,12 @@ export interface AboutContent {
       }[]
     | null;
   lede?: string | null;
+  colorPalette?: {
+    line1?: string | null;
+    line2Lead?: string | null;
+    line2Rest?: string | null;
+    line3?: string | null;
+  };
   /**
    * Idea / character / personality, in order.
    */
@@ -1074,6 +1080,14 @@ export interface AboutContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
+  colorPalette?:
+    | T
+    | {
+        line1?: T;
+        line2Lead?: T;
+        line2Rest?: T;
+        line3?: T;
+      };
   sections?:
     | T
     | {

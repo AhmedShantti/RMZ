@@ -165,6 +165,7 @@ await updateGlobal("portfolioContent", {
 await updateGlobal("aboutContent", {
   pageTitle: aboutContent.pageTitle,
   lede: aboutContent.lede,
+  colorPalette: aboutContent.colorPalette,
   sections: aboutContent.sections.map((s) => ({
     kicker: s.kicker,
     title: s.title,

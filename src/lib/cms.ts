@@ -194,9 +194,16 @@ export const getAbout = cache(() =>
     "about",
     async (p) => {
       const g = await p.findGlobal({ slug: "aboutContent", depth: 0 });
+      const cp = g.colorPalette ?? {};
       return {
         pageTitle: runs(g.pageTitle, aboutDefault.pageTitle),
         lede: f(g.lede, aboutDefault.lede),
+        colorPalette: {
+          line1: f(cp.line1, aboutDefault.colorPalette.line1),
+          line2Lead: f(cp.line2Lead, aboutDefault.colorPalette.line2Lead),
+          line2Rest: f(cp.line2Rest, aboutDefault.colorPalette.line2Rest),
+          line3: f(cp.line3, aboutDefault.colorPalette.line3),
+        },
         sections: g.sections?.length
           ? g.sections.map((s) => ({
               kicker: s.kicker,
@@ -213,6 +220,7 @@ export const getAbout = cache(() =>
     {
       pageTitle: aboutDefault.pageTitle,
       lede: aboutDefault.lede,
+      colorPalette: aboutDefault.colorPalette,
       sections: aboutDefault.sections,
       closingStatement: aboutDefault.closingStatement,
     },

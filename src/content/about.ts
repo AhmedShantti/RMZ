@@ -12,6 +12,15 @@ export const aboutContent = {
     { text: ".", style: "normal", tone: "cream", noSpaceBefore: true },
   ] as Run[],
   lede: "Rebel Mind Zone is a creative studio built on a simple, stubborn belief: discipline is what makes boldness work.",
+  // Section 2 — the scroll-revealed colour-palette statement (three lines).
+  // Line 2 is split into its heavy-italic lead + letter-spaced rest; the
+  // styling and 3-line layout stay fixed in ColorPaletteSection.
+  colorPalette: {
+    line1: "COLORPALATTE balances",
+    line2Lead: "BOLD",
+    line2Rest: "EXPRESSION",
+    line3: "with Professional Presence",
+  },
   sections: [
     {
       kicker: "The idea",
