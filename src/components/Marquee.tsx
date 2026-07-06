@@ -120,8 +120,8 @@ export function MarqueeDemo() {
   }
 
   return (
-     <div className="relative flex w-full flex-col items-center justify-center gap-4 bg-transparent py-6">
-      <Marquee pauseOnHover className="[--duration:20s] py-4">
+     <div className="relative flex w-full flex-col items-stretch justify-center gap-4 bg-transparent py-6">
+      <Marquee pauseOnHover className="w-full [--duration:20s] py-4">
         {firstRow.map(renderCard)}
       </Marquee>
 

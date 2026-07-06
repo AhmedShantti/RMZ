@@ -225,14 +225,7 @@ export default function HeroCursorField({
       )}
 
       {/* Reactive grain spotlight canvas */}
-      {!reduce && (
-        <canvas
-          ref={canvasRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          style={{ mixBlendMode: "screen", opacity: 0.32 }}
-        />
-      )}
+     
 
       {/* Composition */}
       <div className="relative mx-auto w-full max-w-6xl py-28">
@@ -273,19 +266,8 @@ export default function HeroCursorField({
         </motion.div>
       </div>
 
-      {/* scroll cue, bottom-center */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-        <motion.span
-          className="font-body text-cream-dim flex flex-col items-center gap-2 text-[0.65rem] uppercase tracking-[0.3em]"
-          animate={reduce ? undefined : { y: [0, 6, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          Scroll
-          <span aria-hidden="true" className="text-base leading-none">
-            ↓
-          </span>
-        </motion.span>
-      </div>
+     
+      
     </section>
   );
 }

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import { NeatGradient, type NeatConfig } from "@firecms/neat"
+import { useEffect, useRef } from "react";
+import { NeatGradient, type NeatConfig } from "@firecms/neat";
 
 const config = {
   colors: [
@@ -94,56 +94,88 @@ const config = {
   cameraRotationY: 0,
   cameraRotationZ: 0,
   cameraZoom: 1,
-} satisfies Omit<NeatConfig, "ref">
+} satisfies Omit<NeatConfig, "ref">;
 
 export function NeatGradientBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const gradientRef = useRef<NeatGradient | null>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gradientRef = useRef<NeatGradient | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    const wrapper = wrapperRef.current;
+    if (!canvas || !wrapper) return;
+
+    const isMobile = window.innerWidth < 768;
+
     const gradient = new NeatGradient({
       ref: canvas,
       ...config,
-    })
-    gradientRef.current = gradient
+      resolution: isMobile ? 0.35 : config.resolution,
+      shadows: isMobile ? 3 : config.shadows,
+      highlights: isMobile ? 2 : config.highlights,
+    });
 
-    const setCanvasSize = () => {
-      const dpr = Math.max(1, window.devicePixelRatio || 1)
-      const { width, height } = canvas.getBoundingClientRect()
-      const w = Math.max(1, Math.floor(width * dpr))
-      const h = Math.max(1, Math.floor(height * dpr))
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w
-        canvas.height = h
-      }
-    }
-    // Initial sizing
-    setCanvasSize()
-    const handleResize = () => setCanvasSize()
-    window.addEventListener("resize", handleResize)
+    gradientRef.current = gradient;
+
+    // Size the canvas from its own wrapper's real box, never from vw/vh.
+    // This is what avoids the 100vw scrollbar-overflow bug and the
+    // 100vh "address bar" bug on mobile in one shot.
+    const resize = () => {
+      const rect = wrapper.getBoundingClientRect();
+      const dpr = Math.max(window.devicePixelRatio || 1, 1);
+
+      const width = rect.width;
+      const height = rect.height;
+
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      (gradientRef.current as any)?.resize?.();
+      (gradientRef.current as any)?.update?.();
+    };
+
+    resize();
+
+    // ResizeObserver reacts to the wrapper's actual rendered size,
+    // which changes correctly when mobile browser chrome shows/hides —
+    // window "resize" alone doesn't reliably fire for that.
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(wrapper);
+
+    // Still listen for viewport resize (rotation, zoom, etc.) as a fallback.
+    window.addEventListener("resize", resize);
+    window.visualViewport?.addEventListener("resize", resize);
 
     const handleScroll = () => {
       if (gradientRef.current) {
-        gradientRef.current.yOffset = window.scrollY
+        gradientRef.current.yOffset = window.scrollY;
       }
-    }
-    window.addEventListener("scroll", handleScroll)
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("resize", handleResize)
-      gradient.destroy?.()
-      gradientRef.current = null
-    }
-  }, [])
+      ro.disconnect();
+      window.removeEventListener("resize", resize);
+      window.visualViewport?.removeEventListener("resize", resize);
+      window.removeEventListener("scroll", handleScroll);
+
+      gradient.destroy?.();
+      gradientRef.current = null;
+    };
+  }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      id="gradient"
-      className="fixed inset-0 -z-10 h-full w-full"
-    />
-  )
+    <div
+      ref={wrapperRef}
+      className="fixed inset-0 -z-10"
+      style={{ pointerEvents: "none" }}
+    >
+      <canvas ref={canvasRef} id="gradient" className="block h-full w-full" />
+    </div>
+  );
 }
