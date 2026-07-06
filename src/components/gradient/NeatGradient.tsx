@@ -103,12 +103,26 @@ export function NeatGradientBackground() {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-
     const gradient = new NeatGradient({
       ref: canvas,
       ...config,
     })
     gradientRef.current = gradient
+
+    const setCanvasSize = () => {
+      const dpr = Math.max(1, window.devicePixelRatio || 1)
+      const { width, height } = canvas.getBoundingClientRect()
+      const w = Math.max(1, Math.floor(width * dpr))
+      const h = Math.max(1, Math.floor(height * dpr))
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w
+        canvas.height = h
+      }
+    }
+    // Initial sizing
+    setCanvasSize()
+    const handleResize = () => setCanvasSize()
+    window.addEventListener("resize", handleResize)
 
     const handleScroll = () => {
       if (gradientRef.current) {
@@ -119,6 +133,7 @@ export function NeatGradientBackground() {
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleResize)
       gradient.destroy?.()
       gradientRef.current = null
     }
