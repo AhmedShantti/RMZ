@@ -118,50 +118,31 @@ export function NeatGradientBackground() {
 
     gradientRef.current = gradient;
 
-    // Size the canvas from its own wrapper's real box, never from vw/vh.
-    // This is what avoids the 100vw scrollbar-overflow bug and the
-    // 100vh "address bar" bug on mobile in one shot.
-    const resize = () => {
-      const rect = wrapper.getBoundingClientRect();
-      const dpr = Math.max(window.devicePixelRatio || 1, 1);
+    // NOTE: we deliberately do NOT manually set canvas.width/height or
+    // call any resize()/update() here. @firecms/neat's own docs never show
+    // a manual resize step — it manages its own canvas sizing internally.
+    // Our previous manual dpr-based resizing was fighting the library's
+    // internal resize logic and compounding into the shrinking/glitchy
+    // canvas. The canvas is sized purely by CSS (h-full w-full inside a
+    // fixed inset-0 wrapper), which is all it needs.
 
-      const width = rect.width;
-      const height = rect.height;
-
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      (gradientRef.current as any)?.resize?.();
-      (gradientRef.current as any)?.update?.();
-    };
-
-    resize();
-
-    // ResizeObserver reacts to the wrapper's actual rendered size,
-    // which changes correctly when mobile browser chrome shows/hides —
-    // window "resize" alone doesn't reliably fire for that.
-    const ro = new ResizeObserver(() => resize());
-    ro.observe(wrapper);
-
-    // Still listen for viewport resize (rotation, zoom, etc.) as a fallback.
-    window.addEventListener("resize", resize);
-    window.visualViewport?.addEventListener("resize", resize);
+    // --- Throttle the scroll-driven yOffset update to one write per frame.
+    let scrollTicking = false;
 
     const handleScroll = () => {
-      if (gradientRef.current) {
-        gradientRef.current.yOffset = window.scrollY;
-      }
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        if (gradientRef.current) {
+          gradientRef.current.yOffset = window.scrollY;
+        }
+        scrollTicking = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", resize);
-      window.visualViewport?.removeEventListener("resize", resize);
       window.removeEventListener("scroll", handleScroll);
 
       gradient.destroy?.();
