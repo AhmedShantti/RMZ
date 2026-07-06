@@ -33,10 +33,7 @@ export default function WordmarkMoment() {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(80% 80% at 50% 120%, color-mix(in srgb, var(--rebel-red) 26%, transparent), transparent 60%)",
-        }}
+        
       />
       <motion.div
         style={reduce ? undefined : { y, opacity }}

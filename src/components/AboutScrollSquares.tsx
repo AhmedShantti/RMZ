@@ -57,46 +57,51 @@ const row = (
   size: number,
   gap: number,
   index: number,
+  offsetY: number,
 ): Vec => {
   const total = 3 * size + 2 * gap;
   const startX = (vw - total) / 2;
-  return { x: startX + index * (size + gap), y: (vh - size) / 2 };
+
+  return {
+    x: startX + index * (size + gap),
+    y: (vh - size) / 2 + offsetY,
+  };
 };
 
 // ── Keyframes per square ──────────────────────────────────────────────────
 // Order in stage 1 row: Green(0) Red(1) Yellow(2). In stage 7: Yellow(0) Red(1) Green(2).
 
 export const GREEN: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0, 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: w - 0.02 * w - 70, y: 0.18 * h }) },
-  { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 0) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0, 0) },
   { at: 0.333, size: 100, rotate: 0, pos: (w, h) => ({ x: w + 0.02 * w - 100, y: 0.05 * h }) },
   { at: 0.444, size: 95, rotate: 0, pos: (w, h) => ({ x: 0.08 * w, y: 0.08 * h }) },
   { at: 0.667, size: 100, rotate: 10, pos: (w, h) => ({ x: 0.12 * w, y: 0.05 * h }) },
   { at: 0.778, size: 110, rotate: 45, pos: (w, h) => ({ x: 0.35 * w, y: 0.08 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 2) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 2, -250) },
 ];
 
 export const RED: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1, 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.38 * h }) },
-  { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 1) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1, 0) },
   { at: 0.333, size: 100, rotate: 22, pos: (w, h) => ({ x: 0.05 * w, y: 0.65 * h }) },
   { at: 0.444, size: 95, rotate: 15, pos: (w, h) => ({ x: 0.18 * w, y: 0.38 * h }) },
   { at: 0.667, size: 100, rotate: 35, pos: (w, h) => ({ x: 0.22 * w, y: 0.3 * h }) },
   { at: 0.778, size: 110, rotate: -15, pos: (w, h) => ({ x: w - 0.05 * w - 110, y: 0.35 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 1) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 1, -250) },
 ];
 
 export const YELLOW: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2, 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.08 * h }) },
-  { at: 0.222, size: 18, rotate: 0, pos: (w, h) => row(w, h, 18, 6, 2) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2, 0) },
   { at: 0.333, size: 100, rotate: 0, pos: (w, h) => ({ x: w - 0.15 * w - 100, y: 0.4 * h }) },
   { at: 0.444, size: 95, rotate: 0, pos: (w, h) => ({ x: 0.03 * w, y: 0.15 * h }) },
   { at: 0.667, size: 100, rotate: 30, pos: (w, h) => ({ x: 0.05 * w, y: 0.5 * h }) },
   { at: 0.778, size: 110, rotate: 32, pos: (w, h) => ({ x: 0.3 * w, y: 0.68 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 0) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 0, -250) },
 ];
 
 export type State = { x: number; y: number; size: number; rotate: number };
