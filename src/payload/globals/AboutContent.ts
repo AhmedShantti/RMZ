@@ -20,6 +20,32 @@ export const AboutContent: GlobalConfig = {
     runsField("pageTitle", "Page title"),
     { name: "lede", type: "textarea" },
     {
+      type: "collapsible",
+      label: "Colour-palette statement (Section 2)",
+      admin: {
+        description:
+          "The three scroll-revealed lines. Styling and layout are fixed in code.",
+      },
+      fields: [
+        {
+          name: "colorPalette",
+          type: "group",
+          label: false,
+          fields: [
+            { name: "line1", type: "text", label: "Line 1", defaultValue: "COLORPALATTE balances" },
+            {
+              type: "row",
+              fields: [
+                { name: "line2Lead", type: "text", label: "Line 2 — bold word", defaultValue: "BOLD", admin: { width: "50%" } },
+                { name: "line2Rest", type: "text", label: "Line 2 — spaced word", defaultValue: "EXPRESSION", admin: { width: "50%" } },
+              ],
+            },
+            { name: "line3", type: "text", label: "Line 3", defaultValue: "with Professional Presence" },
+          ],
+        },
+      ],
+    },
+    {
       name: "sections",
       type: "array",
       labels: { singular: "Section", plural: "Sections" },

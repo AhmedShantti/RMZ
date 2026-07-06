@@ -11,8 +11,15 @@ import Reveal from "./Reveal";
  *
  * Strips + video are flush (one unified horizontal unit). Mobile (<768px): the
  * strips become 50px horizontal bars above/below the video with normal text.
+ *
+ * Strip labels come from the CMS (homeContent → Showreel).
  */
-export default function VideoSection() {
+type Props = {
+  leftLabel: string;
+  rightLabel: string;
+};
+
+export default function VideoSection({ leftLabel, rightLabel }: Props) {
   return (
     <section
       aria-label="Showreel"
@@ -27,7 +34,7 @@ export default function VideoSection() {
           style={{ backgroundColor: "var(--acc-green)" }}
         >
           <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:rotate-180 md:[writing-mode:vertical-rl]">
-            How to Success
+            {leftLabel}
           </span>
         </div>
 
@@ -58,7 +65,7 @@ export default function VideoSection() {
           style={{ backgroundColor: "var(--acc-orange)" }}
         >
           <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:[writing-mode:vertical-rl]">
-            How to be Rebel
+            {rightLabel}
           </span>
         </div>
       </Reveal>

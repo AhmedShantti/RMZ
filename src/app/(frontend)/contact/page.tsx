@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Logo from "@/components/Logo";
-import FloatingSquares from "@/components/FloatingSquares";
+import FloatingSquare from "@/components/FloatingSquares";
 import ContactForm from "@/components/ContactForm";
 import MarketsColumns from "@/components/MarketsColumns";
 import RunsText from "@/components/RunsText";
@@ -37,13 +37,9 @@ export default async function ContactPage() {
           <Logo className="w-[clamp(200px,40vw,280px)]" />
         </Reveal>
 
-        {/* Heading framed by the floating squares */}
+        {/* Heading — no longer framed by the squares */}
         <Reveal delay={0.05}>
           <div className="relative mt-14 flex flex-col items-center text-center">
-            <FloatingSquares
-              size={80}
-              className="-top-6 right-2 hidden sm:block"
-            />
             <h1 className="display-statement text-cream relative z-10 text-[clamp(2.6rem,7vw,5.5rem)]">
               <RunsText runs={contact.heroStory} />
             </h1>
@@ -56,10 +52,10 @@ export default async function ContactPage() {
         {/* Info bar — address · email · arrow */}
         <Reveal delay={0.1}>
           <div className="border-cream-dim/30 mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b py-5">
-            <span className="font-body text-cream-dim text-sm underline underline-offset-4">
+            <span className="font-body text-cream-dim text-base underline underline-offset-4">
               {OFFICE_ADDRESS}
             </span>
-            <span className="font-body text-cream-dim flex items-center gap-3 text-sm">
+            <span className="font-body text-cream-dim flex items-center gap-3 text-base">
               <a
                 href={`mailto:${settings.email}`}
                 className="underline underline-offset-4 hover:text-cream transition-colors"
@@ -91,9 +87,26 @@ export default async function ContactPage() {
           </div>
         </Reveal>
 
-        {/* Form */}
-        <Reveal delay={0.14} className="mt-12">
-          <ContactForm form={contact.form} />
+        {/* Form — one square on top, one left, one right, each floating independently */}
+        <Reveal delay={0.14} className="relative mt-12">
+          <FloatingSquare
+            size={90}
+            color="yellow"
+            className="left-1/2 -top-14 -translate-x-1/2 hidden sm:block"
+          />
+          <FloatingSquare
+            size={110}
+            color="orange"
+            className="-left-16 top-1/3 hidden sm:block"
+          />
+          <FloatingSquare
+            size={100}
+            color="green"
+            className="-right-16 top-1/2 hidden sm:block"
+          />
+          <div className="relative z-10">
+            <ContactForm form={contact.form} />
+          </div>
         </Reveal>
       </div>
 

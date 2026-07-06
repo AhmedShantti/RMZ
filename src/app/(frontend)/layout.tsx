@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { ivarDisplay } from "@/lib/fonts";
 import { site } from "@/content/site";
 import { getSiteSettings } from "@/lib/cms";
-import Grain from "@/components/Grain";
-import RedLight from "@/components/RedLight";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -48,8 +46,7 @@ export default async function RootLayout({
         </a>
 
         {/* Global stage layers (TASK.md §6): red light UNDER grain UNDER content */}
-        <RedLight intensity="ember" />
-        <Grain />
+        
 
         <SmoothScroll />
         <Nav

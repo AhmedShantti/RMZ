@@ -6,6 +6,15 @@ import ClientsCollage from "@/components/ClientsCollage";
 import VideoSection from "@/components/VideoSection";
 import MarketsBlock from "@/components/MarketsBlock";
 import { getHome, getServices, getContact, getSiteSettings } from "@/lib/cms";
+import ShaderBackground from "@/components/gradient/ShaderGradient";
+import { MarqueeDemo } from "@/components/Marquee";
+import { NeatGradient } from "@firecms/neat";
+import { NeatGradientBackground } from "@/components/gradient/NeatGradient";
+import { MeshGradient } from '@paper-design/shaders-react';
+import { fulfillRouteCacheEntry } from "next/dist/client/components/segment-cache/cache";
+
+
+
 
 export default async function Home() {
   const [home, servicesData, contact, settings] = await Promise.all([
@@ -28,15 +37,25 @@ export default async function Home() {
   return (
     <>
       <IntroLoader enabled={home.showIntroLoader} />
-      <HeroCursorField
+      <div style={{ position: 'relative', minHeight: '100vh' }}>
+
+      {/* your real content goes here, on top */}
+      <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
+        <NeatGradientBackground />
+        
+        <HeroCursorField
         kicker={home.heroKicker}
         statement={home.heroStatement}
         subline={home.heroSubline}
       />
       <WordmarkMoment />
-      <ServicesTeaser services={featured} />
-      <ClientsCollage />
-      <VideoSection />
+      <ServicesTeaser services={featured}  />
+      <MarqueeDemo />
+      
+      <VideoSection
+        leftLabel={home.showreel.leftLabel}
+        rightLabel={home.showreel.rightLabel}
+      />
       <MarketsBlock
         asTeaser
         story={contact.heroStory}
@@ -44,6 +63,12 @@ export default async function Home() {
         socials={settings.socials}
         ctaLabel={home.teaserCtaLabel}
       />
+      </div>
+      
+    </div>
+
+    
+     
     </>
   );
 }

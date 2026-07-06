@@ -164,7 +164,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         </p>
       )}
 
-      <Field
+      <Field 
         label="Full Name"
         id={id("name")}
         errId={errId("name")}
@@ -294,7 +294,7 @@ function Field({
     <div className={`flex flex-col gap-2 ${className}`}>
       <label
         htmlFor={id}
-        className="font-body text-cream-dim text-xs uppercase tracking-[0.2em]"
+        className="font-body text-cream-dim text-base uppercase tracking-[0.2em]"
       >
         {label}
       </label>

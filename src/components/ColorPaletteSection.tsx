@@ -47,7 +47,19 @@ const computeT = (p: number, size: number) => {
 const LINE_WIDTH = 48; // px, connector length between square edge and text
 const LINE_GAP = 16; // px, gap between line and text
 
-export default function ColorPaletteSection() {
+/** Copy for the three scroll-revealed lines (from aboutContent → CMS). */
+type ColorPaletteCopy = {
+  line1: string;
+  line2Lead: string;
+  line2Rest: string;
+  line3: string;
+};
+
+export default function ColorPaletteSection({
+  copy,
+}: {
+  copy: ColorPaletteCopy;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const yellowLineRef = useRef<HTMLParagraphElement>(null);
   const greenLineRef = useRef<HTMLParagraphElement>(null);
@@ -142,7 +154,7 @@ export default function ColorPaletteSection() {
             whiteSpace: "nowrap",
           }}
         >
-          COLORPALATTE balances
+          {copy.line1}
         </p>
 
         <div
@@ -160,10 +172,10 @@ export default function ColorPaletteSection() {
           }}
         >
           <span style={{ fontWeight: 900, fontStyle: "italic", color: CREAM }}>
-            BOLD
+            {copy.line2Lead}
           </span>{" "}
           <span style={{ fontWeight: 400, letterSpacing: "0.08em" }}>
-            EXPRESSION
+            {copy.line2Rest}
           </span>
         </p>
 
@@ -182,7 +194,7 @@ export default function ColorPaletteSection() {
             whiteSpace: "nowrap",
           }}
         >
-          with Professional Presence
+          {copy.line3}
         </p>
       </div>
     </section>
