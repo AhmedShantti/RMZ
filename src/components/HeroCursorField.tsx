@@ -212,10 +212,7 @@ export default function HeroCursorField({
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(130% 120% at 100% 100%, color-mix(in srgb, var(--rebel-red) 30%, transparent), transparent 55%)",
-        }}
+        
       />
 
       {/* Cursor-tracked red focal glow (eased) */}
