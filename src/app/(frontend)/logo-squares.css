@@ -1,0 +1,141 @@
+/* ============================================================
+   Logo squares → emerge → stairs feature
+   (logo-squares-animation-spec.md). Global (non-module) classes:
+   the traveling squares are cloned onto <body> and toggle these
+   class names by string, so they must not be CSS-module-hashed.
+   ============================================================ */
+
+/* --- The three static squares in the logo mark --- */
+.logo-squares {
+  display: inline-flex;
+  gap: 12px;
+}
+.sq {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+}
+.sq-yellow {
+  background: var(--acc-yellow);
+}
+.sq-orange {
+  background: var(--acc-orange);
+}
+.sq-green {
+  background: var(--acc-green);
+}
+
+/* --- Traveling clone (fixed-position, appended to body) --- */
+.sq-clone {
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* --- Landed state, inside a stair slot (Phase 2+) --- */
+.stair-square {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px;
+}
+
+/* --- Stairs layout (Phase 3) --- */
+.about-stairs {
+  position: relative;
+  /* Exactly one viewport: the pin's `end: "+=2000"` supplies the scroll room
+     (pin-spacer), so extra height would only push the counter below the fold
+     while pinned. */
+  min-height: 100vh;
+}
+.stair-slot {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  /* overflow stays visible during the Flip flight (the traveling square is
+     re-parented into the slot and animated with transforms, which do NOT
+     escape overflow clipping) — .filled turns the crop on after landing. */
+  overflow: visible;
+  border-radius: 4px;
+  /* faint outline so empty landing slots are visible while building */
+  outline: 1px dashed color-mix(in srgb, var(--cream-dim) 30%, transparent);
+}
+.stair-slot.filled {
+  overflow: hidden;
+  outline: none;
+}
+.stair-1 {
+  top: 10%;
+  left: 10%;
+}
+.stair-2 {
+  top: 35%;
+  left: 35%;
+}
+.stair-3 {
+  top: 60%;
+  left: 60%;
+}
+.stair-slot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Demo harness hero --- */
+.lab-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Counter + paragraph (Phase 5) --- */
+.stairs-counter {
+  position: absolute;
+  bottom: 6vh;
+  left: 6vw;
+  font-variant-numeric: tabular-nums;
+}
+.stairs-paragraph {
+  position: absolute;
+  top: 18vh; /* below the fixed nav chrome */
+  right: 6vw;
+  max-width: 320px;
+  animation: sqFadeIn 0.4s ease both;
+}
+
+/* Mobile — smaller squares + tighter stair positions (spec cleanup note). */
+@media (max-width: 640px) {
+  .stair-slot {
+    width: 140px;
+    height: 140px;
+  }
+  .stair-1 {
+    top: 8%;
+    left: 6%;
+  }
+  .stair-2 {
+    top: 30%;
+    left: 32%;
+  }
+  .stair-3 {
+    top: 52%;
+    left: 55%;
+  }
+  .stairs-paragraph {
+    max-width: 220px;
+  }
+}
+@keyframes sqFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
