@@ -58,8 +58,9 @@ export default function AboutStairsSection({
 
       const render = (p: number) => {
         const u = p * (slots.length - 1); // 0..2 → two transitions
-        const enterY = window.innerHeight * 0.65; // rises from below centre
-        const exitY = -window.innerHeight * 0.18; // subtle upward drift out
+        // Staircase step (diagonal, bottom-right → top-left): incoming panel
+        // travels (+120,+120) → (0,0); outgoing continues (0,0) → (-120,-120).
+        const STEP = 120;
 
         slots.forEach((ref, i) => {
           const el = ref.current;
@@ -72,10 +73,15 @@ export default function AboutStairsSection({
           const eIn = ease(enterF);
           const eOut = ease(exitF);
 
+          // One shared diagonal offset keeps the motion exactly 45° — the
+          // climb reads as stairs, not a vertical slide.
+          const d = (1 - eIn) * STEP + eOut * -STEP;
+
           gsap.set(el, {
-            y: (1 - eIn) * enterY + eOut * exitY,
+            x: d,
+            y: d,
             scale: lerp(lerp(1.05, 1, eIn), 0.9, eOut),
-            // fade in over the first half of the rise, out across the exit
+            // fade in over the first half of the climb, out across the exit
             opacity: ease(clamp01(enterF * 2)) * (1 - eOut),
           });
         });
