@@ -14,7 +14,6 @@
   display: block;
   width: 64px;
   height: 64px;
-  border-radius: 4px;
 }
 .sq-yellow {
   background: var(--acc-yellow);
@@ -29,7 +28,6 @@
 /* --- Traveling clone (fixed-position, appended to body) --- */
 .sq-clone {
   pointer-events: none;
-  border-radius: 4px;
 }
 
 /* --- Landed state, inside a stair slot (Phase 2+) --- */
@@ -38,7 +36,6 @@
   inset: 0;
   width: 100% !important;
   height: 100% !important;
-  border-radius: 4px;
 }
 
 /* --- Stairs layout (Phase 3) --- */
@@ -48,32 +45,30 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
+  --stair-size: 340px; /* card edge length — mobile overrides below */
 }
 .stair-slot {
   position: absolute;
-  width: 220px;
-  height: 220px;
+  width: var(--stair-size);
+  height: var(--stair-size);
   /* overflow stays visible during the Flip flight (the traveling square is
      re-parented into the slot and animated with transforms, which do NOT
      escape overflow clipping) — .filled turns the crop on after landing. */
   overflow: visible;
-  border-radius: 4px;
-  /* faint outline so empty landing slots are visible while building */
-  outline: 1px dashed color-mix(in srgb, var(--cream-dim) 30%, transparent);
 }
 .stair-slot.filled {
   overflow: hidden;
-  outline: none;
 }
-/* Card-deck layout: all three slots share the viewport centre (calc offsets,
+/* Card-deck layout: all slots share the viewport centre (calc offsets,
    NOT css transforms — GSAP owns `transform` for the y/scale choreography).
-   Later cards stack above earlier ones so the incoming card rises over the
+   Later cards stack above earlier ones so the incoming card climbs over the
    outgoing one. */
 .stair-1,
 .stair-2,
-.stair-3 {
-  top: calc(50% - 110px);
-  left: calc(50% - 110px);
+.stair-3,
+.stair-4 {
+  top: calc(50% - var(--stair-size) / 2);
+  left: calc(50% - var(--stair-size) / 2);
   will-change: transform, opacity;
 }
 .stair-1 {
@@ -84,6 +79,9 @@
 }
 .stair-3 {
   z-index: 3;
+}
+.stair-4 {
+  z-index: 4;
 }
 .stair-slot img {
   display: block;
@@ -111,24 +109,17 @@
   position: absolute;
   top: 18vh; /* below the fixed nav chrome */
   right: 6vw;
-  max-width: 320px;
+  max-width: 420px;
   animation: sqFadeIn 0.4s ease both;
 }
 
 /* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
-  .stair-slot {
-    width: 140px;
-    height: 140px;
-  }
-  .stair-1,
-  .stair-2,
-  .stair-3 {
-    top: calc(50% - 70px);
-    left: calc(50% - 70px);
+  .about-stairs {
+    --stair-size: 220px;
   }
   .stairs-paragraph {
-    max-width: 220px;
+    max-width: 280px;
   }
 }
 @keyframes sqFadeIn {

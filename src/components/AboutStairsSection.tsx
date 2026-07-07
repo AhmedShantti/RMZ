@@ -24,13 +24,17 @@ const PARAGRAPHS = [
   "Step one — where the idea is born. Placeholder copy describing the first image.",
   "Step two — discipline shapes the boldness. Placeholder copy for the second image.",
   "Step three — the work meets the world. Placeholder copy for the third image.",
+  "Step four — the story keeps climbing. Placeholder copy for the fourth image.",
 ];
 
 const IMG_LABELS = [
   "[ STEP 1 PHOTO — REPLACE ]",
   "[ STEP 2 PHOTO — REPLACE ]",
   "[ STEP 3 PHOTO — REPLACE ]",
+  "[ STEP 4 PHOTO — REPLACE ]",
 ];
+
+const TOTAL = PARAGRAPHS.length;
 
 export default function AboutStairsSection({
   landingRefs,
@@ -39,6 +43,9 @@ export default function AboutStairsSection({
 }) {
   const { yellow, orange, green } = landingRefs;
   const sectionRef = useRef<HTMLElement>(null);
+  // 4th deck card — internal only (the logo has 3 squares to travel, so it
+  // isn't a Flip landing target and stays out of the landingRefs API).
+  const fourth = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(0);
 
   useGSAP(
@@ -46,7 +53,7 @@ export default function AboutStairsSection({
       if (prefersReducedMotion()) return;
 
       const cleanupLenis = syncScrollTriggerWithLenis();
-      const slots = [yellow, orange, green];
+      const slots = [yellow, orange, green, fourth];
 
       // Card-deck choreography (reference video): every card's state is a pure
       // function of scroll progress — no thresholds, no index snapping. The
@@ -57,7 +64,7 @@ export default function AboutStairsSection({
       const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
       const render = (p: number) => {
-        const u = p * (slots.length - 1); // 0..2 → two transitions
+        const u = p * (slots.length - 1); // one unit per transition
         // Staircase step (diagonal, bottom-right → top-left): incoming panel
         // travels (+120,+120) → (0,0); outgoing continues (0,0) → (-120,-120).
         const STEP = 120;
@@ -87,7 +94,7 @@ export default function AboutStairsSection({
         });
 
         // Counter/paragraph follow the focused card (rounds mid-transition).
-        const step = Math.min(2, Math.max(0, Math.round(u)));
+        const step = Math.min(slots.length - 1, Math.max(0, Math.round(u)));
         setActiveStep((prev) => (prev !== step ? step : prev));
       };
 
@@ -96,10 +103,11 @@ export default function AboutStairsSection({
       render(0);
 
       // One master trigger owns the pin; everything derives from its progress.
+      // Scroll room scales with the number of transitions (1000px each).
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=2000",
+        end: `+=${(slots.length - 1) * 1000}`,
         pin: true,
         scrub: 1,
         onUpdate: (self) => render(self.progress),
@@ -121,17 +129,20 @@ export default function AboutStairsSection({
       <div ref={green} className="stair-slot stair-3">
         <StairImg label={IMG_LABELS[2]} />
       </div>
+      <div ref={fourth} className="stair-slot stair-4">
+        <StairImg label={IMG_LABELS[3]} />
+      </div>
 
       {/* Phase 5 — counter (bottom-left) */}
       <div className="stairs-counter font-body" aria-hidden="true">
-        <span className="current font-display text-cream text-4xl italic">
+        <span className="current font-display text-cream text-6xl italic sm:text-7xl">
           0{activeStep + 1}
         </span>
-        <span className="total text-cream-dim text-sm"> / 03</span>
+        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
       </div>
 
       {/* Phase 5 — paragraph (top-right); key remount = CSS crossfade */}
-      <p className="stairs-paragraph font-body text-cream-dim text-sm leading-relaxed" key={activeStep}>
+      <p className="stairs-paragraph font-body text-cream-dim text-lg leading-relaxed sm:text-xl" key={activeStep}>
         {PARAGRAPHS[activeStep]}
       </p>
     </section>
