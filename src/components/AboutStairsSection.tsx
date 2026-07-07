@@ -47,26 +47,56 @@ export default function AboutStairsSection({
 
       const cleanupLenis = syncScrollTriggerWithLenis();
       const slots = [yellow, orange, green];
-      // Smaller travel on narrow viewports (spec cleanup note).
-      const stepY = window.innerWidth < 640 ? 120 : 200;
 
-      // One master trigger owns the pin; the three y-movements + the active
-      // step derive from its progress (the spec's "more robust pattern").
+      // Card-deck choreography (reference video): every card's state is a pure
+      // function of scroll progress — no thresholds, no index snapping. The
+      // outgoing card shrinks (1 → 0.9), drifts up and fades while the next
+      // rises from below (1.05 → 1); both stay visible mid-transition.
+      const ease = gsap.parseEase("power2.inOut");
+      const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+      const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+      const render = (p: number) => {
+        const u = p * (slots.length - 1); // 0..2 → two transitions
+        const enterY = window.innerHeight * 0.65; // rises from below centre
+        const exitY = -window.innerHeight * 0.18; // subtle upward drift out
+
+        slots.forEach((ref, i) => {
+          const el = ref.current;
+          if (!el) return;
+          // Card 0 starts focused; card i enters over u ∈ [i-1, i] and
+          // exits over u ∈ [i, i+1]. Both ramps are eased for the cinematic
+          // feel; scrub smoothing does the rest.
+          const enterF = i === 0 ? 1 : clamp01(u - (i - 1));
+          const exitF = clamp01(u - i);
+          const eIn = ease(enterF);
+          const eOut = ease(exitF);
+
+          gsap.set(el, {
+            y: (1 - eIn) * enterY + eOut * exitY,
+            scale: lerp(lerp(1.05, 1, eIn), 0.9, eOut),
+            // fade in over the first half of the rise, out across the exit
+            opacity: ease(clamp01(enterF * 2)) * (1 - eOut),
+          });
+        });
+
+        // Counter/paragraph follow the focused card (rounds mid-transition).
+        const step = Math.min(2, Math.max(0, Math.round(u)));
+        setActiveStep((prev) => (prev !== step ? step : prev));
+      };
+
+      // Initial stack: card 1 focused, cards 2–3 waiting below (also keeps
+      // them invisible before the pin, so nothing pokes out of the section).
+      render(0);
+
+      // One master trigger owns the pin; everything derives from its progress.
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
         end: "+=2000",
         pin: true,
         scrub: 1,
-        onUpdate: (self) => {
-          slots.forEach((ref, i) => {
-            if (ref.current) {
-              gsap.set(ref.current, { y: self.progress * (i + 1) * stepY });
-            }
-          });
-          const step = Math.min(2, Math.floor(self.progress * 3));
-          setActiveStep((prev) => (prev !== step ? step : prev));
-        },
+        onUpdate: (self) => render(self.progress),
       });
 
       return cleanupLenis;

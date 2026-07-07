@@ -65,17 +65,25 @@
   overflow: hidden;
   outline: none;
 }
+/* Card-deck layout: all three slots share the viewport centre (calc offsets,
+   NOT css transforms — GSAP owns `transform` for the y/scale choreography).
+   Later cards stack above earlier ones so the incoming card rises over the
+   outgoing one. */
+.stair-1,
+.stair-2,
+.stair-3 {
+  top: calc(50% - 110px);
+  left: calc(50% - 110px);
+  will-change: transform, opacity;
+}
 .stair-1 {
-  top: 10%;
-  left: 10%;
+  z-index: 1;
 }
 .stair-2 {
-  top: 35%;
-  left: 35%;
+  z-index: 2;
 }
 .stair-3 {
-  top: 60%;
-  left: 60%;
+  z-index: 3;
 }
 .stair-slot img {
   display: block;
@@ -107,23 +115,17 @@
   animation: sqFadeIn 0.4s ease both;
 }
 
-/* Mobile — smaller squares + tighter stair positions (spec cleanup note). */
+/* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
   .stair-slot {
     width: 140px;
     height: 140px;
   }
-  .stair-1 {
-    top: 8%;
-    left: 6%;
-  }
-  .stair-2 {
-    top: 30%;
-    left: 32%;
-  }
+  .stair-1,
+  .stair-2,
   .stair-3 {
-    top: 52%;
-    left: 55%;
+    top: calc(50% - 70px);
+    left: calc(50% - 70px);
   }
   .stairs-paragraph {
     max-width: 220px;
