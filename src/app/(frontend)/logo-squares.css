@@ -63,12 +63,14 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
-  --stair-size: 420px; /* card edge length — mobile overrides below */
+  /* Portrait cards (reference arrangement) — mobile overrides below. */
+  --stair-w: 400px;
+  --stair-h: 520px;
 }
 .stair-slot {
   position: absolute;
-  width: var(--stair-size);
-  height: var(--stair-size);
+  width: var(--stair-w);
+  height: var(--stair-h);
   /* overflow stays visible during the Flip flight (the traveling square is
      re-parented into the slot and animated with transforms, which do NOT
      escape overflow clipping) — .filled turns the crop on after landing. */
@@ -85,8 +87,8 @@
 .stair-2,
 .stair-3,
 .stair-4 {
-  top: calc(50% - var(--stair-size) / 2);
-  left: calc(50% - var(--stair-size) / 2);
+  top: calc(50% - var(--stair-h) / 2);
+  left: calc(50% - var(--stair-w) / 2);
   will-change: transform, opacity;
 }
 .stair-1 {
@@ -136,20 +138,21 @@
 }
 .stairs-paragraph {
   position: absolute;
-  top: 18vh; /* below the fixed nav chrome */
-  right: 6vw;
+  top: 32vh; /* middle-right, per the reference arrangement */
+  right: 8vw;
   z-index: 120;
-  max-width: 520px;
+  max-width: 340px;
   animation: sqFadeIn 0.4s ease both;
 }
 
 /* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
   .about-stairs {
-    --stair-size: 260px;
+    --stair-w: 240px;
+    --stair-h: 310px;
   }
   .stairs-paragraph {
-    max-width: 320px;
+    max-width: 260px;
   }
 }
 @keyframes sqFadeIn {

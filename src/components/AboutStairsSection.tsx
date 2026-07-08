@@ -66,7 +66,10 @@ export default function AboutStairsSection({
 
       const render = (p: number) => {
         const u = p * (slots.length - 1); // one unit per transition
-        const STEP = 120;
+        // Big diagonal stride (reference arrangement): the previous card sits
+        // far up-left and the next far down-right, both partially cropped by
+        // the viewport edges.
+        const stride = Math.min(window.innerWidth, window.innerHeight) * 0.45;
 
         slots.forEach((ref, i) => {
           const el = ref.current;
@@ -74,14 +77,13 @@ export default function AboutStairsSection({
           const rel = i - u; // + waiting → 0 focused → − exited
           const wait = clamp01(rel);
           const gone = clamp01(-rel);
-          const depth = Math.max(0, rel - 1); // steps beyond the next one
 
           gsap.set(el, {
-            x: STEP * rel,
-            y: STEP * rel,
+            x: stride * rel,
+            y: stride * rel,
             scale: 1 + 0.05 * wait - 0.1 * gone,
-            // exits fade out over one step; deeper waiting steps sit dimmer
-            opacity: rel < 0 ? 1 - gone : Math.max(0.35, 1 - 0.3 * depth),
+            // neighbours stay visible but dimmed (reference tint), both sides
+            opacity: Math.max(0.35, 1 - 0.65 * Math.abs(rel)),
             // focused card on top; outgoing yields to incoming mid-transition
             zIndex: Math.round(100 - Math.abs(rel) * 10 - (rel < 0 ? 5 : 0)),
           });
@@ -135,12 +137,12 @@ export default function AboutStairsSection({
         <StairImg label={IMG_LABELS[3]} />
       </div>
 
-      {/* Phase 5 — counter (bottom-left) */}
+      {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
       <div className="stairs-counter font-body" aria-hidden="true">
-        <span className="current font-display text-cream text-7xl italic sm:text-8xl">
+        <span className="current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]">
           0{activeStep + 1}
         </span>
-        <span className="total text-cream-dim text-xl"> / 0{TOTAL}</span>
+        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
       </div>
 
       {/* Phase 5 — paragraph (top-right); key remount = CSS crossfade */}
