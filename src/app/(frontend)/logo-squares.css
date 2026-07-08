@@ -25,6 +25,24 @@
   background: var(--acc-green);
 }
 
+/* Overlay mode — the container matches the logo <img> box exactly (same
+   aspect ratio, pinned to its top-left), so percentage anchors land on the
+   trio inside the artwork. */
+.logo-squares-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 691 / 211; /* LOGO-b.svg viewBox */
+  pointer-events: none;
+}
+
+/* Invisible anchors over the logo's own squares: the artwork stays the visible
+   trio; clones drop this class (EmergeSquares) to become visible. */
+.sq-anchor {
+  visibility: hidden;
+}
+
 /* --- Traveling clone (fixed-position, appended to body) --- */
 .sq-clone {
   pointer-events: none;

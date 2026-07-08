@@ -10,7 +10,12 @@ import { useReducedMotion } from "@/lib/reducedMotion";
  * centered on black with the red light — a held, confident beat with a subtle
  * scroll-parallax reveal.
  */
-export default function WordmarkMoment() {
+export default function WordmarkMoment({
+  children,
+}: {
+  /** Optional content under the wordmark (e.g. the traveling logo squares). */
+  children?: React.ReactNode;
+}) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -41,6 +46,8 @@ export default function WordmarkMoment() {
       >
         {/* Large centred rmz signature lockup (real brand SVG) */}
         <Logo variant="signature" className="w-full" />
+        {/* Inside the parallax box so overlay anchors track the logo. */}
+        {children}
       </motion.div>
     </section>
   );

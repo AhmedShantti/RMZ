@@ -74,22 +74,18 @@ export default function EmergeSquares({
       const original = squareRefs[color].current;
       if (!original) return;
 
-      const rect = original.getBoundingClientRect();
       const clone = original.cloneNode(true) as HTMLElement;
       clone.classList.add("sq-clone");
+      // The original may be an invisible overlay anchor (over the logo's own
+      // trio) — the clone must be visible.
+      clone.classList.remove("sq-anchor");
       document.body.appendChild(clone);
 
-      // Sit the clone exactly on top of the original, invisible until it emerges.
-      gsap.set(clone, {
-        position: "fixed",
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-        margin: 0,
-        opacity: 0,
-        zIndex: 999,
-      });
+      // Hidden fixed clone; its coordinates are sampled when the emerge fires
+      // (function-based below), NOT at mount — on pages where the logo section
+      // sits below the fold, mount-time coordinates would be stale by the time
+      // the user scrolls to it.
+      gsap.set(clone, { position: "fixed", margin: 0, opacity: 0, zIndex: 999 });
 
       clones.push(clone);
       emergeRefs.current[color] = clone;
@@ -102,6 +98,13 @@ export default function EmergeSquares({
             once: true,
           },
           delay: gsap.utils.random(0, 0.4), // randomized stagger per square
+        })
+        // Sit the clone exactly on top of the original as the emerge starts.
+        .set(clone, {
+          top: () => original.getBoundingClientRect().top,
+          left: () => original.getBoundingClientRect().left,
+          width: () => original.getBoundingClientRect().width,
+          height: () => original.getBoundingClientRect().height,
         })
         .fromTo(
           clone,
