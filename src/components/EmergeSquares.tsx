@@ -35,6 +35,14 @@ import {
  *   slot's identical brand-colour cover (AboutStairsSection), which dissolves
  *   into the photo when its card reaches focus.
  *
+ *   Phase 3 — after the stairs, the squares fade back in and drift on a
+ *   randomized scrubbed path through the "What we do" section (behind its
+ *   text: z-index drops under the content while there).
+ *
+ *   Phase 4 — they converge into a centred row that settles on the marquee
+ *   section (placeholder arrangement — the marquee gets its own pass later).
+ *   Both phases no-op on pages without those sections (e.g. the lab).
+ *
  * All triggers are created at MOUNT with function-based values +
  * invalidateOnRefresh (creating them mid-scroll — e.g. in an onComplete —
  * computes their ranges from pinned/stale layout and breaks the scrub).
@@ -75,6 +83,15 @@ export default function EmergeSquares({
     // layout effect runs — defer all setup one frame. contextSafe keeps the
     // deferred tweens/triggers inside useGSAP's auto-cleanup context.
     const setup = contextSafe!(() => {
+      // Post-stairs waypoint sections (absent on the lab page → phases 3/4
+      // simply don't run there).
+      const teaser = document.querySelector<HTMLElement>(
+        'section[aria-label="What we do"]',
+      );
+      const marquee = document.querySelector<HTMLElement>(
+        "[data-squares-marquee]",
+      );
+
       COLORS.forEach((color, i) => {
         const original = squareRefs[color].current;
         const slot = landingRefs[color].current;
@@ -189,6 +206,89 @@ export default function EmergeSquares({
               },
             },
           );
+
+        // Phase 3 — random float through "What we do". Ends as the teaser's
+        // bottom nears the viewport bottom, where Phase 4's range begins.
+        if (teaser) {
+          const FLOAT = 72; // px — floating square size
+          const pts = [
+            { fx: gsap.utils.random(0.1, 0.35), fy: gsap.utils.random(0.05, 0.35), rot: gsap.utils.random(-35, 35) },
+            { fx: gsap.utils.random(0.4, 0.75), fy: gsap.utils.random(0.3, 0.65), rot: gsap.utils.random(-35, 35) },
+            { fx: gsap.utils.random(0.15, 0.8), fy: gsap.utils.random(0.55, 0.9), rot: gsap.utils.random(-35, 35) },
+          ];
+          const drift = gsap.timeline({
+            defaults: { ease: "none" },
+            scrollTrigger: {
+              trigger: teaser,
+              start: "top bottom",
+              end: "bottom 92%",
+              scrub: 1,
+              invalidateOnRefresh: true,
+              // float behind the section's text; back above for the flight
+              onEnter: () => gsap.set(wrapper, { zIndex: 5 }),
+              onLeaveBack: () => gsap.set(wrapper, { zIndex: 999 }),
+            },
+          });
+          pts.forEach((pt) => {
+            drift.to(wrapper, {
+              x: () => {
+                const t = teaser.getBoundingClientRect();
+                return t.left + window.scrollX + pt.fx * t.width - ax;
+              },
+              y: () => {
+                const t = teaser.getBoundingClientRect();
+                return t.top + window.scrollY + pt.fy * t.height - ay;
+              },
+              scaleX: () => FLOAT / aw,
+              scaleY: () => FLOAT / ah,
+              rotation: pt.rot,
+            });
+          });
+          // fade back in as the section arrives (the covers keep the cards)
+          gsap.to(inner, {
+            opacity: 1,
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: teaser,
+              start: "top 95%",
+              end: "top 55%",
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
+
+        // Phase 4 — converge into a centred row shaping the marquee
+        // (placeholder arrangement; the marquee gets its own pass later).
+        if (marquee) {
+          const S = 72;
+          const GAP = 24;
+          gsap.to(wrapper, {
+            x: () => {
+              const m = marquee.getBoundingClientRect();
+              const rowStart =
+                m.left + window.scrollX + m.width / 2 - (3 * S + 2 * GAP) / 2;
+              return rowStart + i * (S + GAP) - ax;
+            },
+            y: () => {
+              const m = marquee.getBoundingClientRect();
+              return m.top + window.scrollY + m.height / 2 - S / 2 - ay;
+            },
+            scaleX: () => S / aw,
+            scaleY: () => S / ah,
+            rotation: 0,
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: marquee,
+              start: "top 92%",
+              end: "top 45%",
+              scrub: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+        }
       });
 
       ScrollTrigger.addEventListener("refreshInit", refreshAnchors);
