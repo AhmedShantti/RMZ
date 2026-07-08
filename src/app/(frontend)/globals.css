@@ -175,6 +175,11 @@
 html {
   background: var(--ink);
   -webkit-text-size-adjust: 100%;
+  /* Pairs with body's overflow-x: clip below — a non-visible value here stops
+     body's overflow from propagating to the viewport, so body's clip applies
+     locally (on the root alone, clip degrades to viewport `hidden`, which
+     still allows sideways shifting). */
+  overflow-x: clip;
   /* Whole site uses IvarDisplay: body/utility role aliases the display family. */
   --font-body: var(--font-display);
 }
@@ -188,6 +193,12 @@ body {
   text-rendering: optimizeLegibility;
   /* The stage sits above the fixed red-light + grain layers. */
   position: relative;
+  /* Decorative layers (stairs deck, traveling squares) transform past the
+     right edge; clip them at the viewport width. Unlike overflow-x: hidden,
+     `clip` creates no scroll container — position: sticky and the GSAP-pinned
+     (fixed) sections are unaffected. Requires the html rule above, otherwise
+     this value would propagate to the viewport instead of clipping here. */
+  overflow-x: clip;
 }
 
 /* Lenis smooth-scroll wiring */
