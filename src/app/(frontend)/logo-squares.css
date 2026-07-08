@@ -63,9 +63,10 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
-  /* Portrait cards (reference arrangement) — mobile overrides below. */
-  --stair-w: 400px;
-  --stair-h: 520px;
+  /* Portrait cards, scaled to the viewport like the reference (~26vw wide) —
+     mobile overrides below. */
+  --stair-w: clamp(240px, 26vw, 400px);
+  --stair-h: clamp(300px, 34vw, 520px);
 }
 .stair-slot {
   position: absolute;
@@ -142,10 +143,10 @@
    it, so the text never sits above the images. */
 .stairs-paragraph-wrap {
   position: absolute;
-  top: 16vh;
-  right: 5vw;
+  top: 14vh; /* above the focused card's top line */
+  right: 0;
   z-index: 120;
-  max-width: 340px;
+  max-width: 320px;
 }
 .stairs-paragraph {
   animation: sqFadeIn 0.4s ease both;
