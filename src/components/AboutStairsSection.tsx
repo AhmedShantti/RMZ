@@ -55,42 +55,40 @@ export default function AboutStairsSection({
       const cleanupLenis = syncScrollTriggerWithLenis();
       const slots = [yellow, orange, green, fourth];
 
-      // Card-deck choreography (reference video): every card's state is a pure
-      // function of scroll progress — no thresholds, no index snapping. The
-      // outgoing card shrinks (1 → 0.9), drifts up and fades while the next
-      // rises from below (1.05 → 1); both stay visible mid-transition.
-      const ease = gsap.parseEase("power2.inOut");
-      const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+      // Continuous diagonal staircase: every card sits STEP·(i − u) down-right
+      // of the centre — uniform spacing, all steps visible at once, the whole
+      // flight of stairs climbing up-left as one function of scroll progress.
+      // Each card wears its brand-colour cover square while waiting, and the
+      // cover dissolves into the photo exactly as the card reaches focus (so
+      // the traveling squares stay visible in the section however slowly the
+      // user scrolls).
       const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
       const render = (p: number) => {
         const u = p * (slots.length - 1); // one unit per transition
-        // Staircase step (diagonal, bottom-right → top-left): incoming panel
-        // travels (+120,+120) → (0,0); outgoing continues (0,0) → (-120,-120).
         const STEP = 120;
 
         slots.forEach((ref, i) => {
           const el = ref.current;
           if (!el) return;
-          // Card 0 starts focused; card i enters over u ∈ [i-1, i] and
-          // exits over u ∈ [i, i+1]. Both ramps are eased for the cinematic
-          // feel; scrub smoothing does the rest.
-          const enterF = i === 0 ? 1 : clamp01(u - (i - 1));
-          const exitF = clamp01(u - i);
-          const eIn = ease(enterF);
-          const eOut = ease(exitF);
-
-          // One shared diagonal offset keeps the motion exactly 45° — the
-          // climb reads as stairs, not a vertical slide.
-          const d = (1 - eIn) * STEP + eOut * -STEP;
+          const rel = i - u; // + waiting → 0 focused → − exited
+          const wait = clamp01(rel);
+          const gone = clamp01(-rel);
+          const depth = Math.max(0, rel - 1); // steps beyond the next one
 
           gsap.set(el, {
-            x: d,
-            y: d,
-            scale: lerp(lerp(1.05, 1, eIn), 0.9, eOut),
-            // fade in over the first half of the climb, out across the exit
-            opacity: ease(clamp01(enterF * 2)) * (1 - eOut),
+            x: STEP * rel,
+            y: STEP * rel,
+            scale: 1 + 0.05 * wait - 0.1 * gone,
+            // exits fade out over one step; deeper waiting steps sit dimmer
+            opacity: rel < 0 ? 1 - gone : Math.max(0.35, 1 - 0.3 * depth),
+            // focused card on top; outgoing yields to incoming mid-transition
+            zIndex: Math.round(100 - Math.abs(rel) * 10 - (rel < 0 ? 5 : 0)),
           });
+
+          // Brand-square cover → photo, timed to the final climb into focus.
+          const cover = el.querySelector<HTMLElement>(".stair-cover");
+          if (cover) gsap.set(cover, { opacity: wait });
         });
 
         // Counter/paragraph follow the focused card (rounds mid-transition).
@@ -98,8 +96,7 @@ export default function AboutStairsSection({
         setActiveStep((prev) => (prev !== step ? step : prev));
       };
 
-      // Initial stack: card 1 focused, cards 2–3 waiting below (also keeps
-      // them invisible before the pin, so nothing pokes out of the section).
+      // Initial staircase: card 1 focused, the rest stepping down-right.
       render(0);
 
       // One master trigger owns the pin; everything derives from its progress.
@@ -120,14 +117,19 @@ export default function AboutStairsSection({
 
   return (
     <section ref={sectionRef} className="about-stairs">
+      {/* Slots 1–3 wear their brand-square cover (dissolves into the photo at
+          focus); slot 4 is the extra step with no traveling square. */}
       <div ref={yellow} className="stair-slot stair-1">
         <StairImg label={IMG_LABELS[0]} />
+        <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
       </div>
       <div ref={orange} className="stair-slot stair-2">
         <StairImg label={IMG_LABELS[1]} />
+        <span className="stair-cover" style={{ background: "var(--acc-orange)" }} aria-hidden="true" />
       </div>
       <div ref={green} className="stair-slot stair-3">
         <StairImg label={IMG_LABELS[2]} />
+        <span className="stair-cover" style={{ background: "var(--acc-green)" }} aria-hidden="true" />
       </div>
       <div ref={fourth} className="stair-slot stair-4">
         <StairImg label={IMG_LABELS[3]} />
@@ -135,14 +137,14 @@ export default function AboutStairsSection({
 
       {/* Phase 5 — counter (bottom-left) */}
       <div className="stairs-counter font-body" aria-hidden="true">
-        <span className="current font-display text-cream text-6xl italic sm:text-7xl">
+        <span className="current font-display text-cream text-7xl italic sm:text-8xl">
           0{activeStep + 1}
         </span>
-        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
+        <span className="total text-cream-dim text-xl"> / 0{TOTAL}</span>
       </div>
 
       {/* Phase 5 — paragraph (top-right); key remount = CSS crossfade */}
-      <p className="stairs-paragraph font-body text-cream-dim text-lg leading-relaxed sm:text-xl" key={activeStep}>
+      <p className="stairs-paragraph font-body text-cream-dim text-xl leading-relaxed sm:text-2xl" key={activeStep}>
         {PARAGRAPHS[activeStep]}
       </p>
     </section>

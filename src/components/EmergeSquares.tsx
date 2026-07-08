@@ -1,24 +1,43 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, Flip, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
+import {
+  gsap,
+  ScrollTrigger,
+  useGSAP,
+  syncScrollTriggerWithLenis,
+} from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
-import { COLORS, type ColorKey, type SquareRefs, type StairRefs } from "./logoSquares.types";
+import {
+  COLORS,
+  type ColorKey,
+  type SquareRefs,
+  type StairRefs,
+} from "./logoSquares.types";
 
 /**
  * Controller for the traveling squares. It clones each static logo square and
  * animates the clones (the originals stay in the logo). Renders nothing visible
- * — clones are fixed-position elements appended to <body>.
+ * — clones are elements appended to <body>.
  *
- *   Phase 1 — emerge: on scroll-in, each clone spawns on top of its original
- *   and pops outward with randomized rotation/stagger (once only).
+ * Every traveler is a wrapper (owns the FLIGHT transform) around an inner
+ * square (owns the EMERGE pop + the arrival fade), so the two never fight
+ * over the same `transform`.
  *
- *   Phase 2 — travel: right after a clone finishes emerging, a staggered
- *   delayedCall re-parents it into its matching stair slot and GSAP Flip
- *   animates the position/size change (fixed 64px square → 220px slot).
+ *   Phase 1 — emerge: on scroll-in, the inner square pops out of its original
+ *   with randomized rotation/stagger (once only, time-based — it's a beat).
  *
- * Later phases (scroll-driven stair movement, counter + paragraph) hang off
- * the landed squares.
+ *   Phase 2 — travel: SCRUBBED to scroll, not timed. The wrapper's flight to
+ *   the stair slot maps onto the stairs section's approach ("top bottom" →
+ *   staggered ends), so the squares are always mid-flight wherever the user
+ *   is between the logo and the stairs — scroll slowly and they fly slowly,
+ *   scroll back and they return. On arrival a scrubbed fade hands off to the
+ *   slot's identical brand-colour cover (AboutStairsSection), which dissolves
+ *   into the photo when its card reaches focus.
+ *
+ * All triggers are created at MOUNT with function-based values +
+ * invalidateOnRefresh (creating them mid-scroll — e.g. in an onComplete —
+ * computes their ranges from pinned/stale layout and breaks the scrub).
  */
 export default function EmergeSquares({
   squareRefs,
@@ -27,113 +46,162 @@ export default function EmergeSquares({
   squareRefs: SquareRefs;
   landingRefs: StairRefs;
 }) {
-  // The emerged clone per colour — later phases grab these.
+  // The traveling wrapper per colour — later phases grab these.
   const emergeRefs = useRef<Record<ColorKey, HTMLElement | null>>({
     yellow: null,
     orange: null,
     green: null,
   });
 
-  useGSAP(() => {
+  useGSAP((_, contextSafe) => {
     if (prefersReducedMotion()) return;
 
     const cleanupLenis = syncScrollTriggerWithLenis();
-    const clones: HTMLElement[] = [];
-    const delayedCalls: gsap.core.Tween[] = [];
+    const wrappers: HTMLElement[] = [];
+    const anchors: (() => void)[] = [];
+    const refreshAnchors = () => anchors.forEach((fn) => fn());
 
-    /** Phase 2 — Flip the clone from wherever it is into its stair slot. */
-    const sendCloneToStairs = (clone: HTMLElement, slot: HTMLElement) => {
-      const state = Flip.getState(clone);
+    // Staggered arrival points so the three don't fly in unison, each with a
+    // short scrubbed fade window ending at its arrival.
+    const FLIGHT_ENDS = ["top 30%", "top 15%", "top top"];
+    const FADE_RANGES: [string, string][] = [
+      ["top 42%", "top 30%"],
+      ["top 27%", "top 15%"],
+      ["top 12%", "top top"],
+    ];
 
-      // Re-parent into the slot and switch to the landed styling. Clearing the
-      // inline fixed-position props lets `.stair-square` (absolute, 100%)
-      // define the end state that Flip animates toward.
-      slot.appendChild(clone);
-      clone.classList.add("stair-square");
-      gsap.set(clone, {
-        clearProps: "position,top,left,width,height,margin,zIndex",
-      });
+    // React attaches refs and runs layout effects in ONE depth-first pass, so
+    // the stair-slot refs (a LATER sibling's DOM) are still null while this
+    // layout effect runs — defer all setup one frame. contextSafe keeps the
+    // deferred tweens/triggers inside useGSAP's auto-cleanup context.
+    const setup = contextSafe!(() => {
+      COLORS.forEach((color, i) => {
+        const original = squareRefs[color].current;
+        const slot = landingRefs[color].current;
+        if (!original || !slot) return;
+        const section = slot.closest(".about-stairs") ?? slot;
 
-      Flip.from(state, {
-        duration: 1,
-        ease: "power2.inOut",
-        scale: true,
-        absolute: true,
-        zIndex: 999, // stay above page content during flight
-        onComplete: () => {
-          clone.classList.remove("sq-clone");
-          slot.classList.add("filled"); // turn the overflow crop back on
-          // Phase 3 — the colour square dissolves, leaving the slot as a
-          // cropped window onto the step photo beneath it.
-          gsap.to(clone, { opacity: 0, duration: 0.5, delay: 0.25, ease: "power1.out" });
-        },
-      });
-    };
+        // wrapper = flight, inner = emerge pop + arrival fade
+        const wrapper = document.createElement("div");
+        wrapper.className = "sq-clone";
+        const inner = original.cloneNode(true) as HTMLElement;
+        inner.classList.remove("sq-anchor");
+        inner.removeAttribute("style");
+        gsap.set(inner, {
+          display: "block",
+          width: "100%",
+          height: "100%",
+          opacity: 0,
+        });
+        wrapper.appendChild(inner);
+        document.body.appendChild(wrapper);
+        wrappers.push(wrapper);
+        emergeRefs.current[color] = wrapper;
 
-    COLORS.forEach((color, i) => {
-      const original = squareRefs[color].current;
-      if (!original) return;
+        // Anchor the wrapper on the logo square in DOCUMENT coordinates —
+        // re-measured on every ScrollTrigger refresh (resize, font load…).
+        let ax = 0;
+        let ay = 0;
+        let aw = 1;
+        let ah = 1;
+        const anchor = () => {
+          const a = original.getBoundingClientRect();
+          ax = a.left + window.scrollX;
+          ay = a.top + window.scrollY;
+          aw = a.width || 1;
+          ah = a.height || 1;
+          gsap.set(wrapper, {
+            position: "absolute",
+            top: ay,
+            left: ax,
+            width: aw,
+            height: ah,
+            margin: 0,
+            zIndex: 999,
+            transformOrigin: "0 0",
+          });
+        };
+        anchor();
+        anchors.push(anchor);
 
-      const clone = original.cloneNode(true) as HTMLElement;
-      clone.classList.add("sq-clone");
-      // The original may be an invisible overlay anchor (over the logo's own
-      // trio) — the clone must be visible.
-      clone.classList.remove("sq-anchor");
-      document.body.appendChild(clone);
-
-      // Hidden fixed clone; its coordinates are sampled when the emerge fires
-      // (function-based below), NOT at mount — on pages where the logo section
-      // sits below the fold, mount-time coordinates would be stale by the time
-      // the user scrolls to it.
-      gsap.set(clone, { position: "fixed", margin: 0, opacity: 0, zIndex: 999 });
-
-      clones.push(clone);
-      emergeRefs.current[color] = clone;
-
-      gsap
-        .timeline({
+        // Phase 2 — the scrubbed flight (logo → slot's pre-pin rect).
+        gsap.to(wrapper, {
+          x: () => {
+            const d = slot.getBoundingClientRect();
+            return d.left + window.scrollX - ax;
+          },
+          y: () => {
+            const d = slot.getBoundingClientRect();
+            return d.top + window.scrollY - ay;
+          },
+          scaleX: () => slot.getBoundingClientRect().width / aw,
+          scaleY: () => slot.getBoundingClientRect().height / ah,
+          ease: "none",
           scrollTrigger: {
-            trigger: ".logo-squares",
-            start: "top 80%",
-            once: true,
+            trigger: section,
+            start: "top bottom",
+            end: FLIGHT_ENDS[i] ?? "top top",
+            scrub: 1,
+            invalidateOnRefresh: true,
           },
-          delay: gsap.utils.random(0, 0.4), // randomized stagger per square
-        })
-        // Sit the clone exactly on top of the original as the emerge starts.
-        .set(clone, {
-          top: () => original.getBoundingClientRect().top,
-          left: () => original.getBoundingClientRect().left,
-          width: () => original.getBoundingClientRect().width,
-          height: () => original.getBoundingClientRect().height,
-        })
-        .fromTo(
-          clone,
-          { scale: 0.4, opacity: 0, rotate: gsap.utils.random(-25, 25) },
-          {
-            scale: 1,
-            opacity: 1,
-            rotate: 0,
-            duration: 0.5,
-            ease: "back.out(2)",
-            // Phase 2 kick-off: staggered so the three don't move in unison.
-            onComplete: () => {
-              delayedCalls.push(
-                gsap.delayedCall(i * 0.15, () => {
-                  const slot = landingRefs[color].current;
-                  if (slot) sendCloneToStairs(clone, slot);
-                }),
-              );
-            },
-          },
-        );
-    });
+        });
 
-    // useGSAP reverts the tweens/ScrollTriggers; we also kill the chained
-    // delayed calls, remove the clones and detach the Lenis listener.
+        // Arrival handoff — scrubbed fade onto the slot's identical cover
+        // (reversible: scrolling back up brings the traveler back).
+        const fade = gsap.to(inner, {
+          opacity: 0,
+          ease: "none",
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: section,
+            start: FADE_RANGES[i][0],
+            end: FADE_RANGES[i][1],
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // Phase 1 — the emerge pop (once, at the logo).
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: ".logo-squares",
+              start: "top 80%",
+              once: true,
+            },
+            delay: gsap.utils.random(0, 0.4), // randomized stagger per square
+          })
+          .fromTo(
+            inner,
+            { scale: 0.4, opacity: 0, rotate: gsap.utils.random(-25, 25) },
+            {
+              scale: 1,
+              opacity: 1,
+              rotate: 0,
+              duration: 0.5,
+              ease: "back.out(2)",
+              // Deep-load guard (scroll restoration past the stairs): if the
+              // arrival fade has already fully played, stay handed-off.
+              onComplete: () => {
+                if (fade.scrollTrigger && fade.scrollTrigger.progress >= 1) {
+                  gsap.set(inner, { opacity: 0 });
+                }
+              },
+            },
+          );
+      });
+
+      ScrollTrigger.addEventListener("refreshInit", refreshAnchors);
+    });
+    const raf = requestAnimationFrame(setup);
+
+    // useGSAP reverts the tweens/ScrollTriggers; we also remove the clones,
+    // the refresh listener and the Lenis hook.
     return () => {
+      cancelAnimationFrame(raf);
       cleanupLenis();
-      delayedCalls.forEach((d) => d.kill());
-      clones.forEach((c) => c.remove());
+      ScrollTrigger.removeEventListener("refreshInit", refreshAnchors);
+      wrappers.forEach((c) => c.remove());
     };
   }, []);
 

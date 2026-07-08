@@ -37,7 +37,10 @@ export default function HomeLogoStairs() {
 
       <EmergeSquares squareRefs={squareRefs} landingRefs={landingRefs} />
 
-      <AboutStairsSection landingRefs={landingRefs} />
+      {/* Centered 80% column; the pin-spacer lives inside it. */}
+      <div className="mx-auto w-[80%]">
+        <AboutStairsSection landingRefs={landingRefs} />
+      </div>
     </>
   );
 }

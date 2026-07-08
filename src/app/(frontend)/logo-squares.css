@@ -63,7 +63,7 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
-  --stair-size: 340px; /* card edge length — mobile overrides below */
+  --stair-size: 420px; /* card edge length — mobile overrides below */
 }
 .stair-slot {
   position: absolute;
@@ -108,6 +108,16 @@
   object-fit: cover;
 }
 
+/* Brand-square cover over each card's photo — full square while the card
+   waits/climbs, dissolved by the deck loop as the card reaches focus.
+   Default 0 so reduced-motion / no-JS shows the photos. */
+.stair-cover {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
 /* --- Demo harness hero --- */
 .lab-hero {
   min-height: 100vh;
@@ -116,28 +126,30 @@
   justify-content: center;
 }
 
-/* --- Counter + paragraph (Phase 5) --- */
+/* --- Counter + paragraph (Phase 5) — above the cards (deck z ≤ 100) --- */
 .stairs-counter {
   position: absolute;
   bottom: 6vh;
   left: 6vw;
+  z-index: 120;
   font-variant-numeric: tabular-nums;
 }
 .stairs-paragraph {
   position: absolute;
   top: 18vh; /* below the fixed nav chrome */
   right: 6vw;
-  max-width: 420px;
+  z-index: 120;
+  max-width: 520px;
   animation: sqFadeIn 0.4s ease both;
 }
 
 /* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
   .about-stairs {
-    --stair-size: 220px;
+    --stair-size: 260px;
   }
   .stairs-paragraph {
-    max-width: 280px;
+    max-width: 320px;
   }
 }
 @keyframes sqFadeIn {
