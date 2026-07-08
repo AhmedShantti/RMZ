@@ -136,12 +136,18 @@
   z-index: 120;
   font-variant-numeric: tabular-nums;
 }
-.stairs-paragraph {
+/* Positioning lives on the wrapper (GSAP fades it — the inner <p>'s keyed
+   crossfade animation would override inline opacity via fill-mode). Top-right
+   corner: the cards' travel diagonal (bottom-right → top-left) never crosses
+   it, so the text never sits above the images. */
+.stairs-paragraph-wrap {
   position: absolute;
-  top: 32vh; /* middle-right, per the reference arrangement */
-  right: 8vw;
+  top: 16vh;
+  right: 5vw;
   z-index: 120;
   max-width: 340px;
+}
+.stairs-paragraph {
   animation: sqFadeIn 0.4s ease both;
 }
 
@@ -151,7 +157,7 @@
     --stair-w: 240px;
     --stair-h: 310px;
   }
-  .stairs-paragraph {
+  .stairs-paragraph-wrap {
     max-width: 260px;
   }
 }

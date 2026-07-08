@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Logo from "@/components/Logo";
 import FloatingSquare from "@/components/FloatingSquares";
 import ContactForm from "@/components/ContactForm";
 import MarketsColumns from "@/components/MarketsColumns";
@@ -30,12 +29,27 @@ export default async function ContactPage() {
   ]);
 
   return (
-    <div className="px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
-      <div className="mx-auto max-w-4xl">
-        {/* Large centred logo */}
-        <Reveal className="flex justify-center">
-          <Logo className="w-[clamp(200px,40vw,280px)]" />
-        </Reveal>
+    <div className="relative px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
+      {/* Floating squares — now positioned relative to the whole page,
+          not scoped to the form. Blur removed. */}
+      <FloatingSquare
+        size={110}
+        color="yellow"
+        className="fixed left-[12%] top-[18%] hidden sm:block filter-none"
+      />
+      <FloatingSquare
+        size={110}
+        color="orange"
+        className="fixed right-[8%] top-[45%] hidden sm:block filter-none"
+      />
+      <FloatingSquare
+        size={110}
+        color="green"
+        className="fixed left-[6%] top-[70%] hidden sm:block  filter-none"
+      />
+
+      <div className="relative z-10 mx-auto max-w-4xl">
+        
 
         {/* Heading — no longer framed by the squares */}
         <Reveal delay={0.05}>
@@ -87,23 +101,8 @@ export default async function ContactPage() {
           </div>
         </Reveal>
 
-        {/* Form — one square on top, one left, one right, each floating independently */}
+        {/* Form */}
         <Reveal delay={0.14} className="relative mt-12">
-          <FloatingSquare
-            size={90}
-            color="yellow"
-            className="left-1/2 -top-14 -translate-x-1/2 hidden sm:block"
-          />
-          <FloatingSquare
-            size={110}
-            color="orange"
-            className="-left-16 top-1/3 hidden sm:block"
-          />
-          <FloatingSquare
-            size={100}
-            color="green"
-            className="-right-16 top-1/2 hidden sm:block"
-          />
           <div className="relative z-10">
             <ContactForm form={contact.form} />
           </div>
@@ -112,7 +111,7 @@ export default async function ContactPage() {
 
       {/* Markets — kept, moved below the form */}
       <Reveal delay={0.1}>
-        <div className="mx-auto mt-28 max-w-6xl">
+        <div className="relative z-10 mx-auto mt-28 max-w-6xl">
           <h2 className="font-display text-cream-dim mb-8 text-sm uppercase tracking-[0.3em]">
             {contact.whereWeWorkLabel}
           </h2>

@@ -72,7 +72,7 @@ export default function FloatingSquare({
         zIndex: -1,
         width: size,
         height: size,
-        filter: "blur(4px)",
+        
       }}
     >
       <style jsx>{`
