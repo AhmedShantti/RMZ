@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 import { prefersReducedMotion } from "./reducedMotion";
+import { setLenis } from "./lenis";
 
 /**
  * Lenis smooth scroll (TASK.md §1) — editorial pacing.
@@ -19,6 +20,8 @@ export function useSmoothScroll() {
       touchMultiplier: 1.5,
     });
 
+    setLenis(lenis);
+
     let raf = 0;
     const loop = (time: number) => {
       lenis.raf(time);
@@ -29,6 +32,7 @@ export function useSmoothScroll() {
     return () => {
       cancelAnimationFrame(raf);
       lenis.destroy();
+      setLenis(null);
     };
   }, []);
 }

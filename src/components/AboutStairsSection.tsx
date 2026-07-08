@@ -1,0 +1,165 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { gsap, ScrollTrigger, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
+import { prefersReducedMotion } from "@/lib/reducedMotion";
+import type { StairRefs } from "./logoSquares.types";
+
+/**
+ * The landing section for the traveling squares.
+ *
+ *   Phase 3 — each `.stair-slot` holds a cropped image (placeholder block
+ *   until real photos land; swap for next/image). The landed square fades out
+ *   after arrival (see EmergeSquares) so the slot becomes a photo window.
+ *
+ *   Phase 4 — a single master ScrollTrigger pins the section and, on update,
+ *   drives each slot's `y` at a different multiplier so the three feel like
+ *   steps being walked down rather than one parallax layer.
+ *
+ *   Phase 5 — the same onUpdate derives the active step (0–2) into React
+ *   state for the counter + crossfading paragraph.
+ */
+
+const PARAGRAPHS = [
+  "Step one — where the idea is born. Placeholder copy describing the first image.",
+  "Step two — discipline shapes the boldness. Placeholder copy for the second image.",
+  "Step three — the work meets the world. Placeholder copy for the third image.",
+  "Step four — the story keeps climbing. Placeholder copy for the fourth image.",
+];
+
+const IMG_LABELS = [
+  "[ STEP 1 PHOTO — REPLACE ]",
+  "[ STEP 2 PHOTO — REPLACE ]",
+  "[ STEP 3 PHOTO — REPLACE ]",
+  "[ STEP 4 PHOTO — REPLACE ]",
+];
+
+const TOTAL = PARAGRAPHS.length;
+
+export default function AboutStairsSection({
+  landingRefs,
+}: {
+  landingRefs: StairRefs;
+}) {
+  const { yellow, orange, green } = landingRefs;
+  const sectionRef = useRef<HTMLElement>(null);
+  // 4th deck card — internal only (the logo has 3 squares to travel, so it
+  // isn't a Flip landing target and stays out of the landingRefs API).
+  const fourth = useRef<HTMLDivElement>(null);
+  const [activeStep, setActiveStep] = useState(0);
+
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return;
+
+      const cleanupLenis = syncScrollTriggerWithLenis();
+      const slots = [yellow, orange, green, fourth];
+
+      // Continuous diagonal staircase: every card sits STEP·(i − u) down-right
+      // of the centre — uniform spacing, all steps visible at once, the whole
+      // flight of stairs climbing up-left as one function of scroll progress.
+      // Each card wears its brand-colour cover square while waiting, and the
+      // cover dissolves into the photo exactly as the card reaches focus (so
+      // the traveling squares stay visible in the section however slowly the
+      // user scrolls).
+      const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+      const render = (p: number) => {
+        const u = p * (slots.length - 1); // one unit per transition
+        // Big diagonal stride (reference arrangement): the previous card sits
+        // far up-left and the next far down-right, both partially cropped by
+        // the viewport edges.
+        const stride = Math.min(window.innerWidth, window.innerHeight) * 0.45;
+
+        slots.forEach((ref, i) => {
+          const el = ref.current;
+          if (!el) return;
+          const rel = i - u; // + waiting → 0 focused → − exited
+          const wait = clamp01(rel);
+          const gone = clamp01(-rel);
+
+          gsap.set(el, {
+            x: stride * rel,
+            y: stride * rel,
+            scale: 1 + 0.05 * wait - 0.1 * gone,
+            // neighbours stay visible but dimmed (reference tint), both sides
+            opacity: Math.max(0.35, 1 - 0.65 * Math.abs(rel)),
+            // focused card on top; outgoing yields to incoming mid-transition
+            zIndex: Math.round(100 - Math.abs(rel) * 10 - (rel < 0 ? 5 : 0)),
+          });
+
+          // Brand-square cover → photo, timed to the final climb into focus.
+          const cover = el.querySelector<HTMLElement>(".stair-cover");
+          if (cover) gsap.set(cover, { opacity: wait });
+        });
+
+        // Counter/paragraph follow the focused card (rounds mid-transition).
+        const step = Math.min(slots.length - 1, Math.max(0, Math.round(u)));
+        setActiveStep((prev) => (prev !== step ? step : prev));
+      };
+
+      // Initial staircase: card 1 focused, the rest stepping down-right.
+      render(0);
+
+      // One master trigger owns the pin; everything derives from its progress.
+      // Scroll room scales with the number of transitions (1000px each).
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top",
+        end: `+=${(slots.length - 1) * 1000}`,
+        pin: true,
+        scrub: 1,
+        onUpdate: (self) => render(self.progress),
+      });
+
+      return cleanupLenis;
+    },
+    { scope: sectionRef },
+  );
+
+  return (
+    <section ref={sectionRef} className="about-stairs">
+      {/* Slots 1–3 wear their brand-square cover (dissolves into the photo at
+          focus); slot 4 is the extra step with no traveling square. */}
+      <div ref={yellow} className="stair-slot stair-1">
+        <StairImg label={IMG_LABELS[0]} />
+        <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
+      </div>
+      <div ref={orange} className="stair-slot stair-2">
+        <StairImg label={IMG_LABELS[1]} />
+        <span className="stair-cover" style={{ background: "var(--acc-orange)" }} aria-hidden="true" />
+      </div>
+      <div ref={green} className="stair-slot stair-3">
+        <StairImg label={IMG_LABELS[2]} />
+        <span className="stair-cover" style={{ background: "var(--acc-green)" }} aria-hidden="true" />
+      </div>
+      <div ref={fourth} className="stair-slot stair-4">
+        <StairImg label={IMG_LABELS[3]} />
+      </div>
+
+      {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
+      <div className="stairs-counter font-body" aria-hidden="true">
+        <span className="current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]">
+          0{activeStep + 1}
+        </span>
+        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
+      </div>
+
+      {/* Phase 5 — paragraph (top-right); key remount = CSS crossfade */}
+      <p className="stairs-paragraph font-body text-cream-dim text-xl leading-relaxed sm:text-2xl" key={activeStep}>
+        {PARAGRAPHS[activeStep]}
+      </p>
+    </section>
+  );
+}
+
+/** Cropped photo window — placeholder until real step photos exist.
+ *  Swap for: <Image src="/images/step-N.jpg" alt="" fill className="object-cover" /> */
+function StairImg({ label }: { label: string }) {
+  return (
+    // TODO: Replace with a real photo
+    <div className="stair-img flex h-full w-full items-center justify-center bg-[#1a1a1a]">
+      <span className="font-body px-2 text-center text-xs text-[#666]">{label}</span>
+    </div>
+  );
+}
