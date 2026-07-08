@@ -101,6 +101,52 @@ export default function AboutStairsSection({
       // Initial staircase: card 1 focused, the rest stepping down-right.
       render(0);
 
+      // Reveal: the section stays invisible on approach and each card fades
+      // in exactly as its traveling square lands on it (same windows as
+      // EmergeSquares' FADE_RANGES — keep in sync). The 4th card (no
+      // traveler), counter and paragraph appear with the last arrival.
+      const ARRIVALS: [string, string][] = [
+        ["top 42%", "top 30%"],
+        ["top 27%", "top 15%"],
+        ["top 12%", "top top"],
+        ["top 12%", "top top"],
+      ];
+      slots.forEach((ref, i) => {
+        const el = ref.current;
+        if (!el) return;
+        gsap.fromTo(
+          el,
+          { opacity: 0 },
+          {
+            // land on the deck's resting dim for card i (render(0) values)
+            opacity: Math.max(0.35, 1 - 0.65 * i),
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: ARRIVALS[i][0],
+              end: ARRIVALS[i][1],
+              scrub: true,
+            },
+          },
+        );
+      });
+      [".stairs-counter", ".stairs-paragraph-wrap"].forEach((sel) => {
+        gsap.fromTo(
+          sel,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 20%",
+              end: "top top",
+              scrub: true,
+            },
+          },
+        );
+      });
+
       // One master trigger owns the pin; everything derives from its progress.
       // Scroll room scales with the number of transitions (1000px each).
       ScrollTrigger.create({
@@ -145,10 +191,13 @@ export default function AboutStairsSection({
         <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
       </div>
 
-      {/* Phase 5 — paragraph (top-right); key remount = CSS crossfade */}
-      <p className="stairs-paragraph font-body text-cream-dim text-xl leading-relaxed sm:text-2xl" key={activeStep}>
-        {PARAGRAPHS[activeStep]}
-      </p>
+      {/* Phase 5 — paragraph (top-right, off the travel diagonal);
+          key remount on the inner <p> = CSS crossfade */}
+      <div className="stairs-paragraph-wrap">
+        <p className="stairs-paragraph font-body text-cream-dim text-xl leading-relaxed sm:text-2xl" key={activeStep}>
+          {PARAGRAPHS[activeStep]}
+        </p>
+      </div>
     </section>
   );
 }

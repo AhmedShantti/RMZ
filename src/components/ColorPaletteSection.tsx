@@ -7,27 +7,29 @@ import { GREEN, RED, YELLOW, sample } from "./AboutScrollSquares";
 const CREAM = "#f5f0e8";
 
 // Fade-in window: text appears as squares approach the 70px "marker" stage.
+// Fade-in window: text appears as squares approach the 70px "marker" stage.
 const FADE_IN_START = 0.06;
 const FADE_IN_END = 0.111; // fully visible exactly when squares hit this stage
 
-// Fade-out is tied to the squares' actual size, not scroll distance: as they
-// shrink from 70px (stage 0.111) down toward the 18px cluster (stage 0.222),
-// the text fades out in lockstep, fully gone right as squares go small.
-const SIZE_AT_FADE_START = 70; // px — squares' size where fade-out begins
-const SIZE_AT_FADE_END = 18; // px — squares' size where text is fully gone
+// Fade-out is now scroll-progress based: begins right as squares start
+// regrouping back toward the centred row, and finishes a little before
+// they land at 0.222 (stage 3 — composed row again), so the text is
+// fully gone before the squares recompose.
+const FADE_OUT_START = 0.111;
+const FADE_OUT_END = 0.2; // fully gone shortly before the 0.222 regroup
 
 // Hard upper bound: once scroll passes this, force-hidden forever — prevents
 // the text reappearing later when squares happen to grow past 70px again
 // (e.g. stages 0.333/0.444/0.667/0.778/0.889 all use larger sizes).
-const HARD_CUTOFF = 0.2;
+const HARD_CUTOFF = FADE_OUT_END + 0.0005;
 
 const smooth = (t: number) => {
   const c = Math.max(0, Math.min(1, t));
   return c * c * (3 - 2 * c);
 };
 
-/** Opacity from scroll-in (fade-in window) combined with size-based fade-out. */
-const computeT = (p: number, size: number) => {
+/** Opacity from scroll-in (fade-in window) combined with scroll-out (fade-out window). */
+const computeT = (p: number) => {
   if (p >= HARD_CUTOFF) return 0;
 
   let fadeIn = 1;
@@ -35,10 +37,8 @@ const computeT = (p: number, size: number) => {
   else if (p < FADE_IN_END) fadeIn = smooth((p - FADE_IN_START) / (FADE_IN_END - FADE_IN_START));
 
   let fadeOut = 1;
-  if (p >= FADE_IN_END) {
-    fadeOut = smooth(
-      (size - SIZE_AT_FADE_END) / (SIZE_AT_FADE_START - SIZE_AT_FADE_END),
-    );
+  if (p >= FADE_OUT_START) {
+    fadeOut = 1 - smooth((p - FADE_OUT_START) / (FADE_OUT_END - FADE_OUT_START));
   }
 
   return Math.min(fadeIn, fadeOut);
@@ -94,7 +94,7 @@ export default function ColorPaletteSection({
     ) => {
       if (!el) return;
       const centerY = state.y + state.size / 2;
-      const t = computeT(progress, state.size);
+      const t = computeT(progress);
 
       el.style.position = "fixed";
       el.style.top = `${centerY}px`;

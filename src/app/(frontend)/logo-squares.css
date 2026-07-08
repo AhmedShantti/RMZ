@@ -63,9 +63,10 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
-  /* Portrait cards (reference arrangement) — mobile overrides below. */
-  --stair-w: 400px;
-  --stair-h: 520px;
+  /* Portrait cards, scaled to the viewport like the reference (~26vw wide) —
+     mobile overrides below. */
+  --stair-w: clamp(240px, 26vw, 400px);
+  --stair-h: clamp(300px, 34vw, 520px);
 }
 .stair-slot {
   position: absolute;
@@ -136,12 +137,18 @@
   z-index: 120;
   font-variant-numeric: tabular-nums;
 }
-.stairs-paragraph {
+/* Positioning lives on the wrapper (GSAP fades it — the inner <p>'s keyed
+   crossfade animation would override inline opacity via fill-mode). Top-right
+   corner: the cards' travel diagonal (bottom-right → top-left) never crosses
+   it, so the text never sits above the images. */
+.stairs-paragraph-wrap {
   position: absolute;
-  top: 32vh; /* middle-right, per the reference arrangement */
-  right: 8vw;
+  top: 14vh; /* above the focused card's top line */
+  right: 0;
   z-index: 120;
-  max-width: 340px;
+  max-width: 320px;
+}
+.stairs-paragraph {
   animation: sqFadeIn 0.4s ease both;
 }
 
@@ -151,7 +158,7 @@
     --stair-w: 240px;
     --stair-h: 310px;
   }
-  .stairs-paragraph {
+  .stairs-paragraph-wrap {
     max-width: 260px;
   }
 }

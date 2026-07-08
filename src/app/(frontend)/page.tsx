@@ -1,6 +1,6 @@
 import IntroLoader from "@/components/IntroLoader";
 import HeroCursorField from "@/components/HeroCursorField";
-import WordmarkMoment from "@/components/WordmarkMoment";
+import HomeLogoStairs from "@/components/HomeLogoStairs";
 import ServicesTeaser from "@/components/ServicesTeaser";
 import ClientsCollage from "@/components/ClientsCollage";
 import VideoSection from "@/components/VideoSection";
@@ -9,7 +9,7 @@ import { getHome, getServices, getContact, getSiteSettings } from "@/lib/cms";
 import ShaderBackground from "@/components/gradient/ShaderGradient";
 import { MarqueeDemo } from "@/components/Marquee";
 import { NeatGradient } from "@firecms/neat";
-import { NeatGradientBackground } from "@/components/gradient/NeatGradient";
+import Gradient from "@/components/gradient/NeatGradient";
 import { MeshGradient } from '@paper-design/shaders-react';
 import { fulfillRouteCacheEntry } from "next/dist/client/components/segment-cache/cache";
 
@@ -38,17 +38,22 @@ export default async function Home() {
     <>
       <IntroLoader enabled={home.showIntroLoader} />
       <div style={{ position: 'relative', minHeight: '100vh' }}>
+       <Gradient />
+       
+      
 
       {/* your real content goes here, on top */}
       <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
-        <NeatGradientBackground />
         
+        
+ 
         <HeroCursorField
         kicker={home.heroKicker}
         statement={home.heroStatement}
         subline={home.heroSubline}
       />
-      <WordmarkMoment />
+      {/* Wordmark + logo squares → emerge → stairs (pinned) */}
+      <HomeLogoStairs />
       <ServicesTeaser services={featured}  />
       <MarqueeDemo />
       
