@@ -48,6 +48,12 @@
   pointer-events: none;
 }
 
+/* --- Resting floater: lives inside "What we do" at z-index:-1 --- */
+.sq-floater {
+  pointer-events: none;
+  will-change: transform;
+}
+
 /* --- Landed state, inside a stair slot (Phase 2+) --- */
 .stair-square {
   position: absolute;

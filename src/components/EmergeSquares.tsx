@@ -66,6 +66,7 @@ export default function EmergeSquares({
 
     const cleanupLenis = syncScrollTriggerWithLenis();
     const wrappers: HTMLElement[] = [];
+    const floaters: HTMLElement[] = [];
     const anchors: (() => void)[] = [];
     const refreshAnchors = () => anchors.forEach((fn) => fn());
 
@@ -83,14 +84,16 @@ export default function EmergeSquares({
     // layout effect runs — defer all setup one frame. contextSafe keeps the
     // deferred tweens/triggers inside useGSAP's auto-cleanup context.
     const setup = contextSafe!(() => {
-      // Post-stairs waypoint sections (absent on the lab page → phases 3/4
-      // simply don't run there).
+      // The journey ends in the "What we do" section (absent on the lab page
+      // → the final phase simply doesn't run there).
       const teaser = document.querySelector<HTMLElement>(
         'section[aria-label="What we do"]',
       );
-      const marquee = document.querySelector<HTMLElement>(
-        "[data-squares-marquee]",
-      );
+      // The squares rest BEHIND this section's content: isolate makes the
+      // z-index:-1 floaters sit behind the text but in front of the section's
+      // (transparent) backdrop, instead of sinking below the whole content
+      // column (which is its own stacking context).
+      if (teaser) teaser.style.isolation = "isolate";
 
       COLORS.forEach((color, i) => {
         const original = squareRefs[color].current;
@@ -207,73 +210,75 @@ export default function EmergeSquares({
             },
           );
 
-        // Phase 3 — random float through "What we do". Ends as the teaser's
-        // bottom nears the viewport bottom, where Phase 4's range begins.
+        // Phase 3 (final) — the journey ends in "What we do". The traveler
+        // flies into the section (above content) and hands off to an ambient
+        // floater that lives INSIDE the section at z-index:-1, drifting
+        // randomly forever behind the text.
         if (teaser) {
-          const FLOAT = 72; // px — floating square size
-          const pts = [
-            { fx: gsap.utils.random(0.1, 0.35), fy: gsap.utils.random(0.05, 0.35), rot: gsap.utils.random(-35, 35) },
-            { fx: gsap.utils.random(0.4, 0.75), fy: gsap.utils.random(0.3, 0.65), rot: gsap.utils.random(-35, 35) },
-            { fx: gsap.utils.random(0.15, 0.8), fy: gsap.utils.random(0.55, 0.9), rot: gsap.utils.random(-35, 35) },
-          ];
-          const drift = gsap.timeline({
-            defaults: { ease: "none" },
-            scrollTrigger: {
-              trigger: teaser,
-              start: "top bottom",
-              end: "bottom 92%",
-              scrub: 1,
-              invalidateOnRefresh: true,
-              // float behind the section's text; back above for the flight
-              onEnter: () => gsap.set(wrapper, { zIndex: 5 }),
-              onLeaveBack: () => gsap.set(wrapper, { zIndex: 999 }),
-            },
-          });
-          pts.forEach((pt) => {
-            drift.to(wrapper, {
-              x: () => {
-                const t = teaser.getBoundingClientRect();
-                return t.left + window.scrollX + pt.fx * t.width - ax;
-              },
-              y: () => {
-                const t = teaser.getBoundingClientRect();
-                return t.top + window.scrollY + pt.fy * t.height - ay;
-              },
-              scaleX: () => FLOAT / aw,
-              scaleY: () => FLOAT / ah,
-              rotation: pt.rot,
+          const S = 72; // floating-square size
+          // Random home cell within the section for this square.
+          const home = {
+            fx: gsap.utils.random(0.12, 0.88),
+            fy: gsap.utils.random(0.16, 0.82),
+          };
+
+          // The resting floater — a child of the section, behind its content.
+          const floater = original.cloneNode(true) as HTMLElement;
+          floater.className = `sq sq-${color} sq-floater`;
+          floater.removeAttribute("style");
+          teaser.appendChild(floater);
+          floaters.push(floater);
+          gsap.set(floater, { opacity: 0 });
+
+          // Position (re-evaluated on refresh); drift animates x/y on top.
+          const placeFloater = () => {
+            const t = teaser.getBoundingClientRect();
+            gsap.set(floater, {
+              position: "absolute",
+              width: S,
+              height: S,
+              left: home.fx * t.width - S / 2,
+              top: home.fy * t.height - S / 2,
+              zIndex: -1,
             });
+          };
+          placeFloater();
+          anchors.push(placeFloater);
+
+          // Ambient random drift — forever, independent of scroll.
+          gsap.to(floater, {
+            x: () => gsap.utils.random(-45, 45),
+            y: () => gsap.utils.random(-45, 45),
+            rotation: () => gsap.utils.random(-25, 25),
+            duration: () => gsap.utils.random(3.5, 6.5),
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            repeatRefresh: true,
+            delay: i * 0.5,
           });
-          // fade back in as the section arrives (the covers keep the cards)
+
+          // Traveler re-appears after the stairs and flies to the home cell.
           gsap.to(inner, {
             opacity: 1,
             ease: "none",
             immediateRender: false,
             scrollTrigger: {
               trigger: teaser,
-              start: "top 95%",
-              end: "top 55%",
+              start: "top 96%",
+              end: "top 70%",
               scrub: true,
               invalidateOnRefresh: true,
             },
           });
-        }
-
-        // Phase 4 — converge into a centred row shaping the marquee
-        // (placeholder arrangement; the marquee gets its own pass later).
-        if (marquee) {
-          const S = 72;
-          const GAP = 24;
           gsap.to(wrapper, {
             x: () => {
-              const m = marquee.getBoundingClientRect();
-              const rowStart =
-                m.left + window.scrollX + m.width / 2 - (3 * S + 2 * GAP) / 2;
-              return rowStart + i * (S + GAP) - ax;
+              const t = teaser.getBoundingClientRect();
+              return t.left + window.scrollX + home.fx * t.width - S / 2 - ax;
             },
             y: () => {
-              const m = marquee.getBoundingClientRect();
-              return m.top + window.scrollY + m.height / 2 - S / 2 - ay;
+              const t = teaser.getBoundingClientRect();
+              return t.top + window.scrollY + home.fy * t.height - S / 2 - ay;
             },
             scaleX: () => S / aw,
             scaleY: () => S / ah,
@@ -281,13 +286,43 @@ export default function EmergeSquares({
             ease: "none",
             immediateRender: false,
             scrollTrigger: {
-              trigger: marquee,
-              start: "top 92%",
-              end: "top 45%",
+              trigger: teaser,
+              start: "top bottom",
+              end: "top 50%",
               scrub: 1,
               invalidateOnRefresh: true,
             },
           });
+          // Handoff: as it lands, the traveler fades out and the floater in.
+          const HANDOFF: [string, string] = ["top 58%", "top 44%"];
+          gsap.to(inner, {
+            opacity: 0,
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: teaser,
+              start: HANDOFF[0],
+              end: HANDOFF[1],
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
+          });
+          gsap.fromTo(
+            floater,
+            { opacity: 0 },
+            {
+              opacity: 1,
+              ease: "none",
+              immediateRender: false,
+              scrollTrigger: {
+                trigger: teaser,
+                start: HANDOFF[0],
+                end: HANDOFF[1],
+                scrub: true,
+                invalidateOnRefresh: true,
+              },
+            },
+          );
         }
       });
 
@@ -302,6 +337,7 @@ export default function EmergeSquares({
       cleanupLenis();
       ScrollTrigger.removeEventListener("refreshInit", refreshAnchors);
       wrappers.forEach((c) => c.remove());
+      floaters.forEach((f) => f.remove());
     };
   }, []);
 
