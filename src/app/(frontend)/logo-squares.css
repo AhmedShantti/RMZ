@@ -43,13 +43,8 @@
   visibility: hidden;
 }
 
-/* --- Traveling clone (fixed-position, appended to body) --- */
-.sq-clone {
-  pointer-events: none;
-}
-
-/* --- Resting floater: lives inside "What we do" at z-index:-1 --- */
-.sq-floater {
+/* --- Traveling square: one continuous journey, appended to <body> --- */
+.sq-travel {
   pointer-events: none;
   will-change: transform;
 }

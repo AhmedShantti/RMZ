@@ -120,7 +120,8 @@ export function MarqueeDemo() {
   }
 
   return (
-     <div className="relative flex w-full flex-col items-stretch justify-center gap-4 bg-transparent py-6">
+     // data hook: end waypoint of the traveling logo squares
+     <div data-squares-marquee className="relative flex w-full flex-col items-stretch justify-center gap-4 bg-transparent py-6">
       <Marquee pauseOnHover className="w-full [--duration:20s] py-4">
         {firstRow.map(renderCard)}
       </Marquee>
