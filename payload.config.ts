@@ -89,6 +89,11 @@ export default buildConfig({
             enabled: true,
             collections: { media: true },
             token: blobToken,
+            // Upload straight from the browser to Blob. Vercel serverless
+            // functions cap request bodies at ~4.5MB, so routing the file
+            // through /api/media 500s on any larger photo — client uploads
+            // bypass that entirely.
+            clientUploads: true,
           }),
         ]
       : []),
