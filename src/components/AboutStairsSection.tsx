@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
+import { homeContent, type StairStep } from "@/content/home";
 import type { StairRefs } from "./logoSquares.types";
 
 /**
@@ -20,13 +22,6 @@ import type { StairRefs } from "./logoSquares.types";
  *   state for the counter + crossfading paragraph.
  */
 
-const PARAGRAPHS = [
-  "Step one — where the idea is born. Placeholder copy describing the first image.",
-  "Step two — discipline shapes the boldness. Placeholder copy for the second image.",
-  "Step three — the work meets the world. Placeholder copy for the third image.",
-  "Step four — the story keeps climbing. Placeholder copy for the fourth image.",
-];
-
 const IMG_LABELS = [
   "[ STEP 1 PHOTO — REPLACE ]",
   "[ STEP 2 PHOTO — REPLACE ]",
@@ -34,15 +29,17 @@ const IMG_LABELS = [
   "[ STEP 4 PHOTO — REPLACE ]",
 ];
 
-const TOTAL = PARAGRAPHS.length;
-
 export default function AboutStairsSection({
   landingRefs,
+  steps = homeContent.stairs,
 }: {
   landingRefs: StairRefs;
+  /** CMS-driven step content (photo + paragraph); falls back to the default. */
+  steps?: StairStep[];
 }) {
   const { yellow, orange, green } = landingRefs;
   const sectionRef = useRef<HTMLElement>(null);
+  const TOTAL = steps.length;
   // 4th deck card — internal only (the logo has 3 squares to travel, so it
   // isn't a Flip landing target and stays out of the landingRefs API).
   const fourth = useRef<HTMLDivElement>(null);
@@ -168,19 +165,19 @@ export default function AboutStairsSection({
       {/* Slots 1–3 wear their brand-square cover (dissolves into the photo at
           focus); slot 4 is the extra step with no traveling square. */}
       <div ref={yellow} className="stair-slot stair-1">
-        <StairImg label={IMG_LABELS[0]} />
+        <StairImg step={steps[0]} label={IMG_LABELS[0]} />
         <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
       </div>
       <div ref={orange} className="stair-slot stair-2">
-        <StairImg label={IMG_LABELS[1]} />
+        <StairImg step={steps[1]} label={IMG_LABELS[1]} />
         <span className="stair-cover" style={{ background: "var(--acc-orange)" }} aria-hidden="true" />
       </div>
       <div ref={green} className="stair-slot stair-3">
-        <StairImg label={IMG_LABELS[2]} />
+        <StairImg step={steps[2]} label={IMG_LABELS[2]} />
         <span className="stair-cover" style={{ background: "var(--acc-green)" }} aria-hidden="true" />
       </div>
       <div ref={fourth} className="stair-slot stair-4">
-        <StairImg label={IMG_LABELS[3]} />
+        <StairImg step={steps[3]} label={IMG_LABELS[3]} />
       </div>
 
       {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
@@ -195,18 +192,28 @@ export default function AboutStairsSection({
           key remount on the inner <p> = CSS crossfade */}
       <div className="stairs-paragraph-wrap">
         <p className="stairs-paragraph font-body text-cream-dim text-xl leading-relaxed sm:text-2xl" key={activeStep}>
-          {PARAGRAPHS[activeStep]}
+          {steps[activeStep]?.paragraph}
         </p>
       </div>
     </section>
   );
 }
 
-/** Cropped photo window — placeholder until real step photos exist.
- *  Swap for: <Image src="/images/step-N.jpg" alt="" fill className="object-cover" /> */
-function StairImg({ label }: { label: string }) {
+/** Cropped photo window — the CMS photo (object-cover) or a labelled placeholder. */
+function StairImg({ step, label }: { step?: StairStep; label: string }) {
+  if (step?.photoUrl) {
+    return (
+      <Image
+        src={step.photoUrl}
+        alt={step.alt}
+        fill
+        unoptimized
+        sizes="(max-width: 640px) 240px, 26vw"
+        className="stair-img object-cover"
+      />
+    );
+  }
   return (
-    // TODO: Replace with a real photo
     <div className="stair-img flex h-full w-full items-center justify-center bg-[#1a1a1a]">
       <span className="font-body px-2 text-center text-xs text-[#666]">{label}</span>
     </div>

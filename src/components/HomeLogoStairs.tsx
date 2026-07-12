@@ -6,6 +6,7 @@ import LogoSquares from "./LogoSquares";
 import EmergeSquares from "./EmergeSquares";
 import AboutStairsSection from "./AboutStairsSection";
 import type { SquareRefs, StairRefs } from "./logoSquares.types";
+import type { StairStep } from "@/content/home";
 import "@/app/(frontend)/logo-squares.css";
 
 /**
@@ -15,7 +16,7 @@ import "@/app/(frontend)/logo-squares.css";
  * because the six refs must live in one parent — the page itself is a server
  * component.
  */
-export default function HomeLogoStairs() {
+export default function HomeLogoStairs({ stairs }: { stairs?: StairStep[] }) {
   const squareRefs: SquareRefs = {
     yellow: useRef<HTMLSpanElement>(null),
     orange: useRef<HTMLSpanElement>(null),
@@ -39,7 +40,7 @@ export default function HomeLogoStairs() {
 
       {/* Centered 80% column; the pin-spacer lives inside it. */}
       <div className="mx-auto w-[80%]">
-        <AboutStairsSection landingRefs={landingRefs} />
+        <AboutStairsSection landingRefs={landingRefs} steps={stairs} />
       </div>
     </>
   );

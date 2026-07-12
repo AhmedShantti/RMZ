@@ -561,6 +561,16 @@ export interface HomeContent {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Exactly four steps — the animation lands three logo squares on the first three cards plus one extra. Each: a photo + its paragraph. Leave a photo empty to show the placeholder.
+   */
+  stairs?:
+    | {
+        photo?: (number | null) | Media;
+        paragraph: string;
+        id?: string | null;
+      }[]
+    | null;
   teaserCtaLabel?: string | null;
   /**
    * Optional overrides for this page's metadata. Blank = defaults.
@@ -1050,6 +1060,13 @@ export interface HomeContentSelect<T extends boolean = true> {
         label?: T;
         badgeName?: T;
         badgeAccent?: T;
+        id?: T;
+      };
+  stairs?:
+    | T
+    | {
+        photo?: T;
+        paragraph?: T;
         id?: T;
       };
   teaserCtaLabel?: T;

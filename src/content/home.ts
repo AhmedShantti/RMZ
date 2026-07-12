@@ -6,6 +6,13 @@ export type ClientPhoto = {
   badgeAccent: "orange" | "green" | "none";
 };
 
+/** A stairs step (logo-squares journey): a photo window + its paragraph. */
+export type StairStep = {
+  photoUrl: string | null;
+  alt: string;
+  paragraph: string;
+};
+
 /**
  * Home page content — the canonical default (matches what the page rendered
  * before the CMS). Used as the component fallback AND as the seed source for
@@ -37,4 +44,12 @@ export const homeContent = {
     { label: "[ CLIENT PHOTO 2 — REPLACE ]", badgeName: "", badgeAccent: "none" },
     { label: "[ CLIENT PHOTO 3 — REPLACE ]", badgeName: "CLIENT NAME", badgeAccent: "green" },
   ] as ClientPhoto[],
+  // Logo-squares stairs — exactly 4 steps (the animation lands 3 squares on the
+  // first three cards + one extra). Each step: a photo + its paragraph.
+  stairs: [
+    { photoUrl: null, alt: "", paragraph: "Step one — where the idea is born. Placeholder copy describing the first image." },
+    { photoUrl: null, alt: "", paragraph: "Step two — discipline shapes the boldness. Placeholder copy for the second image." },
+    { photoUrl: null, alt: "", paragraph: "Step three — the work meets the world. Placeholder copy for the third image." },
+    { photoUrl: null, alt: "", paragraph: "Step four — the story keeps climbing. Placeholder copy for the fourth image." },
+  ] as StairStep[],
 };

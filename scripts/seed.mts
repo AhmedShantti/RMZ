@@ -155,6 +155,8 @@ await updateGlobal("homeContent", {
   showreelLeftLabel: homeContent.showreel.leftLabel,
   showreelRightLabel: homeContent.showreel.rightLabel,
   clients: homeContent.clients,
+  // Photos are uploaded by editors; seed the paragraphs only.
+  stairs: homeContent.stairs.map((s) => ({ paragraph: s.paragraph })),
 });
 
 await updateGlobal("portfolioContent", {
