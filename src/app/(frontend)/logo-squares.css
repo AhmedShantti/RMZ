@@ -120,6 +120,8 @@
   inset: 0;
   pointer-events: none;
   opacity: 0;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
 }
 
 /* --- Demo harness hero --- */
@@ -156,11 +158,18 @@
 /* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
   .about-stairs {
-    --stair-w: 240px;
-    --stair-h: 310px;
+    /* Scale the card with the viewport so it fits small phones too. */
+    --stair-w: min(240px, 64vw);
+    --stair-h: min(312px, 83vw);
   }
   .stairs-paragraph-wrap {
-    max-width: 260px;
+    top: 11vh;
+    right: 5vw; /* keep the copy off the edge */
+    max-width: 72vw;
+  }
+  .stairs-paragraph {
+    font-size: 1.05rem;
+    line-height: 1.5;
   }
 }
 @keyframes sqFadeIn {

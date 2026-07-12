@@ -107,7 +107,21 @@ export default function EmergeSquares({
         return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height };
       };
 
-      const paths: { el: HTMLElement; wps: Waypoint[] }[] = [];
+      type Frac = { x: number; y: number };
+      const paths: {
+        el: HTMLElement;
+        wps: Waypoint[];
+        slotRef: { current: HTMLDivElement | null };
+        floater: HTMLElement;
+        fA: Frac;
+        fB: Frac;
+      }[] = [];
+
+      // The teaser squares must sit UNDER its content. A body-level element
+      // can't (it's above the whole content column), so the teaser leg uses an
+      // in-section floater at z-index:-1; isolate keeps it behind the text but
+      // above the section's transparent backdrop.
+      teaser.style.isolation = "isolate";
 
       COLORS.forEach((color, i) => {
         const anchor = squareRefs[color].current;
@@ -126,8 +140,28 @@ export default function EmergeSquares({
           zIndex: 30, // above page content, below the fixed nav (z 40)
           pointerEvents: "none",
           force3D: true,
+          // Flip-to-reveal: once the square lands on its card it rotates past
+          // 90°; with the backface hidden it vanishes and the card photo
+          // underneath shows through.
+          backfaceVisibility: "hidden",
         });
         els.push(el);
+
+        // In-teaser floater (z-index:-1, under the text) for the teaser leg.
+        const floater = document.createElement("div");
+        floater.className = `sq sq-${color} sq-travel`;
+        teaser.appendChild(floater);
+        gsap.set(floater, {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 72,
+          height: 72,
+          zIndex: -1,
+          pointerEvents: "none",
+          scale: 0,
+        });
+        els.push(floater);
 
         // The stair slot this square lands on / becomes (yellow→1, orange→2,
         // green→3), matching LogoSquares / AboutStairsSection.
@@ -169,21 +203,42 @@ export default function EmergeSquares({
             },
           },
         ];
-        paths.push({ el, wps });
+        paths.push({ el, wps, slotRef, floater, fA, fB });
       });
 
-      // Place every square for a given path phase (viewport → document
-      // coords, transform-only).
+      // Place every square for a given path phase (viewport → document coords,
+      // transform-only). The traveling square travels and, on arrival at its
+      // stair card, hands off (shrinks out) to that card's cover, which does
+      // the flip (AboutStairsSection) — so every card reveals its photo with
+      // the same deck-driven flip. The teaser leg is an in-section floater at
+      // z-index:-1 so it sits under the content.
       const place = (phase: number) => {
         const sx = window.scrollX;
         const sy = window.scrollY;
-        for (const { el, wps } of paths) {
+        // Hand-off: full while travelling to the card, shrunk out once landed
+        // (the card cover takes over from here on).
+        const landed = smoothstep((phase - 0.22) / 0.05);
+        const bodyScale = 1 - landed;
+        // Teaser floater: visible only across the "What we do" drift.
+        const teaserAmt =
+          smoothstep((phase - 0.58) / 0.04) - smoothstep((phase - 0.86) / 0.04);
+        const tw = teaser.offsetWidth;
+        const th = teaser.offsetHeight;
+        const dt = Math.min(1, Math.max(0, (phase - 0.62) / 0.24)); // fA→fB
+        for (const { el, wps, floater, fA, fB } of paths) {
           const { cx, cy, w, h } = samplePath(wps, phase);
           gsap.set(el, {
             x: cx + sx - 50,
             y: cy + sy - 50,
-            scaleX: w / 100,
-            scaleY: h / 100,
+            scaleX: (w / 100) * bodyScale,
+            scaleY: (h / 100) * bodyScale,
+          });
+          const fx = fA.x + (fB.x - fA.x) * dt;
+          const fy = fA.y + (fB.y - fA.y) * dt;
+          gsap.set(floater, {
+            left: fx * tw - 36,
+            top: fy * th - 36,
+            scale: teaserAmt,
           });
         }
       };
