@@ -154,7 +154,8 @@ export const getHome = cache(() =>
   safe(
     "home",
     async (p) => {
-      const g = await p.findGlobal({ slug: "homeContent", depth: 0 });
+      // depth 1 so the stairs `photo` upload is populated with its media doc.
+      const g = await p.findGlobal({ slug: "homeContent", depth: 1 });
       return {
         showIntroLoader: g.showIntroLoader ?? homeDefault.showIntroLoader,
         heroKicker: f(g.heroKicker, homeDefault.heroKicker),
@@ -175,6 +176,20 @@ export const getHome = cache(() =>
                 | "none",
             }))
           : homeDefault.clients,
+        stairs: g.stairs?.length
+          ? g.stairs.map((s, i) => {
+              const photo =
+                s.photo && typeof s.photo === "object" ? s.photo : null;
+              return {
+                photoUrl: photo?.url ?? null,
+                alt: photo?.alt ?? "",
+                paragraph: f(
+                  s.paragraph,
+                  homeDefault.stairs[i]?.paragraph ?? "",
+                ),
+              };
+            })
+          : homeDefault.stairs,
       };
     },
     {
@@ -185,6 +200,7 @@ export const getHome = cache(() =>
       teaserCtaLabel: homeDefault.teaserCtaLabel,
       showreel: homeDefault.showreel,
       clients: homeDefault.clients,
+      stairs: homeDefault.stairs,
     },
   ),
 );

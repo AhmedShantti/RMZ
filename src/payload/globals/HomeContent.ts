@@ -89,6 +89,31 @@ export const HomeContent: GlobalConfig = {
       ],
     },
     {
+      name: "stairs",
+      type: "array",
+      label: "Stairs steps (logo-squares journey)",
+      minRows: 4,
+      maxRows: 4,
+      admin: {
+        description:
+          "Exactly four steps — the animation lands three logo squares on the first three cards plus one extra. Each: a photo + its paragraph. Leave a photo empty to show the placeholder.",
+      },
+      fields: [
+        {
+          name: "photo",
+          type: "upload",
+          relationTo: "media",
+          label: "Photo",
+        },
+        {
+          name: "paragraph",
+          type: "textarea",
+          required: true,
+          label: "Paragraph",
+        },
+      ],
+    },
+    {
       name: "teaserCtaLabel",
       type: "text",
       label: "Markets teaser CTA label",

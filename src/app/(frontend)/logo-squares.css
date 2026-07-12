@@ -43,9 +43,10 @@
   visibility: hidden;
 }
 
-/* --- Traveling clone (fixed-position, appended to body) --- */
-.sq-clone {
+/* --- Traveling square: one continuous journey, appended to <body> --- */
+.sq-travel {
   pointer-events: none;
+  will-change: transform;
 }
 
 /* --- Landed state, inside a stair slot (Phase 2+) --- */

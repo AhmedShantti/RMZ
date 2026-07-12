@@ -53,7 +53,7 @@ export default async function Home() {
         subline={home.heroSubline}
       />
       {/* Wordmark + logo squares → emerge → stairs (pinned) */}
-      <HomeLogoStairs />
+      <HomeLogoStairs stairs={home.stairs} />
       <ServicesTeaser services={featured}  />
       <MarqueeDemo />
       
