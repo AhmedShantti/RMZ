@@ -60,6 +60,10 @@ export default function AboutStairsSection({
       // the traveling squares stay visible in the section however slowly the
       // user scrolls).
       const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+      const smooth = (t: number) => {
+        const c = clamp01(t);
+        return c * c * (3 - 2 * c);
+      };
 
       const render = (p: number) => {
         const u = p * (slots.length - 1); // one unit per transition
@@ -85,9 +89,19 @@ export default function AboutStairsSection({
             zIndex: Math.round(100 - Math.abs(rel) * 10 - (rel < 0 ? 5 : 0)),
           });
 
-          // Brand-square cover → photo, timed to the final climb into focus.
+          // Every card wears a repeating brand-colour cover (yellow/orange/
+          // green/yellow…) that flips up to reveal its photo, completing
+          // exactly as the card centres (rel → 0). The traveling logo squares
+          // hand off to these on arrival, so all cards flip identically.
           const cover = el.querySelector<HTMLElement>(".stair-cover");
-          if (cover) gsap.set(cover, { opacity: wait });
+          if (cover) {
+            const prox = smooth(1 - Math.abs(rel) / 0.4); // 1 centred → 0 away
+            gsap.set(cover, {
+              opacity: 1,
+              rotationX: -180 * prox,
+              transformPerspective: 700,
+            });
+          }
         });
 
         // Counter/paragraph follow the focused card (rounds mid-transition).
@@ -178,6 +192,7 @@ export default function AboutStairsSection({
       </div>
       <div ref={fourth} className="stair-slot stair-4">
         <StairImg step={steps[3]} label={IMG_LABELS[3]} />
+        <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
       </div>
 
       {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
