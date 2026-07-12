@@ -172,13 +172,13 @@ export default function EmergeSquares({
         paths.push({ el, wps });
       });
 
-      // Place every square for a given global progress (viewport → document
+      // Place every square for a given path phase (viewport → document
       // coords, transform-only).
-      const place = (p: number) => {
+      const place = (phase: number) => {
         const sx = window.scrollX;
         const sy = window.scrollY;
         for (const { el, wps } of paths) {
-          const { cx, cy, w, h } = samplePath(wps, p);
+          const { cx, cy, w, h } = samplePath(wps, phase);
           gsap.set(el, {
             x: cx + sx - 50,
             y: cy + sy - 50,
@@ -187,17 +187,60 @@ export default function EmergeSquares({
           });
         }
       };
-      place(0);
 
-      // The one master trigger — logo entering → marquee centred.
+      // Section-aligned phase: the raw scroll→progress mapping is warped by the
+      // stairs PIN (it swallows a big band of scroll at one point), which made
+      // the "What we do" drift race past. So map the path phase to the REAL
+      // scroll positions of each section (measured live, pin included), giving
+      // every leg a speed that matches actually scrolling through it. Phase
+      // values here mirror the waypoint `at`s above.
+      const stairsEl =
+        landingRefs.yellow.current?.closest<HTMLElement>(".about-stairs") ?? null;
+      let cp: [number, number][] = [];
+      const buildCheckpoints = () => {
+        const vh = window.innerHeight;
+        const docTop = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
+        const tTop = docTop(teaser);
+        const pts: [number, number][] = [
+          [docTop(startSection) - 0.75 * vh, 0.0], // logo enters
+          [(stairsEl ? docTop(stairsEl) : tTop) - 0.15 * vh, 0.22], // land on cards
+          [tTop - vh, 0.55], // stairs done, teaser entering (spans the pin)
+          [tTop + teaser.offsetHeight / 2 - vh / 2, 0.74], // teaser centred (drift)
+          [docTop(marquee) + marquee.offsetHeight / 2 - vh / 2, 1.0], // marquee centred
+        ];
+        // Keep scroll values strictly increasing so the piecewise map is sane.
+        for (let k = 1; k < pts.length; k++) {
+          if (pts[k][0] <= pts[k - 1][0]) pts[k][0] = pts[k - 1][0] + 1;
+        }
+        cp = pts;
+      };
+      const phaseAt = (y: number) => {
+        if (!cp.length) return 0;
+        if (y <= cp[0][0]) return cp[0][1];
+        const last = cp[cp.length - 1];
+        if (y >= last[0]) return last[1];
+        for (let k = 0; k < cp.length - 1; k++) {
+          const [ya, pa] = cp[k];
+          const [yb, pb] = cp[k + 1];
+          if (y <= yb) return pa + (pb - pa) * ((y - ya) / (yb - ya));
+        }
+        return last[1];
+      };
+
+      buildCheckpoints();
+      place(phaseAt(window.scrollY));
+
+      // One trigger spans the journey; onUpdate maps live scroll → phase.
       ScrollTrigger.create({
         trigger: startSection,
         start: "top 75%",
         endTrigger: marquee,
         end: "center center",
-        scrub: 1,
-        onUpdate: (self) => place(self.progress),
-        onRefresh: (self) => place(self.progress),
+        onUpdate: (self) => place(phaseAt(self.scroll())),
+        onRefresh: (self) => {
+          buildCheckpoints();
+          place(phaseAt(self.scroll()));
+        },
       });
     });
 
