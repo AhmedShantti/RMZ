@@ -30,14 +30,14 @@ import { COLORS, type SquareRefs, type StairRefs } from "./logoSquares.types";
  * The waypoints (progress 0→1):
  *   0.00  sit exactly on the logo square (same size/pos → invisible seam)
  *   0.06  pop to travel size, still on the logo (a small back-eased beat)
- *   0.30  spread into the stairs region, upper screen
- *   0.50  descend the stairs diagonal, lower screen (moves through the pin)
+ *   0.22  LAND on the matching stair slot — the square becomes that card
+ *   0.55  still glued to the slot, so it rides the deck as a card, then lifts
  *   0.66  drift point A inside "What we do"
  *   0.82  drift point B inside "What we do"
  *   1.00  settle into a centred row on the marquee
  */
 
-type Vec = { cx: number; cy: number; size: number };
+type Vec = { cx: number; cy: number; w: number; h: number };
 type Waypoint = { at: number; ease?: (t: number) => number; get: () => Vec };
 
 const smoothstep = (t: number) => {
@@ -61,7 +61,8 @@ function samplePath(wps: Waypoint[], p: number): Vec {
   return {
     cx: lerp(A.cx, B.cx, t),
     cy: lerp(A.cy, B.cy, t),
-    size: lerp(A.size, B.size, t),
+    w: lerp(A.w, B.w, t),
+    h: lerp(A.h, B.h, t),
   };
 }
 
@@ -91,17 +92,19 @@ export default function EmergeSquares({
       );
       // The journey needs the full home layout; bail otherwise (e.g. lab).
       if (!startSection || !teaser || !marquee) return;
-      // Keep landingRefs referenced (API parity) — used to prove the stairs
-      // exist between logo and teaser.
-      const stairs =
-        landingRefs.yellow.current?.closest(".about-stairs") ?? null;
 
       const back = gsap.parseEase("back.out(1.7)");
-      const vw = () => window.innerWidth;
-      const vh = () => window.innerHeight;
+      // A square's own footprint (viewport centre + width/height as a square).
       const centerOf = (el: HTMLElement): Vec => {
         const r = el.getBoundingClientRect();
-        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, size: r.width };
+        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.width };
+      };
+      // A stair slot's footprint (portrait card — the square fills it exactly).
+      const slotOf = (ref: { current: HTMLElement | null }): Vec => {
+        const el = ref.current;
+        if (!el) return { cx: 0, cy: 0, w: 72, h: 72 };
+        const r = el.getBoundingClientRect();
+        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height };
       };
 
       const paths: { el: HTMLElement; wps: Waypoint[] }[] = [];
@@ -126,6 +129,9 @@ export default function EmergeSquares({
         });
         els.push(el);
 
+        // The stair slot this square lands on / becomes (yellow→1, orange→2,
+        // green→3), matching LogoSquares / AboutStairsSection.
+        const slotRef = landingRefs[color];
         // Per-square drift fractions inside the teaser (fixed per load).
         const fA = { x: gsap.utils.random(0.12, 0.4), y: gsap.utils.random(0.14, 0.42) };
         const fB = { x: gsap.utils.random(0.5, 0.86), y: gsap.utils.random(0.5, 0.82) };
@@ -134,21 +140,23 @@ export default function EmergeSquares({
 
         const wps: Waypoint[] = [
           { at: 0.0, get: () => centerOf(anchor) },
-          { at: 0.06, ease: back, get: () => ({ ...centerOf(anchor), size: 72 }) },
-          { at: 0.3, get: () => ({ cx: vw() * (0.3 + 0.07 * i), cy: vh() * (0.24 + 0.05 * i), size: 118 }) },
-          { at: 0.5, get: () => ({ cx: vw() * (0.36 + 0.07 * i), cy: vh() * (0.74 + 0.03 * i), size: 118 }) },
+          { at: 0.06, ease: back, get: () => ({ ...centerOf(anchor), w: 72, h: 72 }) },
+          // Land ON the stair slot and stay glued to it — the square IS the
+          // card, riding the deck as it animates through the pin.
+          { at: 0.22, get: () => slotOf(slotRef) },
+          { at: 0.55, get: () => slotOf(slotRef) },
           {
             at: 0.66,
             get: () => {
               const r = teaser.getBoundingClientRect();
-              return { cx: r.left + r.width * fA.x, cy: r.top + r.height * fA.y, size: 72 };
+              return { cx: r.left + r.width * fA.x, cy: r.top + r.height * fA.y, w: 72, h: 72 };
             },
           },
           {
             at: 0.82,
             get: () => {
               const r = teaser.getBoundingClientRect();
-              return { cx: r.left + r.width * fB.x, cy: r.top + r.height * fB.y, size: 72 };
+              return { cx: r.left + r.width * fB.x, cy: r.top + r.height * fB.y, w: 72, h: 72 };
             },
           },
           {
@@ -157,7 +165,7 @@ export default function EmergeSquares({
               const r = marquee.getBoundingClientRect();
               const rowW = 3 * rowS + 2 * rowGap;
               const sx = r.left + r.width / 2 - rowW / 2;
-              return { cx: sx + i * (rowS + rowGap) + rowS / 2, cy: r.top + r.height / 2, size: rowS };
+              return { cx: sx + i * (rowS + rowGap) + rowS / 2, cy: r.top + r.height / 2, w: rowS, h: rowS };
             },
           },
         ];
@@ -170,11 +178,12 @@ export default function EmergeSquares({
         const sx = window.scrollX;
         const sy = window.scrollY;
         for (const { el, wps } of paths) {
-          const { cx, cy, size } = samplePath(wps, p);
+          const { cx, cy, w, h } = samplePath(wps, p);
           gsap.set(el, {
             x: cx + sx - 50,
             y: cy + sy - 50,
-            scale: size / 100,
+            scaleX: w / 100,
+            scaleY: h / 100,
           });
         }
       };
@@ -190,9 +199,6 @@ export default function EmergeSquares({
         onUpdate: (self) => place(self.progress),
         onRefresh: (self) => place(self.progress),
       });
-
-      // Touch `stairs` so the (optional) presence check isn't dead code.
-      void stairs;
     });
 
     const raf = requestAnimationFrame(setup);
