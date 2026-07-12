@@ -201,8 +201,13 @@ export default function EmergeSquares({
         const vh = window.innerHeight;
         const docTop = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
         const tTop = docTop(teaser);
+        // Phase 0 = the logo centred in the viewport (its section centres the
+        // logo, so the section's centre is the logo's centre). Before this the
+        // squares sit on the logo; the journey launches exactly at centre.
+        const logoCentered =
+          docTop(startSection) + startSection.offsetHeight / 2 - vh / 2;
         const pts: [number, number][] = [
-          [docTop(startSection) - 0.75 * vh, 0.0], // logo enters
+          [logoCentered, 0.0], // logo centred → launch
           [(stairsEl ? docTop(stairsEl) : tTop) - 0.15 * vh, 0.22], // land on cards
           [tTop - vh, 0.55], // stairs done, teaser entering (spans the pin)
           [tTop + teaser.offsetHeight / 2 - vh / 2, 0.74], // teaser centred (drift)
@@ -233,7 +238,9 @@ export default function EmergeSquares({
       // One trigger spans the journey; onUpdate maps live scroll → phase.
       ScrollTrigger.create({
         trigger: startSection,
-        start: "top 75%",
+        // Track from when the logo enters (so it sits on the logo before
+        // centre); phaseAt clamps to 0 until the logo is centred.
+        start: "top bottom",
         endTrigger: marquee,
         end: "center center",
         onUpdate: (self) => place(phaseAt(self.scroll())),
