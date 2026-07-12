@@ -5,12 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
-    "build": "node scripts/db-push.mts && next build",
+    "build": "node scripts/db-push.mts && node scripts/generate-importmap.mts && next build",
     "start": "next start",
     "lint": "eslint",
     "payload": "payload",
     "generate:types": "node scripts/generate-types.mts",
-    "generate:importmap": "payload generate:importmap",
+    "generate:importmap": "node scripts/generate-importmap.mts",
     "seed": "node scripts/seed.mts"
   },
   "dependencies": {
