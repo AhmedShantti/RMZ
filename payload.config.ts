@@ -52,26 +52,6 @@ export default buildConfig({
       titleSuffix: "— RMZ Studio",
     },
   },
-  // TEMP DEBUG — surface the real error instead of the masked "Something went
-  // wrong." so we can see why /api/media 500s in prod. REMOVE once diagnosed.
-  hooks: {
-    afterError: [
-      ({ error }) => ({
-        status: 500,
-        response: {
-          errors: [
-            {
-              message: `[DEBUG] ${error?.name ?? "Error"}: ${error?.message ?? "unknown"} :: ${String(error?.stack ?? "")
-                .split("\n")
-                .slice(1, 5)
-                .map((l) => l.trim())
-                .join(" | ")}`,
-            },
-          ],
-        },
-      }),
-    ],
-  },
   collections: [
     Users,
     Media,
