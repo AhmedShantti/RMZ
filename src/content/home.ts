@@ -13,6 +13,13 @@ export type StairStep = {
   paragraph: string;
 };
 
+/** A marquee card — the scrolling row the brand squares become. Colour + label
+ * are assigned in code (brand cycle); the CMS only owns the photo. */
+export type MarqueePhoto = {
+  photoUrl: string | null;
+  alt: string;
+};
+
 /**
  * Home page content — the canonical default (matches what the page rendered
  * before the CMS). Used as the component fallback AND as the seed source for
@@ -52,4 +59,11 @@ export const homeContent = {
     { photoUrl: null, alt: "", paragraph: "Step three — the work meets the world. Placeholder copy for the third image." },
     { photoUrl: null, alt: "", paragraph: "Step four — the story keeps climbing. Placeholder copy for the fourth image." },
   ] as StairStep[],
+  // Marquee cards — the scrolling row the three brand squares morph into. Brand
+  // colours cycle in code; photos stay placeholder until real imagery lands.
+  marqueeCards: [
+    { photoUrl: null, alt: "" },
+    { photoUrl: null, alt: "" },
+    { photoUrl: null, alt: "" },
+  ] as MarqueePhoto[],
 };

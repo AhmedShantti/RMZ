@@ -190,6 +190,13 @@ export const getHome = cache(() =>
               };
             })
           : homeDefault.stairs,
+        marqueeCards: g.marqueeCards?.length
+          ? g.marqueeCards.map((m) => {
+              const photo =
+                m.photo && typeof m.photo === "object" ? m.photo : null;
+              return { photoUrl: photo?.url ?? null, alt: photo?.alt ?? "" };
+            })
+          : homeDefault.marqueeCards,
       };
     },
     {
@@ -201,6 +208,7 @@ export const getHome = cache(() =>
       showreel: homeDefault.showreel,
       clients: homeDefault.clients,
       stairs: homeDefault.stairs,
+      marqueeCards: homeDefault.marqueeCards,
     },
   ),
 );

@@ -571,6 +571,15 @@ export interface HomeContent {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The scrolling card row the three brand squares morph into. Brand colours (yellow → orange → green) cycle automatically per card; upload a photo to fill a card (object-cover). Leave empty to show the colour + number placeholders.
+   */
+  marqueeCards?:
+    | {
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   teaserCtaLabel?: string | null;
   /**
    * Optional overrides for this page's metadata. Blank = defaults.
@@ -1067,6 +1076,12 @@ export interface HomeContentSelect<T extends boolean = true> {
     | {
         photo?: T;
         paragraph?: T;
+        id?: T;
+      };
+  marqueeCards?:
+    | T
+    | {
+        photo?: T;
         id?: T;
       };
   teaserCtaLabel?: T;
