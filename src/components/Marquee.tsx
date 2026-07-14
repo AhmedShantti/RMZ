@@ -1,133 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Marquee } from "./ui/marquee"
+import { Marquee } from "./ui/marquee";
 
+/**
+ * The three brand squares end their journey here: they morph into three
+ * portrait cards (ClientsCollage shape/style — aspect 3/4, hairline border) in
+ * the brand colours, which then recur across the marquee's scrolling loop.
+ * EmergeSquares hands the traveling squares off onto this row.
+ */
+const STORY_CARDS = [
+  { color: "var(--acc-yellow)" },
+  { color: "var(--acc-orange)" },
+  { color: "var(--acc-green)" },
+];
 
-const reviews = [
-  {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
-    img: "https://avatar.vercel.sh/jack",
-  },
-  {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
-    img: "https://avatar.vercel.sh/jill",
-  },
-  {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/john",
-  },
-  {
-    name: "Jane",
-    username: "@jane",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jane",
-  },
-  {
-    name: "Jenny",
-    username: "@jenny",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jenny",
-  },
-  {
-    name: "James",
-    username: "@james",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/james",
-  },
-]
+/** Card size — kept in sync with EmergeSquares' final waypoint (w×h). */
+const CARD_W = 180;
+const CARD_H = 240;
 
-const firstRow = reviews.slice(0, reviews.length / 2)
-const secondRow = reviews.slice(reviews.length / 2)
-
-const ReviewCard = ({
-  img,
-  name,
-  username,
-  body,
-  isFocused,
-  isBlurred,
-  onHoverStart,
-  onHoverEnd,
-}: {
-  img: string
-  name: string
-  username: string
-  body: string
-  isFocused: boolean
-  isBlurred: boolean
-  onHoverStart: () => void
-  onHoverEnd: () => void
-}) => {
+function StoryCard({ color }: { color: string }) {
   return (
     <figure
-      onMouseEnter={onHoverStart}
-      onMouseLeave={onHoverEnd}
-      className={cn(
-        "relative aspect-square w-64 cursor-pointer overflow-hidden rounded-xl border p-4",
-        // transition for scale, blur & z-index changes
-        "transition-all duration-300 ease-out",
-        // light styles
-        "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-        // dark styles
-        "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-        // focus (hovered) state — scale up and rise above siblings
-        isFocused && "z-10 scale-110 shadow-xl",
-        // blurred state — everything else dims and softens while one card is focused
-        isBlurred && "scale-95 opacity-50 blur-[2px]"
-      )}
-    >
-      <div className="flex flex-row items-center gap-2">
-        <img className="rounded-full" width="32" height="32" alt="" src={img} />
-        <div className="flex flex-col">
-          <figcaption className="text-sm font-medium dark:text-white">
-            {name}
-          </figcaption>
-          <p className="text-xs font-medium dark:text-white/40">{username}</p>
-        </div>
-      </div>
-      <blockquote className="mt-2 text-sm">{body}</blockquote>
-    </figure>
-  )
+      className="relative shrink-0 overflow-hidden border border-white/10"
+      style={{ width: CARD_W, height: CARD_H, backgroundColor: color }}
+      aria-hidden="true"
+    />
+  );
 }
 
 export function MarqueeDemo() {
-  // Track which card is currently hovered across BOTH rows so the
-  // blur/focus effect applies globally, not just within a single row.
-  const [hoveredUsername, setHoveredUsername] = useState<string | null>(null)
-
-  const renderCard = (review: (typeof reviews)[number]) => {
-    const isFocused = hoveredUsername === review.username
-    const isBlurred = hoveredUsername !== null && !isFocused
-
-    return (
-      <ReviewCard
-        key={review.username}
-        {...review}
-        isFocused={isFocused}
-        isBlurred={isBlurred}
-        onHoverStart={() => setHoveredUsername(review.username)}
-        onHoverEnd={() => setHoveredUsername(null)}
-      />
-    )
-  }
-
   return (
-     // data hook: end waypoint of the traveling logo squares
-     <div data-squares-marquee className="relative flex w-full flex-col items-stretch justify-center gap-4 bg-transparent py-6">
-      <Marquee pauseOnHover className="w-full [--duration:20s] py-4">
-        {firstRow.map(renderCard)}
+    // data hook: the traveling logo squares land / dissolve onto this row.
+    <div
+      data-squares-marquee
+      className="relative flex w-full items-center justify-center overflow-hidden py-12"
+    >
+      <Marquee className="w-full [--duration:24s] [--gap:1.5rem]">
+        {STORY_CARDS.map((c, i) => (
+          <StoryCard key={i} color={c.color} />
+        ))}
       </Marquee>
-
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent to-transparent"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-transparent to-transparent"></div>
     </div>
-  )
+  );
 }
