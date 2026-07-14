@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
@@ -44,23 +45,36 @@ export default async function PortfolioPage() {
         <div className="mx-auto max-w-6xl">
           {/* Editorial varied-height masonry. Column-based (true no-JS masonry)
               so adjacent tiles differ in height and pack flush.
-              TODO: Replace placeholders with real project images. */}
+              Each tile opens that project's case study at /portfolio/<slug>. */}
           <Reveal>
             <ul className="columns-1 [column-gap:2px] sm:columns-2 lg:columns-3">
               {projects.map((p, i) => (
                 <li
-                  key={p.name}
+                  key={p.slug}
                   className={`mb-[2px] break-inside-avoid ${PORTFOLIO_HEIGHTS[i % PORTFOLIO_HEIGHTS.length]}`}
                 >
                   <Link
-                    href="/contact"
+                    href={`/portfolio/${p.slug}`}
+                    aria-label={`${p.name} — ${p.discipline} for ${p.client}`}
                     className="group relative block h-full w-full overflow-hidden"
                   >
-                    {/* image placeholder — fills + scales on hover */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a] transition-transform duration-300 ease-out group-hover:scale-[1.03]">
-                      <span className="font-body text-sm text-[#666]">
-                        [ PROJECT IMAGE — REPLACE ]
-                      </span>
+                    {/* cover — fills + scales on hover. Falls back to the
+                        placeholder tile until real photography lands. */}
+                    <div className="absolute inset-0 bg-[#1a1a1a] transition-transform duration-300 ease-out group-hover:scale-[1.03]">
+                      {p.cover?.src ? (
+                        <Image
+                          src={p.cover.src}
+                          alt={p.cover.alt}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <span className="font-body absolute inset-0 flex items-center justify-center text-sm text-[#666]">
+                          [ PROJECT IMAGE — REPLACE ]
+                        </span>
+                      )}
                     </div>
                     {/* darken on hover + a base gradient so text stays readable */}
                     <div

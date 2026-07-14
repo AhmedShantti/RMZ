@@ -202,13 +202,209 @@ export interface Media {
 export interface PortfolioProject {
   id: number;
   name: string;
+  /**
+   * URL segment — /portfolio/<slug>. Left empty, it is derived from the name.
+   */
+  slug?: string | null;
   client: string;
   market: string;
   discipline: string;
   /**
+   * e.g. 2025
+   */
+  year?: string | null;
+  /**
    * The one-line result.
    */
   resultLine: string;
+  /**
+   * Card + case-study hero visual.
+   */
+  coverImage?: (number | null) | Media;
+  /**
+   * Shape of the hero visual.
+   */
+  coverRatio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+  /**
+   * The case study. Add, remove and reorder freely — the page renders exactly what's here, in this order.
+   */
+  blocks?:
+    | (
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            idea?: string | null;
+            goal?: string | null;
+            challenge?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'overview';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            items?:
+              | {
+                  label: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'services';
+          }
+        | {
+            image?: {
+              image?: (number | null) | Media;
+              /**
+               * Aspect ratio the image is framed to (never stretched).
+               */
+              ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+              caption?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'imageFull';
+          }
+        | {
+            images?:
+              | {
+                  image?: (number | null) | Media;
+                  ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'galleryTwo';
+          }
+        | {
+            images?:
+              | {
+                  image?: (number | null) | Media;
+                  ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'galleryThree';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            kind: 'mobile' | 'desktop' | 'branding' | 'packaging' | 'social' | 'campaign';
+            images?:
+              | {
+                  image?: (number | null) | Media;
+                  ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+                  caption?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'mockups';
+          }
+        | {
+            text: string;
+            attribution?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textBreak';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            items?:
+              | {
+                  /**
+                   * e.g. "+180%"
+                   */
+                  value: string;
+                  /**
+                   * e.g. "Retail sell-through"
+                   */
+                  label: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'stats';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            before?: {
+              image?: (number | null) | Media;
+              /**
+               * Aspect ratio the image is framed to (never stretched).
+               */
+              ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+              caption?: string | null;
+            };
+            after?: {
+              image?: (number | null) | Media;
+              /**
+               * Aspect ratio the image is framed to (never stretched).
+               */
+              ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+              caption?: string | null;
+            };
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'beforeAfter';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            /**
+             * Direct video file URL. Leave empty to show the poster with the play mark.
+             */
+            url?: string | null;
+            poster?: {
+              image?: (number | null) | Media;
+              /**
+               * Aspect ratio the image is framed to (never stretched).
+               */
+              ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
+              caption?: string | null;
+            };
+            caption?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'video';
+          }
+        | {
+            /**
+             * Optional — a sensible default is used when empty.
+             */
+            heading?: string | null;
+            body: string;
+            quote?: string | null;
+            quoteAuthor?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'summary';
+          }
+      )[]
+    | null;
   /**
    * Lower shows first.
    */
@@ -393,10 +589,168 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface PortfolioProjectsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
   client?: T;
   market?: T;
   discipline?: T;
+  year?: T;
   resultLine?: T;
+  coverImage?: T;
+  coverRatio?: T;
+  blocks?:
+    | T
+    | {
+        overview?:
+          | T
+          | {
+              heading?: T;
+              idea?: T;
+              goal?: T;
+              challenge?: T;
+              id?: T;
+              blockName?: T;
+            };
+        services?:
+          | T
+          | {
+              heading?: T;
+              items?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        imageFull?:
+          | T
+          | {
+              image?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        galleryTwo?:
+          | T
+          | {
+              images?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        galleryThree?:
+          | T
+          | {
+              images?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        mockups?:
+          | T
+          | {
+              heading?: T;
+              kind?: T;
+              images?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        textBreak?:
+          | T
+          | {
+              text?: T;
+              attribution?: T;
+              id?: T;
+              blockName?: T;
+            };
+        stats?:
+          | T
+          | {
+              heading?: T;
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        beforeAfter?:
+          | T
+          | {
+              heading?: T;
+              before?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                  };
+              after?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                  };
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        video?:
+          | T
+          | {
+              heading?: T;
+              url?: T;
+              poster?:
+                | T
+                | {
+                    image?: T;
+                    ratio?: T;
+                    caption?: T;
+                  };
+              caption?: T;
+              id?: T;
+              blockName?: T;
+            };
+        summary?:
+          | T
+          | {
+              heading?: T;
+              body?: T;
+              quote?: T;
+              quoteAuthor?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   order?: T;
   updatedAt?: T;
   createdAt?: T;
