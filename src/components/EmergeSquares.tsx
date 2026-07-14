@@ -411,14 +411,22 @@ export default function EmergeSquares({
           const { wps, slotRef, qsEl, qsFloater } = p;
           const { cx, cy, w, h } = samplePath(wps, phase);
 
+          // As each slot reaches viewport centre the square must uncover its
+          // photo. Desktop does this with a 3D flip (rotationX + backface
+          // hidden). Mobile skips 3D (janky there), so instead we fade the
+          // square out by the same centre-proximity — transparent when centred
+          // (photo shown), opaque when away (matching its stair cover). Without
+          // this the square just sits on the image the whole time.
           let rotationX = 0;
-          if (!isCompact && phase < 0.57) {
+          let coverFade = 1;
+          if (phase < 0.57) {
             const slot = slotRef.current;
             if (slot) {
               const r = slot.getBoundingClientRect();
               const dist = Math.abs(r.top + r.height / 2 - vhHalf);
               const prox = smoothstep(1 - dist / (window.innerHeight * 0.4));
-              rotationX = -180 * prox; // negative = bottom edge rises (down→up)
+              if (isCompact) coverFade = 1 - prox;
+              else rotationX = -180 * prox; // negative = bottom edge rises
             }
           }
 
@@ -429,7 +437,7 @@ export default function EmergeSquares({
           qsEl.scaleX(w / 100);
           qsEl.scaleY(h / 100);
           qsEl.rotationX(rotationX);
-          qsEl.autoAlpha((1 - floaterAmt) * (1 - endFade));
+          qsEl.autoAlpha((1 - floaterAmt) * (1 - endFade) * coverFade);
 
           // Floater (teaser-local) layer — only meaningfully visible during
           // the teaser drift; positioned relative to the teaser's own box.
