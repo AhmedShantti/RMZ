@@ -17,7 +17,15 @@ import { markets as marketsDefault } from "@/content/markets";
 import { contactContent as contactDefault } from "@/content/contact";
 import { careersPage as careersDefault, roles as rolesDefault } from "@/content/careers";
 import { projects as projectsDefault, portfolioPage as portfolioPageDefault } from "@/content/portfolio";
+import type {
+  MockupKind,
+  Project,
+  ProjectBlock,
+  Visual,
+  VisualRatio,
+} from "@/content/portfolio";
 import { privacyContent, termsContent } from "@/content/legal";
+import { slugify } from "@/lib/slug";
 
 /** Per-request Payload client (deduped). */
 const client = cache(async () => getPayload({ config }));
@@ -400,6 +408,133 @@ export const getPortfolioPage = cache(() =>
   ),
 );
 
+// ── Portfolio projects + case studies ────────────────────────────────────────
+
+/** A populated `media` doc, once depth ≥ 1 has resolved the upload. */
+type MediaDoc = { url?: string | null; alt?: string | null };
+
+/** The CMS shape of a single image field (upload + framing). */
+type CmsVisual = {
+  image?: unknown;
+  ratio?: string | null;
+  caption?: string | null;
+} | null;
+
+const visual = (v: CmsVisual): Visual | undefined => {
+  if (!v) return undefined;
+  const media =
+    v.image && typeof v.image === "object" ? (v.image as MediaDoc) : null;
+  return {
+    src: media?.url ?? null,
+    alt: media?.alt ?? "",
+    ratio: (v.ratio ?? undefined) as VisualRatio | undefined,
+    caption: v.caption ?? undefined,
+  };
+};
+
+const visuals = (list: CmsVisual[] | null | undefined): Visual[] =>
+  (list ?? []).map((v) => visual(v)).filter((v): v is Visual => Boolean(v));
+
+/** A visual field that is required in the CMS — always yields a Visual. */
+const requiredVisual = (v: CmsVisual): Visual =>
+  visual(v) ?? { src: null, alt: "" };
+
+/**
+ * Map one CMS block onto the code-side `ProjectBlock` union. Block slugs are
+ * identical on both sides, so this is a straight rename of the CMS's nullable
+ * fields into the code model's optional ones. An unrecognised block is dropped.
+ */
+type CmsBlock = { blockType: string } & Record<string, unknown>;
+
+function toBlock(b: CmsBlock): ProjectBlock | null {
+  const heading = (b.heading as string | null) ?? undefined;
+
+  switch (b.blockType) {
+    case "overview":
+      return {
+        type: "overview",
+        heading,
+        idea: (b.idea as string | null) ?? undefined,
+        goal: (b.goal as string | null) ?? undefined,
+        challenge: (b.challenge as string | null) ?? undefined,
+      };
+    case "services":
+      return { type: "services", heading, items: labels(b.items) };
+    case "imageFull":
+      return { type: "imageFull", image: requiredVisual(b.image as CmsVisual) };
+    case "galleryTwo":
+      return { type: "galleryTwo", images: visuals(b.images as CmsVisual[]) };
+    case "galleryThree":
+      return { type: "galleryThree", images: visuals(b.images as CmsVisual[]) };
+    case "mockups":
+      return {
+        type: "mockups",
+        heading,
+        kind: (b.kind as MockupKind) ?? "branding",
+        images: visuals(b.images as CmsVisual[]),
+      };
+    case "textBreak":
+      return {
+        type: "textBreak",
+        text: b.text as string,
+        attribution: (b.attribution as string | null) ?? undefined,
+      };
+    case "stats":
+      return {
+        type: "stats",
+        heading,
+        items: Array.isArray(b.items)
+          ? (b.items as { value: string; label: string }[]).map((s) => ({
+              value: s.value,
+              label: s.label,
+            }))
+          : [],
+      };
+    case "beforeAfter":
+      return {
+        type: "beforeAfter",
+        heading,
+        note: (b.note as string | null) ?? undefined,
+        before: requiredVisual(b.before as CmsVisual),
+        after: requiredVisual(b.after as CmsVisual),
+      };
+    case "video":
+      return {
+        type: "video",
+        heading,
+        url: (b.url as string | null) ?? undefined,
+        poster: visual(b.poster as CmsVisual),
+        caption: (b.caption as string | null) ?? undefined,
+      };
+    case "summary":
+      return {
+        type: "summary",
+        heading,
+        body: b.body as string,
+        quote: (b.quote as string | null) ?? undefined,
+        quoteAuthor: (b.quoteAuthor as string | null) ?? undefined,
+      };
+    default:
+      return null;
+  }
+}
+
+/**
+ * Every published project, in order, with its full case study.
+ *
+ * One query serves the index cards, generateStaticParams and the detail pages
+ * (React `cache` dedupes it per request).
+ *
+ * The CMS is authoritative for the detail pages: whatever blocks a project has
+ * in the studio are exactly what renders, and removing them all removes them
+ * from the page. The code defaults are only a whole-collection safety net (via
+ * `safe`, and the empty-collection check below) for when Payload or the DB is
+ * unreachable — never a per-field override of a live doc.
+ *
+ * The one derivation kept: a doc with no `slug` (seeded before the field
+ * existed) falls back to a slug derived from its name, so it still has a
+ * reachable URL rather than 404ing.
+ */
 export const getPortfolio = cache(() =>
   safe(
     "portfolio",
@@ -409,20 +544,64 @@ export const getPortfolio = cache(() =>
         sort: "order",
         limit: 100,
         where: { _status: { equals: "published" } },
-        depth: 0,
+        // depth 2: blocks → upload field → the media doc (url + alt).
+        depth: 2,
       });
       if (!res.docs.length) return projectsDefault;
-      return res.docs.map((d) => ({
-        name: d.name,
-        client: d.client,
-        market: d.market,
-        discipline: d.discipline,
-        result: d.resultLine,
-      }));
+
+      return res.docs.map((d): Project => {
+        const cover = visual(
+          d.coverImage && typeof d.coverImage === "object"
+            ? { image: d.coverImage, ratio: d.coverRatio }
+            : null,
+        );
+
+        return {
+          slug: f(d.slug, slugify(d.name)),
+          name: d.name,
+          client: d.client,
+          market: d.market,
+          discipline: d.discipline,
+          year: f(d.year, ""),
+          result: d.resultLine,
+          cover,
+          blocks: (d.blocks ?? [])
+            .map((b) => toBlock(b as CmsBlock))
+            .filter((b): b is ProjectBlock => b !== null),
+        };
+      });
     },
     projectsDefault,
   ),
 );
+
+/** Slugs of every published project — feeds generateStaticParams. */
+export const getProjectSlugs = cache(async () =>
+  (await getPortfolio()).map((p) => p.slug),
+);
+
+/**
+ * One project plus its neighbours. Prev/next wrap around the ordered list so a
+ * case study is never a dead end. Returns null for an unknown slug — the page
+ * turns that into a 404.
+ */
+export const getProject = cache(async (slug: string) => {
+  const all = await getPortfolio();
+  const index = all.findIndex((p) => p.slug === slug);
+  if (index === -1) return null;
+
+  const neighbour = (i: number) => {
+    if (all.length < 2) return null;
+    const { slug, name, discipline } = all[(i + all.length) % all.length];
+    return { slug, name, discipline };
+  };
+
+  return {
+    project: all[index],
+    prev: neighbour(index - 1),
+    next: neighbour(index + 1),
+  };
+});
 
 export const getCareerRoles = cache(() =>
   safe(

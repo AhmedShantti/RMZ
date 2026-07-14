@@ -232,14 +232,101 @@ await updateGlobal("legalTerms", {
   body: sectionsToLexical(termsContent.sections),
 });
 
+/**
+ * Case-study blocks → CMS blocks. The CMS owns the detail pages, so the whole
+ * case study is seeded, not just the card fields.
+ *
+ * Image uploads are the one thing a seed can't produce (there is no media to
+ * point at), so each visual seeds its ratio + caption and leaves `image` empty.
+ * The page renders its placeholder at that ratio until an editor attaches the
+ * real photo in the studio — no layout change when they do.
+ */
+type Vis = { ratio?: string; caption?: string };
+const vis = (v: { ratio?: string; caption?: string } | undefined): Vis =>
+  v ? { ratio: v.ratio, caption: v.caption } : {};
+const visList = (list: { ratio?: string; caption?: string }[] = []) =>
+  list.map((v) => vis(v));
+
+const toCmsBlock = (b: (typeof projects)[number]["blocks"][number]): AnyObj => {
+  switch (b.type) {
+    case "overview":
+      return {
+        blockType: "overview",
+        heading: b.heading,
+        idea: b.idea,
+        goal: b.goal,
+        challenge: b.challenge,
+      };
+    case "services":
+      return {
+        blockType: "services",
+        heading: b.heading,
+        items: b.items.map((label) => ({ label })),
+      };
+    case "imageFull":
+      return { blockType: "imageFull", image: vis(b.image) };
+    case "galleryTwo":
+      return { blockType: "galleryTwo", images: visList(b.images) };
+    case "galleryThree":
+      return { blockType: "galleryThree", images: visList(b.images) };
+    case "mockups":
+      return {
+        blockType: "mockups",
+        heading: b.heading,
+        kind: b.kind,
+        images: visList(b.images),
+      };
+    case "textBreak":
+      return {
+        blockType: "textBreak",
+        text: b.text,
+        attribution: b.attribution,
+      };
+    case "stats":
+      return {
+        blockType: "stats",
+        heading: b.heading,
+        items: b.items.map((s) => ({ value: s.value, label: s.label })),
+      };
+    case "beforeAfter":
+      return {
+        blockType: "beforeAfter",
+        heading: b.heading,
+        note: b.note,
+        before: vis(b.before),
+        after: vis(b.after),
+      };
+    case "video":
+      return {
+        blockType: "video",
+        heading: b.heading,
+        url: b.url,
+        poster: vis(b.poster),
+        caption: b.caption,
+      };
+    case "summary":
+      return {
+        blockType: "summary",
+        heading: b.heading,
+        body: b.body,
+        quote: b.quote,
+        quoteAuthor: b.quoteAuthor,
+      };
+  }
+};
+
 await seedCollection(
   "portfolioProjects",
   projects.map((p, i) => ({
     name: p.name,
+    slug: p.slug,
     client: p.client,
     market: p.market,
     discipline: p.discipline,
+    year: p.year,
     resultLine: p.result,
+    coverRatio: p.cover?.ratio ?? "16/9",
+    blocks: p.blocks.map(toCmsBlock),
     order: i,
   })),
 );
