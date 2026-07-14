@@ -20,8 +20,9 @@ import { useReducedMotion } from "@/lib/reducedMotion";
  *  - Each card is an image container (object-cover) backed by its brand colour,
  *    so the colour-square → card handoff is seamless and a real photo just
  *    drops in when one lands. Until then it shows the brand colour + a label.
- *  - Centre focus: a per-frame loop scales up whichever card is crossing the
- *    page's horizontal centre and blurs/dims the rest by their distance from it.
+ *  - Hover focus: cards rest as solid colour blocks; hovering one lifts its
+ *    colour veil (revealing the content) and scales it up while the rest stay
+ *    filled and blur. The row pauses on hover so the card holds under the cursor.
  */
 export type MarqueeCard = {
   color: string;
@@ -36,9 +37,13 @@ const DEFAULT_CARDS: MarqueeCard[] = [
   { color: "var(--acc-green)", label: "03" },
 ];
 
-/** Card size — kept in sync with EmergeSquares' final waypoint (cardW × cardH). */
-const CARD_W = 260;
-const CARD_H = 340;
+/**
+ * Card size — responsive (portrait 3.9:5, i.e. ×1.3077) so it doesn't swallow a
+ * phone screen. Kept in sync with EmergeSquares' final waypoint, which computes
+ * the same clamp so the squares morph into the actual card size.
+ */
+const CARD_W = "clamp(150px, 42vw, 260px)";
+const CARD_H = "clamp(196px, 54.9vw, 340px)";
 
 function StoryCard({ card }: { card: MarqueeCard }) {
   return (
@@ -50,6 +55,8 @@ function StoryCard({ card }: { card: MarqueeCard }) {
         backgroundColor: card.color,
         transformOrigin: "center center",
         willChange: "transform, filter",
+        transition:
+          "transform 0.45s cubic-bezier(0.16,1,0.3,1), filter 0.45s ease",
       }}
       aria-hidden="true"
     >
@@ -63,10 +70,21 @@ function StoryCard({ card }: { card: MarqueeCard }) {
           className="object-cover"
         />
       ) : (
-        <span className="font-body absolute bottom-3 left-3 text-xs font-semibold uppercase tracking-[0.2em] text-black/45">
+        <span className="font-body absolute bottom-3 left-3 z-10 text-xs font-semibold uppercase tracking-[0.2em] text-black/45">
           {card.label}
         </span>
       )}
+      {/* Colour veil — driven by the centre-focus loop: transparent at centre
+          (content shows), fills to solid brand colour as the card leaves it.
+          Starts filled so pre-JS / reduced-motion cards read as colour blocks. */}
+      <span
+        className="story-card-fill pointer-events-none absolute inset-0 z-20"
+        style={{
+          backgroundColor: card.color,
+          opacity: 1,
+          transition: "opacity 0.45s ease",
+        }}
+      />
     </figure>
   );
 }
@@ -79,41 +97,64 @@ export function MarqueeDemo({
   const reduce = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Centre focus — every frame, scale up whichever card is crossing the page's
-  // horizontal centre and blur/dim the others by their distance from it. Driven
-  // off live geometry because the marquee scrolls continuously via CSS.
+  // Hover focus — cards rest as solid colour blocks; hovering one lifts its
+  // colour veil (revealing the content) and scales it up, while the rest stay
+  // filled and blur back. The row pauses on hover (see `pauseOnHover`) so the
+  // hovered card holds still under the cursor.
   useEffect(() => {
-    if (reduce) return;
     const root = rootRef.current;
     if (!root) return;
-    const els = Array.from(
+    const items = Array.from(
       root.querySelectorAll<HTMLElement>(".story-card"),
-    );
-    if (!els.length) return;
+    ).map((el) => ({
+      el,
+      fill: el.querySelector<HTMLElement>(".story-card-fill"),
+    }));
+    if (!items.length) return;
 
-    const MAX_SCALE = 0.28; // +28% at dead centre
-    const MAX_BLUR = 4; // px on the farthest cards
-    const smooth = (t: number) => t * t * (3 - 2 * t);
-    let raf = 0;
-
-    const tick = () => {
-      const mid = window.innerWidth / 2;
-      const focus = Math.min(window.innerWidth * 0.42, 480); // falloff radius
-      for (const el of els) {
-        const r = el.getBoundingClientRect();
-        // Centre X is invariant under a centre-origin scale, so this is stable.
-        const d = Math.abs(r.left + r.width / 2 - mid);
-        const t = smooth(Math.max(0, 1 - d / focus)); // 1 at centre → 0 far off
-        el.style.transform = `scale(${(1 + MAX_SCALE * t).toFixed(3)})`;
-        const blur = MAX_BLUR * (1 - t);
-        el.style.filter = blur > 0.15 ? `blur(${blur.toFixed(2)}px)` : "";
-        el.style.opacity = (0.55 + 0.45 * t).toFixed(3);
-        el.style.zIndex = t > 0.5 ? "2" : "1";
+    // focused = the hovered card, or null for the resting state.
+    const apply = (focused: HTMLElement | null) => {
+      for (const { el, fill } of items) {
+        const isFocus = el === focused;
+        // Scale kept small enough that the grown card stays inside the row gap
+        // (see --gap below) instead of overlapping its neighbours.
+        el.style.transform = isFocus ? "scale(1.14)" : "";
+        el.style.filter = focused && !isFocus ? "blur(3px)" : "";
+        el.style.zIndex = isFocus ? "2" : "1";
+        // Veil lifts on the hovered card, stays/returns to solid colour on the
+        // rest (and on every card at rest).
+        if (fill) fill.style.opacity = isFocus ? "0" : "1";
       }
-      raf = requestAnimationFrame(tick);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+
+    // Skip the hover interaction on touch / no-hover devices (they can't
+    // un-hover, so a tapped card would stay scaled up and overlap its
+    // neighbours) and when reduced motion is requested. In both cases just
+    // reveal each card's content statically — no scaling, blur or overlap.
+    const canHover =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (reduce || !canHover) {
+      items.forEach(({ fill }) => {
+        if (fill) fill.style.opacity = "0";
+      });
+      return;
+    }
+
+    apply(null); // establish the resting (all colour-filled) state
+    const onOver = (e: PointerEvent) => {
+      const card = (e.target as Element | null)?.closest<HTMLElement>(
+        ".story-card",
+      );
+      if (card) apply(card);
+    };
+    const onLeave = () => apply(null);
+    root.addEventListener("pointerover", onOver);
+    root.addEventListener("pointerleave", onLeave);
+    return () => {
+      root.removeEventListener("pointerover", onOver);
+      root.removeEventListener("pointerleave", onLeave);
+    };
   }, [reduce, cards.length]);
 
   return (
@@ -126,7 +167,7 @@ export function MarqueeDemo({
       data-squares-marquee
       className="relative flex w-full items-center justify-center overflow-x-clip py-20"
     >
-      <Marquee className="w-full [--duration:26s] [--gap:1.5rem]">
+      <Marquee pauseOnHover className="w-full [--duration:26s] [--gap:2.75rem]">
         {cards.map((c, i) => (
           <StoryCard key={i} card={c} />
         ))}

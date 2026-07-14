@@ -265,9 +265,8 @@ export default function EmergeSquares({
         // Per-square drift fractions inside the teaser (fixed per load).
         const fA = { x: gsap.utils.random(0.12, 0.4), y: gsap.utils.random(0.14, 0.42) };
         const fB = { x: gsap.utils.random(0.5, 0.86), y: gsap.utils.random(0.5, 0.82) };
-        // Final marquee-card size — MUST match Marquee.tsx's StoryCard (w×h).
-        const cardW = 260;
-        const cardH = 340;
+        // Marquee-card gap; the card w/h are computed per-frame in the END
+        // waypoint below (responsive) to match Marquee.tsx's StoryCard clamp.
         const cardGap = 24;
 
         const wps: Waypoint[] = [
@@ -297,6 +296,9 @@ export default function EmergeSquares({
             at: PHASE.END,
             get: () => {
               const r = marquee.getBoundingClientRect();
+              // Responsive card size — mirrors Marquee.tsx's clamp(150,42vw,260).
+              const cardW = Math.max(150, Math.min(260, window.innerWidth * 0.42));
+              const cardH = cardW * (340 / 260);
               const rowW = 3 * cardW + 2 * cardGap;
               const sx = r.left + r.width / 2 - rowW / 2;
               return {
