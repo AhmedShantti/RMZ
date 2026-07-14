@@ -46,7 +46,9 @@ export function Marquee({
     <div
       {...props}
       className={cn(
-        "group flex gap-(--gap) overflow-hidden p-2 [--duration:40s] [--gap:1rem]",
+        // x-only clip (not `overflow-hidden`) so a scaled-up child can grow
+        // vertically past the row without being cut off top/bottom.
+        "group flex gap-(--gap) overflow-x-clip overflow-y-visible p-2 [--duration:40s] [--gap:1rem]",
         {
           "flex-row": !vertical,
           "flex-col": vertical,
