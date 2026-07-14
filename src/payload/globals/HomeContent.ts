@@ -114,6 +114,23 @@ export const HomeContent: GlobalConfig = {
       ],
     },
     {
+      name: "marqueeCards",
+      type: "array",
+      label: "Marquee cards (post-stairs scrolling row)",
+      admin: {
+        description:
+          "The scrolling card row the three brand squares morph into. Brand colours (yellow → orange → green) cycle automatically per card; upload a photo to fill a card (object-cover). Leave empty to show the colour + number placeholders.",
+      },
+      fields: [
+        {
+          name: "photo",
+          type: "upload",
+          relationTo: "media",
+          label: "Photo",
+        },
+      ],
+    },
+    {
       name: "teaserCtaLabel",
       type: "text",
       label: "Markets teaser CTA label",

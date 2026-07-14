@@ -13,8 +13,12 @@ import Gradient from "@/components/gradient/NeatGradient";
 import { MeshGradient } from '@paper-design/shaders-react';
 import { fulfillRouteCacheEntry } from "next/dist/client/components/segment-cache/cache";
 
-
-
+// Brand colours cycled across the marquee cards (the three squares' end state).
+const MARQUEE_COLORS = [
+  "var(--acc-yellow)",
+  "var(--acc-orange)",
+  "var(--acc-green)",
+];
 
 export default async function Home() {
   const [home, servicesData, contact, settings] = await Promise.all([
@@ -55,7 +59,14 @@ export default async function Home() {
       {/* Wordmark + logo squares → emerge → stairs (pinned) */}
       <HomeLogoStairs stairs={home.stairs} />
       <ServicesTeaser services={featured}  />
-      <MarqueeDemo />
+      <MarqueeDemo
+        cards={home.marqueeCards.map((c, i) => ({
+          color: MARQUEE_COLORS[i % MARQUEE_COLORS.length],
+          photoUrl: c.photoUrl,
+          alt: c.alt,
+          label: String(i + 1).padStart(2, "0"),
+        }))}
+      />
       
       <VideoSection
         leftLabel={home.showreel.leftLabel}

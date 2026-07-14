@@ -204,6 +204,15 @@ export default function EmergeSquares({
       // text but above the section's transparent backdrop.
       teaser.style.isolation = "isolate";
 
+      // The marquee row starts hidden and is revealed (phase-driven, in place()
+      // below) exactly as the squares arrive on it — so the two are perfectly
+      // synced and the reveal reverses on scroll-up. Reduced-motion returns
+      // early above, leaving the row at its default (visible) state.
+      const qsMarquee = gsap.quickSetter(marquee, "opacity") as (
+        v: number,
+      ) => void;
+      gsap.set(marquee, { opacity: 0 });
+
       const paths: PathEntry[] = [];
 
       COLORS.forEach((color, i) => {
@@ -257,8 +266,8 @@ export default function EmergeSquares({
         const fA = { x: gsap.utils.random(0.12, 0.4), y: gsap.utils.random(0.14, 0.42) };
         const fB = { x: gsap.utils.random(0.5, 0.86), y: gsap.utils.random(0.5, 0.82) };
         // Final marquee-card size — MUST match Marquee.tsx's StoryCard (w×h).
-        const cardW = 180;
-        const cardH = 240;
+        const cardW = 260;
+        const cardH = 340;
         const cardGap = 24;
 
         const wps: Waypoint[] = [
@@ -378,6 +387,10 @@ export default function EmergeSquares({
         // marquee row, dissolve it out — the marquee's identical colour card
         // is scrolling underneath, so the square "becomes" the marquee card.
         const endFade = smoothstep((phase - 0.94) / 0.06);
+
+        // Reveal the marquee row as the squares arrive on it — fully in by
+        // ~0.94, right as the squares dissolve into it. Reverses on scroll-up.
+        qsMarquee(smoothstep((phase - 0.84) / 0.2));
 
         // While fully handed off to the floater (between the two cross-fades),
         // the floater IDLE-drifts instead of tracking the scroll path.
@@ -538,7 +551,6 @@ export default function EmergeSquares({
           place(phaseAt(self.scroll()));
         },
       });
-
       // Layout can still shift after this first measurement (web fonts
       // swapping in, lazily-loaded hero/teaser images resolving their
       // intrinsic size) — refresh once those settle so the checkpoints
