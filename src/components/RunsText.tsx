@@ -8,6 +8,15 @@ import { Fragment } from "react";
  *
  * Space is inserted between runs unless a run sets `noSpaceBefore` (e.g. the
  * "STORY" + ".." pair on the contact line).
+ *
+ * `reveal` opt-in: splits each run into per-character `.rt-unit` spans (grouped
+ * into `.rt-word` wrappers so wrapping stays intact) for a staggered entrance —
+ * animated by GSAP (hero) or CSS (`[data-reveal]` ancestor, see globals.css).
+ * Markup is identical on server and client (pure render, no JS injection). The
+ * split is `aria-hidden`; a visually-hidden copy carries the real text so
+ * screen readers read the line normally instead of letter-by-letter.
+ * `revealStartIndex` offsets the `--i` stagger counter so a heading split across
+ * two RunsText calls (e.g. the stacked CTA) staggers as one continuous line.
  */
 export type Run = {
   text: string;
@@ -30,26 +39,88 @@ const TONE_CLASS: Record<Run["tone"], string> = {
   red: "text-rebel-red",
 };
 
-export default function RunsText({ runs }: { runs?: Run[] | null }) {
+function runClass(r: Run): string | undefined {
+  return (
+    [STYLE_CLASS[r.style], TONE_CLASS[r.tone], r.upper ? "uppercase" : ""]
+      .filter(Boolean)
+      .join(" ") || undefined
+  );
+}
+
+/**
+ * Split runs into per-character `.rt-unit` spans (grouped by `.rt-word`) plus
+ * the concatenated plain text. Module-scope so the running counters are local
+ * to this pure builder, not the component render.
+ */
+function buildReveal(runs: Run[], startIndex: number) {
+  let unit = startIndex;
+  let plain = "";
+  const visual = runs.map((r, i) => {
+    const space = i > 0 && !r.noSpaceBefore ? " " : "";
+    plain += space + r.text;
+    // Keep whitespace tokens so intra-run spaces still render and allow breaks.
+    const tokens = r.text.split(/(\s+)/);
+    return (
+      <Fragment key={i}>
+        {space}
+        <span className={runClass(r)}>
+          {tokens.map((tok, ti) => {
+            if (tok === "") return null;
+            if (/^\s+$/.test(tok)) return <Fragment key={ti}>{tok}</Fragment>;
+            return (
+              <span key={ti} className="rt-word">
+                {Array.from(tok).map((ch, ci) => (
+                  <span
+                    key={ci}
+                    className="rt-unit"
+                    style={{ "--i": unit++ } as React.CSSProperties}
+                  >
+                    {ch}
+                  </span>
+                ))}
+              </span>
+            );
+          })}
+        </span>
+      </Fragment>
+    );
+  });
+  return { visual, plain };
+}
+
+export default function RunsText({
+  runs,
+  reveal = false,
+  revealStartIndex = 0,
+}: {
+  runs?: Run[] | null;
+  reveal?: boolean;
+  revealStartIndex?: number;
+}) {
   if (!runs?.length) return null;
+
+  if (!reveal) {
+    return (
+      <>
+        {runs.map((r, i) => {
+          const space = i > 0 && !r.noSpaceBefore ? " " : "";
+          return (
+            <Fragment key={i}>
+              {space}
+              <span className={runClass(r)}>{r.text}</span>
+            </Fragment>
+          );
+        })}
+      </>
+    );
+  }
+
+  // Reveal mode — split into staggerable units + a screen-reader real-text copy.
+  const { visual, plain } = buildReveal(runs, revealStartIndex);
   return (
     <>
-      {runs.map((r, i) => {
-        const className = [
-          STYLE_CLASS[r.style],
-          TONE_CLASS[r.tone],
-          r.upper ? "uppercase" : "",
-        ]
-          .filter(Boolean)
-          .join(" ");
-        const space = i > 0 && !r.noSpaceBefore ? " " : "";
-        return (
-          <Fragment key={i}>
-            {space}
-            <span className={className || undefined}>{r.text}</span>
-          </Fragment>
-        );
-      })}
+      <span aria-hidden="true">{visual}</span>
+      <span className="sr-only">{plain}</span>
     </>
   );
 }

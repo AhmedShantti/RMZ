@@ -39,14 +39,22 @@ export default function ServicesTeaser({
                     {s.index}
                   </span>
                   <span className="font-display group-hover:text-rebel-red flex-1 text-[clamp(1.6rem,4.5vw,2.8rem)] leading-tight italic transition-colors">
-                    {s.title}
+                    {/* underline wipe — a hairline that scales in from the left
+                        on hover (transform-only; instant, no wipe, under
+                        reduced motion). Inner inline-block so it hugs the text
+                        width, not the flex column. */}
+                    <span className="relative inline-block after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-rebel-red after:content-[''] group-hover:after:scale-x-100 motion-safe:after:transition-transform motion-safe:after:duration-500 motion-safe:after:ease-[cubic-bezier(0.16,1,0.3,1)]">
+                      {s.title}
+                    </span>
                   </span>
                   <span className="font-body text-cream-dim hidden max-w-xs text-sm md:block">
                     {s.blurb}
                   </span>
+                  {/* arrow slide — nudges up-right on hover (transform gated by
+                      motion-safe; colour still changes under reduced motion). */}
                   <span
                     aria-hidden="true"
-                    className="text-cream-dim group-hover:text-rebel-red transition-colors"
+                    className="text-cream-dim group-hover:text-rebel-red transition-[color,transform] duration-300 ease-out motion-safe:group-hover:-translate-y-1 motion-safe:group-hover:translate-x-1"
                   >
                     ↗
                   </span>

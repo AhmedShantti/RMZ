@@ -483,6 +483,30 @@ body:focus-visible {
   animation: rmz-pulse 2.6s ease-in-out infinite;
 }
 
+/* ---- Staggered text reveal (RunsText `reveal`) — transform/opacity only ----
+   Units are hidden only under a [data-reveal] ancestor (the CSS path used by
+   the MarketsBlock heading). The hero heading has no such ancestor: its units
+   stay visible by default and GSAP animates them from the entrance timeline. */
+.rt-word {
+  display: inline-block;
+}
+.rt-unit {
+  display: inline-block;
+  will-change: transform;
+}
+[data-reveal] .rt-unit {
+  opacity: 0;
+  transform: translateY(0.45em);
+}
+[data-reveal="in"] .rt-unit {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 18ms);
+}
+
 /* ---- Reduced motion: kill non-essential animation (TASK.md §8) ---- */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -492,6 +516,11 @@ body:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Belt-and-suspenders: units always resolve to their visible state. */
+  [data-reveal] .rt-unit {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
