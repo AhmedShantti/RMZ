@@ -2,6 +2,7 @@ import Link from "next/link";
 import MarketsColumns, { type Market } from "./MarketsColumns";
 import RunsText, { type Run } from "./RunsText";
 import Reveal from "./Reveal";
+import RevealHeading from "./RevealHeading";
 
 /**
  * Markets / CTA block (Redesigning Stage 3) — a 2-column layout:
@@ -34,12 +35,17 @@ export default function MarketsBlock({
   const splitIdx = story.findIndex((r) => r.style === "italic");
   const lead = splitIdx > 0 ? story.slice(0, splitIdx) : story;
   const tail = splitIdx > 0 ? story.slice(splitIdx) : [];
+  // Continue the stagger counter onto the second line so the stacked heading
+  // reveals as one line, not two restarting at 0.
+  const leadChars = lead.reduce((n, r) => n + r.text.length, 0);
   const Heading = (
-    <h2 className="display-statement text-cream text-[clamp(2.4rem,6vw,5rem)] leading-[0.98]">
-      <RunsText runs={lead} />
-      {tail.length > 0 && <br />}
-      <RunsText runs={tail} />
-    </h2>
+    <RevealHeading>
+      <h2 className="display-statement text-cream text-[clamp(2.4rem,6vw,5rem)] leading-[0.98]">
+        <RunsText runs={lead} reveal />
+        {tail.length > 0 && <br />}
+        <RunsText runs={tail} reveal revealStartIndex={leadChars} />
+      </h2>
+    </RevealHeading>
   );
 
   // 3 sharp accent squares (yellow · orange · green), 16px, 6px gap.
