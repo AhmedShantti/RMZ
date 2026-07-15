@@ -12,6 +12,7 @@ import { NeatGradient } from "@firecms/neat";
 import Gradient from "@/components/gradient/NeatGradient";
 import { MeshGradient } from '@paper-design/shaders-react';
 import { fulfillRouteCacheEntry } from "next/dist/client/components/segment-cache/cache";
+import ClientCard from "@/components/ClientCard";
 
 // Brand colours cycled across the marquee cards (the three squares' end state).
 const MARQUEE_COLORS = [
@@ -47,7 +48,7 @@ export default async function Home() {
       
 
       {/* your real content goes here, on top */}
-      <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
+      <div data-squares-stage style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
         
         
  
@@ -59,14 +60,8 @@ export default async function Home() {
       {/* Wordmark + logo squares → emerge → stairs (pinned) */}
       <HomeLogoStairs stairs={home.stairs} />
       <ServicesTeaser services={featured}  />
-      <MarqueeDemo
-        cards={home.marqueeCards.map((c, i) => ({
-          color: MARQUEE_COLORS[i % MARQUEE_COLORS.length],
-          photoUrl: c.photoUrl,
-          alt: c.alt,
-          label: String(i + 1).padStart(2, "0"),
-        }))}
-      />
+     
+      <ClientCard heading={home.clientsHeading} clients={home.clientCards} />
       
       <VideoSection
         leftLabel={home.showreel.leftLabel}

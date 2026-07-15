@@ -89,6 +89,31 @@ export const HomeContent: GlobalConfig = {
       ],
     },
     {
+      name: "clientsHeading",
+      type: "text",
+      label: "Clients section heading",
+      defaultValue: "Clients",
+    },
+    {
+      name: "clientCards",
+      type: "array",
+      label: "Client cards (rotating showcase)",
+      admin: {
+        description:
+          "Clients shown in the rotating card showcase — each a name, category and photo. Leave a photo empty to show a placeholder.",
+      },
+      fields: [
+        { name: "name", type: "text", required: true, label: "Client name" },
+        { name: "category", type: "text", label: "Category" },
+        {
+          name: "photo",
+          type: "upload",
+          relationTo: "media",
+          label: "Photo",
+        },
+      ],
+    },
+    {
       name: "stairs",
       type: "array",
       label: "Stairs steps (logo-squares journey)",

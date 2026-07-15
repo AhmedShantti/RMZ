@@ -20,6 +20,14 @@ export type MarqueePhoto = {
   alt: string;
 };
 
+/** A client card in the rotating showcase (ClientsSection). */
+export type ClientCardItem = {
+  name: string;
+  category: string;
+  photoUrl: string | null;
+  alt: string;
+};
+
 /**
  * Home page content — the canonical default (matches what the page rendered
  * before the CMS). Used as the component fallback AND as the seed source for
@@ -66,4 +74,15 @@ export const homeContent = {
     { photoUrl: null, alt: "" },
     { photoUrl: null, alt: "" },
   ] as MarqueePhoto[],
+  // Rotating client showcase (ClientsSection). Heading + cards are CMS-driven;
+  // photos stay placeholder until real imagery lands.
+  clientsHeading: "Clients",
+  clientCards: [
+    { name: "Client one", category: "Restaurants", photoUrl: null, alt: "" },
+    { name: "Client two", category: "Automotive", photoUrl: null, alt: "" },
+    { name: "Client three", category: "Decorations", photoUrl: null, alt: "" },
+    { name: "Client four", category: "Restaurants", photoUrl: null, alt: "" },
+    { name: "Client five", category: "Automotive", photoUrl: null, alt: "" },
+    { name: "Client six", category: "Decorations", photoUrl: null, alt: "" },
+  ] as ClientCardItem[],
 };
