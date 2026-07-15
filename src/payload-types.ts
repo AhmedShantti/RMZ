@@ -915,6 +915,18 @@ export interface HomeContent {
         id?: string | null;
       }[]
     | null;
+  clientsHeading?: string | null;
+  /**
+   * Clients shown in the rotating card showcase — each a name, category and photo. Leave a photo empty to show a placeholder.
+   */
+  clientCards?:
+    | {
+        name: string;
+        category?: string | null;
+        photo?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Exactly four steps — the animation lands three logo squares on the first three cards plus one extra. Each: a photo + its paragraph. Leave a photo empty to show the placeholder.
    */
@@ -1423,6 +1435,15 @@ export interface HomeContentSelect<T extends boolean = true> {
         label?: T;
         badgeName?: T;
         badgeAccent?: T;
+        id?: T;
+      };
+  clientsHeading?: T;
+  clientCards?:
+    | T
+    | {
+        name?: T;
+        category?: T;
+        photo?: T;
         id?: T;
       };
   stairs?:

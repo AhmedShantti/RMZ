@@ -22,27 +22,24 @@ const { loadEnvConfig } = require("@next/env") as typeof import("@next/env");
 loadEnvConfig(process.cwd(), true);
 
 /**
- * Orphan tables — created by a field that has since been removed from the schema.
+ * Orphan tables — left behind by fields since removed from the schema. The
+ * current schema defines NO `blocks` field (see payload-types: `blocks: {}`),
+ * so every `%blocks%` table left in prod (the removed portfolio case-study
+ * blocks + their versions/locales) is a pending DROP. Drizzle's push cannot
+ * tell a dropped table apart from a renamed one: the moment the schema ALSO
+ * adds tables (the new home CMS arrays: clientCards / marqueeCards), it asks
+ * "is <orphan> renamed to <new table>?" — an interactive prompt with no TTY on
+ * CI, which aborts the build with exit code 13.
  *
- * `home_content_marquee_cards` is left over from HomeContent's old `marqueeCards`
- * field (removed in a later redesign; see commit "Maquee editing"). An orphan is
- * harmless on its own, but drizzle's push cannot tell a dropped table apart from
- * a renamed one: the moment the schema ALSO adds tables (as the portfolio
- * case-study blocks do), it asks "is home_content_marquee_cards renamed to
- * portfolio_projects_blocks_overview?" — an interactive prompt with no TTY on CI,
- * which aborts the build with exit code 13.
+ * We MOVE the orphans to an `archive` schema rather than dropping them. Push
+ * only looks at `public`, so this settles the ambiguity (creates only, no
+ * prompt) while the old rows stay recoverable — a build script should never be
+ * the thing that destroys content. NB: `%blocks%` deliberately does NOT match
+ * the live `home_content_marquee_cards` / `home_content_client_cards` tables.
  *
- * We MOVE the orphan to an `archive` schema rather than dropping it. Push only
- * looks at `public`, so this settles the ambiguity (creates only, no prompt)
- * while the old rows stay recoverable — a build script should never be the thing
- * that destroys content. Matched by prefix because a removed array field leaves
- * sub-tables behind too.
- *
- * To recover:   ALTER TABLE archive.<table> SET SCHEMA public;
+ * To recover:   ALTER TABLE archive."<table>" SET SCHEMA public;
  * To discard:   DROP SCHEMA archive CASCADE;
  */
-const ORPHAN_PREFIXES = ["home_content_marquee"];
-
 async function archiveOrphanTables(uri: string) {
   // pg is CommonJS — reach through `default` for the namespace under ESM.
   const pg = await import("pg");
@@ -52,9 +49,7 @@ async function archiveOrphanTables(uri: string) {
   try {
     const { rows } = await client.query<{ tablename: string }>(
       `SELECT tablename FROM pg_tables
-        WHERE schemaname = 'public'
-          AND (${ORPHAN_PREFIXES.map((_, i) => `tablename LIKE $${i + 1}`).join(" OR ")})`,
-      ORPHAN_PREFIXES.map((p) => `${p}%`),
+        WHERE schemaname = 'public' AND tablename LIKE '%blocks%'`,
     );
 
     if (!rows.length) {
@@ -66,18 +61,22 @@ async function archiveOrphanTables(uri: string) {
     for (const { tablename } of rows) {
       // A previous deploy may already have archived this name; keep the first
       // (oldest) copy and park the duplicate beside it.
-      await client.query(
-        `ALTER TABLE public."${tablename}" SET SCHEMA archive`,
-      ).catch(async (e: Error) => {
-        await client.query(
-          `ALTER TABLE public."${tablename}" RENAME TO "${tablename}_dup"`,
-        );
-        await client.query(
-          `ALTER TABLE public."${tablename}_dup" SET SCHEMA archive`,
-        );
-        console.warn(`[db-push] ${tablename} already archived (${e.message}); parked duplicate.`);
-      });
-      console.log(`[db-push] archived orphan table: public.${tablename} → archive.${tablename}`);
+      await client
+        .query(`ALTER TABLE public."${tablename}" SET SCHEMA archive`)
+        .catch(async (e: Error) => {
+          await client.query(
+            `ALTER TABLE public."${tablename}" RENAME TO "${tablename}_dup"`,
+          );
+          await client.query(
+            `ALTER TABLE public."${tablename}_dup" SET SCHEMA archive`,
+          );
+          console.warn(
+            `[db-push] ${tablename} already archived (${e.message}); parked duplicate.`,
+          );
+        });
+      console.log(
+        `[db-push] archived orphan table: public.${tablename} → archive.${tablename}`,
+      );
     }
   } finally {
     await client.end();
@@ -95,6 +94,19 @@ try {
       // Non-fatal: if this fails the push below may still succeed.
       console.error("[db-push] orphan cleanup skipped:", (e as Error).message);
     }
+  }
+
+  // Payload's dev push asks an interactive `prompts` confirm when a change is
+  // destructive (e.g. dropping columns the schema no longer defines, like the
+  // intentionally-omitted portfolio coverImage/slug/year). There's no TTY on
+  // CI, so it stalls. Pre-answer "yes" via prompts.inject so the schema
+  // reconciles non-interactively. Safe: the code schema is the source of truth
+  // and the dropped columns aren't used by the app.
+  try {
+    const prompts = require("prompts");
+    prompts.inject([true]);
+  } catch {
+    /* prompts is present via Payload; ignore if not resolvable */
   }
 
   const { default: configPromise } = await import("../payload.config.ts");

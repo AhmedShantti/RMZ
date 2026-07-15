@@ -205,6 +205,19 @@ export const getHome = cache(() =>
               return { photoUrl: photo?.url ?? null, alt: photo?.alt ?? "" };
             })
           : homeDefault.marqueeCards,
+        clientsHeading: f(g.clientsHeading, homeDefault.clientsHeading),
+        clientCards: g.clientCards?.length
+          ? g.clientCards.map((c) => {
+              const photo =
+                c.photo && typeof c.photo === "object" ? c.photo : null;
+              return {
+                name: f(c.name, ""),
+                category: f(c.category, ""),
+                photoUrl: photo?.url ?? null,
+                alt: photo?.alt ?? "",
+              };
+            })
+          : homeDefault.clientCards,
       };
     },
     {
@@ -217,6 +230,8 @@ export const getHome = cache(() =>
       clients: homeDefault.clients,
       stairs: homeDefault.stairs,
       marqueeCards: homeDefault.marqueeCards,
+      clientsHeading: homeDefault.clientsHeading,
+      clientCards: homeDefault.clientCards,
     },
   ),
 );
