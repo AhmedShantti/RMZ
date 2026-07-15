@@ -155,27 +155,32 @@ export default function Gradient() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Full animation only on capable devices with motion allowed. Reduced-motion
-    // users and software/CPU WebGL (Lighthouse, no-GPU) get a single static frame
-    // — same look, zero continuous main-thread cost.
     const reduce = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const software = isSoftwareWebGL();
-    const staticFrame = reduce || software;
+
+    // Software / CPU WebGL (Lighthouse's headless Chrome, no-GPU devices): don't
+    // touch WebGL at all. Even a single frame forces an expensive SwiftShader
+    // shader compile (~3s on the main thread — it was the bulk of the remaining
+    // LCP render-delay). Paint the gradient's own dark background colour
+    // instead; it's ~90% of the gradient anyway, and real GPUs never take this
+    // path (so the animation is unchanged for actual users).
+    if (software) {
+      canvas.style.background = config.backgroundColor;
+      return; // nothing created → nothing to clean up
+    }
 
     const gradient = new NeatGradient({
       ref: canvas,
       ...config,
-      // Cheaper single frame only in the already-degraded software case.
-      resolution: software ? 0.25 : config.resolution,
-      // Retain the one rendered frame on the canvas once we stop the loop.
-      preserveDrawingBuffer: staticFrame,
+      // Retain the single rendered frame on the canvas when we freeze it.
+      preserveDrawingBuffer: reduce,
     });
 
-    if (staticFrame) {
-      // The constructor renders frame 1 synchronously and schedules frame 2 via
-      // rAF; cancel it and disconnect the library's auto-resume observers so it
+    if (reduce) {
+      // Reduced-motion on a capable GPU: render one frame (cheap on a GPU), then
+      // cancel the loop + disconnect the library's auto-resume observers so it
       // stays a single static frame with no ongoing per-frame work.
       const g = gradient as unknown as NeatInternals;
       let frozen = false;
@@ -194,9 +199,8 @@ export default function Gradient() {
         frozen = false;
       }
       // If the internals moved (e.g. a library bump renamed `requestRef`) the
-      // loop is still running — degraded, but not broken (still tab-guarded).
-      // Surface it loudly in dev/staging so it doesn't ship as a silent
-      // regression; stays out of the production console.
+      // loop is still running — degraded, not broken (still tab-guarded).
+      // Surface it loudly in dev/staging so it can't ship as a silent regression.
       if (!frozen && process.env.NODE_ENV !== "production") {
         console.warn(
           "[NeatGradient] Could not freeze the static frame — @firecms/neat internal `requestRef` not found. The animation loop may still be running; check for a library version bump.",
