@@ -111,16 +111,98 @@ const config = {
     cameraZoom: 1,
 };
 
+/** Internal @firecms/neat fields we poke to freeze a single static frame.
+ *  (Confirmed against the installed version; all access is guarded so a library
+ *  change can't crash the page — it just falls back to the animated loop, which
+ *  the library already pauses when the tab is hidden.) */
+type NeatInternals = {
+  requestRef?: number;
+  _isVisible?: boolean;
+  _visibilityObserver?: { disconnect: () => void } | null;
+  _visibilityHandler?: (() => void) | null;
+};
+
+/**
+ * True when WebGL is running on a SOFTWARE rasteriser (SwiftShader / llvmpipe /
+ * Microsoft Basic Render / no GPU). There the per-frame shader costs ~1s+ on the
+ * main thread — this is exactly what Lighthouse's headless Chrome uses, and some
+ * low-end devices. When can't-tell, assume hardware (don't over-degrade).
+ */
+function isSoftwareWebGL(): boolean {
+  try {
+    const c = document.createElement("canvas");
+    const gl = (c.getContext("webgl") ||
+      c.getContext("experimental-webgl")) as WebGLRenderingContext | null;
+    if (!gl) return true; // no WebGL at all → treat as incapable
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+    const renderer = ext
+      ? String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || "")
+      : "";
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    if (!renderer) return false; // extension blocked → assume hardware
+    return /swiftshader|software|llvmpipe|basic render|microsoft basic|apple software|softpipe/i.test(
+      renderer,
+    );
+  } catch {
+    return true;
+  }
+}
+
 export default function Gradient() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Full animation only on capable devices with motion allowed. Reduced-motion
+    // users and software/CPU WebGL (Lighthouse, no-GPU) get a single static frame
+    // — same look, zero continuous main-thread cost.
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const software = isSoftwareWebGL();
+    const staticFrame = reduce || software;
 
     const gradient = new NeatGradient({
-      ref: canvasRef.current,
+      ref: canvas,
       ...config,
+      // Cheaper single frame only in the already-degraded software case.
+      resolution: software ? 0.25 : config.resolution,
+      // Retain the one rendered frame on the canvas once we stop the loop.
+      preserveDrawingBuffer: staticFrame,
     });
+
+    if (staticFrame) {
+      // The constructor renders frame 1 synchronously and schedules frame 2 via
+      // rAF; cancel it and disconnect the library's auto-resume observers so it
+      // stays a single static frame with no ongoing per-frame work.
+      const g = gradient as unknown as NeatInternals;
+      let frozen = false;
+      try {
+        if (typeof g.requestRef === "number") {
+          cancelAnimationFrame(g.requestRef);
+          frozen = true;
+        }
+        g._isVisible = false;
+        g._visibilityObserver?.disconnect();
+        if (g._visibilityHandler) {
+          document.removeEventListener("visibilitychange", g._visibilityHandler);
+          g._visibilityHandler = null;
+        }
+      } catch {
+        frozen = false;
+      }
+      // If the internals moved (e.g. a library bump renamed `requestRef`) the
+      // loop is still running — degraded, but not broken (still tab-guarded).
+      // Surface it loudly in dev/staging so it doesn't ship as a silent
+      // regression; stays out of the production console.
+      if (!frozen && process.env.NODE_ENV !== "production") {
+        console.warn(
+          "[NeatGradient] Could not freeze the static frame — @firecms/neat internal `requestRef` not found. The animation loop may still be running; check for a library version bump.",
+        );
+      }
+    }
 
     return () => gradient.destroy?.();
   }, []);

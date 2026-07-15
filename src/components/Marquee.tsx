@@ -65,7 +65,6 @@ function StoryCard({ card }: { card: MarqueeCard }) {
           src={card.photoUrl}
           alt={card.alt ?? ""}
           fill
-          unoptimized
           sizes="260px"
           className="object-cover"
         />

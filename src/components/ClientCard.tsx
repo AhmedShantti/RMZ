@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight } from "lucide-react";
 import { homeContent, type ClientCardItem } from "@/content/home";
 
 const INTERVAL_MS = 5000;
@@ -17,7 +16,6 @@ function ClientImg({ item }: { item: ClientCardItem }) {
         src={item.photoUrl}
         alt={item.alt || item.name}
         fill
-        unoptimized
         sizes="300px"
         className="object-cover"
       />
