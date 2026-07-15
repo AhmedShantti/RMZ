@@ -2,24 +2,11 @@ import IntroLoader from "@/components/IntroLoader";
 import HeroCursorField from "@/components/HeroCursorField";
 import HomeLogoStairs from "@/components/HomeLogoStairs";
 import ServicesTeaser from "@/components/ServicesTeaser";
-import ClientsCollage from "@/components/ClientsCollage";
 import VideoSection from "@/components/VideoSection";
 import MarketsBlock from "@/components/MarketsBlock";
 import { getHome, getServices, getContact, getSiteSettings } from "@/lib/cms";
-import ShaderBackground from "@/components/gradient/ShaderGradient";
-import { MarqueeDemo } from "@/components/Marquee";
-import { NeatGradient } from "@firecms/neat";
 import Gradient from "@/components/gradient/NeatGradient";
-import { MeshGradient } from '@paper-design/shaders-react';
-import { fulfillRouteCacheEntry } from "next/dist/client/components/segment-cache/cache";
 import ClientCard from "@/components/ClientCard";
-
-// Brand colours cycled across the marquee cards (the three squares' end state).
-const MARQUEE_COLORS = [
-  "var(--acc-yellow)",
-  "var(--acc-orange)",
-  "var(--acc-green)",
-];
 
 export default async function Home() {
   const [home, servicesData, contact, settings] = await Promise.all([

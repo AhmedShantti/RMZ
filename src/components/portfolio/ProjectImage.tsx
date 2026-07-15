@@ -12,8 +12,8 @@ import type { Visual, VisualRatio } from "@/content/portfolio";
  *     no `src` renders the site's existing placeholder tile (#1a1a1a + label) at
  *     the same ratio — the layout is identical the day the images land.
  *
- * `unoptimized` matches AboutStairsSection: Payload serves media from its own
- * route, and the optimizer isn't configured for it.
+ * Images run through Next's optimizer (AVIF/WebP + device-sized) — the CMS media
+ * host is allowlisted in next.config `images.remotePatterns`.
  */
 /**
  * Height ceiling for every case-study image. The ratio still decides the shape,
@@ -62,7 +62,6 @@ export default function ProjectImage({
             src={visual.src}
             alt={visual.alt}
             fill
-            unoptimized
             sizes={sizes}
             priority={priority}
             loading={priority ? undefined : "lazy"}

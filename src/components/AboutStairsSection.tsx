@@ -228,7 +228,6 @@ function StairImg({ step, label }: { step?: StairStep; label: string }) {
         src={step.photoUrl}
         alt={step.alt}
         fill
-        unoptimized
         sizes="(max-width: 640px) 240px, 26vw"
         className="stair-img object-cover"
       />
