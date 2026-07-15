@@ -21,6 +21,34 @@ const require = createRequire(import.meta.url);
 const { loadEnvConfig } = require("@next/env") as typeof import("@next/env");
 loadEnvConfig(process.cwd(), true);
 
+// Drop orphaned `blocks` tables BEFORE Payload's schema push runs. The schema
+// no longer defines ANY `blocks` field (see payload-types: `blocks: {}`), so
+// every `%blocks%` table left in prod (e.g. the removed portfolio
+// "before/after" block + its versions/locales) is a pending DROP. When a push
+// ALSO adds a new table (a new CMS array), Drizzle pairs the drop+add and asks
+// an interactive "renamed or created?" prompt — which has no TTY on CI and
+// fails the build (exit 13). Clearing the orphans first means the push only
+// ADDS, so no prompt. Safe: none of these tables are in the schema, so the
+// push was going to drop them anyway. Best-effort; Postgres only.
+const databaseURI = process.env.DATABASE_URI || "";
+if (databaseURI.startsWith("postgres")) {
+  try {
+    const { Client } = require("pg");
+    const client = new Client({ connectionString: databaseURI });
+    await client.connect();
+    const res = await client.query(
+      "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE '%blocks%'",
+    );
+    for (const row of res.rows) {
+      await client.query(`DROP TABLE IF EXISTS "${row.tablename}" CASCADE`);
+      console.log(`[db-push] dropped orphaned table "${row.tablename}"`);
+    }
+    await client.end();
+  } catch (e) {
+    console.error("[db-push] orphan cleanup skipped:", (e as Error).message);
+  }
+}
+
 try {
   const { default: configPromise } = await import("../payload.config.ts");
   const { getPayload } = await import("payload");
