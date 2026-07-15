@@ -96,8 +96,14 @@ export default function AboutStairsSection({
           const cover = el.querySelector<HTMLElement>(".stair-cover");
           if (cover) {
             const prox = smooth(1 - Math.abs(rel) / 0.4); // 1 centred → 0 away
+            // The rotation carries the flip motion; opacity guarantees the
+            // reveal. We fade the cover out as it flips past edge-on (prox 0.5
+            // ≈ 90°) so the photo shows even where backface-visibility is
+            // unreliable (mobile Safari left the flipped cover visible as a
+            // trapezoid over the photo — the glitch).
+            const hidePast = smooth((prox - 0.5) / 0.12);
             gsap.set(cover, {
-              opacity: 1,
+              opacity: 1 - hidePast,
               rotationX: -180 * prox,
               transformPerspective: 700,
             });
