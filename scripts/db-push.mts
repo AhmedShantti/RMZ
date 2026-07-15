@@ -22,61 +22,73 @@ const { loadEnvConfig } = require("@next/env") as typeof import("@next/env");
 loadEnvConfig(process.cwd(), true);
 
 /**
- * Orphan tables — left behind by fields since removed from the schema. The
- * current schema defines NO `blocks` field (see payload-types: `blocks: {}`),
- * so every `%blocks%` table left in prod (the removed portfolio case-study
- * blocks + their versions/locales) is a pending DROP. Drizzle's push cannot
- * tell a dropped table apart from a renamed one: the moment the schema ALSO
- * adds tables (the new home CMS arrays: clientCards / marqueeCards), it asks
- * "is <orphan> renamed to <new table>?" — an interactive prompt with no TTY on
- * CI, which aborts the build with exit code 13.
+ * Reconcile leftover block-table artifacts before push.
  *
- * We MOVE the orphans to an `archive` schema rather than dropping them. Push
- * only looks at `public`, so this settles the ambiguity (creates only, no
- * prompt) while the old rows stay recoverable — a build script should never be
- * the thing that destroys content. NB: `%blocks%` deliberately does NOT match
- * the live `home_content_marquee_cards` / `home_content_client_cards` tables.
+ * The portfolio case-study `blocks` field IS part of the schema, so its tables
+ * (`portfolio_projects_blocks_*` + versions/locales) are LIVE — push owns them.
+ * An earlier version of THIS script wrongly treated them as orphans (during a
+ * window when the schema had no blocks) and moved them to an `archive` schema /
+ * left `*_dup` copies behind in `public`. Those leftovers make push ask an
+ * interactive "is <table> created or renamed from <leftover>?" prompt — no TTY
+ * on CI, so the build hangs then aborts with exit code 13.
  *
- * To recover:   ALTER TABLE archive."<table>" SET SCHEMA public;
- * To discard:   DROP SCHEMA archive CASCADE;
+ * Fix, both idempotent and best-effort (once prod is clean, later deploys are
+ * no-ops):
+ *   1. DROP the leftover `*_dup` tables (pure junk — they exist only to be
+ *      paired against the real tables push recreates).
+ *   2. RESTORE any block tables parked in `archive` back to `public` (with
+ *      their rows), where `public` doesn't already have them, so push finds
+ *      them in place instead of recreating them empty.
+ *
+ * IMPORTANT: this must NOT move/drop live block tables — it only removes `_dup`
+ * junk and pulls archived copies BACK. Nothing here archives or drops a table
+ * that push actually wants.
  */
-async function archiveOrphanTables(uri: string) {
+async function reconcileBlockTables(uri: string) {
   // pg is CommonJS — reach through `default` for the namespace under ESM.
   const pg = await import("pg");
   const Client = pg.Client ?? pg.default.Client;
   const client = new Client({ connectionString: uri });
   await client.connect();
   try {
-    const { rows } = await client.query<{ tablename: string }>(
+    // 1) Drop leftover duplicate tables (name ends in "_dup").
+    const { rows: dups } = await client.query<{ tablename: string }>(
       `SELECT tablename FROM pg_tables
-        WHERE schemaname = 'public' AND tablename LIKE '%blocks%'`,
+        WHERE schemaname = 'public' AND tablename LIKE '%\\_dup' ESCAPE '\\'`,
     );
-
-    if (!rows.length) {
-      console.log("[db-push] no orphan tables to archive.");
-      return;
+    for (const { tablename } of dups) {
+      await client.query(`DROP TABLE IF EXISTS public."${tablename}" CASCADE`);
+      console.log(`[db-push] dropped leftover duplicate: public.${tablename}`);
     }
 
-    await client.query(`CREATE SCHEMA IF NOT EXISTS archive`);
-    for (const { tablename } of rows) {
-      // A previous deploy may already have archived this name; keep the first
-      // (oldest) copy and park the duplicate beside it.
-      await client
-        .query(`ALTER TABLE public."${tablename}" SET SCHEMA archive`)
-        .catch(async (e: Error) => {
-          await client.query(
-            `ALTER TABLE public."${tablename}" RENAME TO "${tablename}_dup"`,
-          );
-          await client.query(
-            `ALTER TABLE public."${tablename}_dup" SET SCHEMA archive`,
-          );
-          console.warn(
-            `[db-push] ${tablename} already archived (${e.message}); parked duplicate.`,
-          );
-        });
-      console.log(
-        `[db-push] archived orphan table: public.${tablename} → archive.${tablename}`,
+    // 2) Restore archived block tables to public (only where public lacks them).
+    const hasArchive = await client.query(
+      `SELECT 1 FROM information_schema.schemata WHERE schema_name = 'archive'`,
+    );
+    if (hasArchive.rows.length) {
+      const { rows: archived } = await client.query<{ tablename: string }>(
+        `SELECT tablename FROM pg_tables
+          WHERE schemaname = 'archive' AND tablename LIKE '%blocks%'`,
       );
+      for (const { tablename } of archived) {
+        const inPublic = await client.query(
+          `SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = $1`,
+          [tablename],
+        );
+        if (inPublic.rows.length) continue; // already present — leave the copy
+        try {
+          await client.query(
+            `ALTER TABLE archive."${tablename}" SET SCHEMA public`,
+          );
+          console.log(
+            `[db-push] restored block table: archive.${tablename} → public.${tablename}`,
+          );
+        } catch (e) {
+          console.warn(
+            `[db-push] could not restore ${tablename}: ${(e as Error).message}`,
+          );
+        }
+      }
     }
   } finally {
     await client.end();
@@ -85,23 +97,22 @@ async function archiveOrphanTables(uri: string) {
 
 try {
   const uri = process.env.DATABASE_URI || "";
-  // Postgres (prod) only — SQLite dev DBs are recreated freely and never hit
-  // the rename prompt.
+  // Postgres (prod) only — SQLite dev DBs are recreated freely.
   if (uri.startsWith("postgres")) {
     try {
-      await archiveOrphanTables(uri);
+      await reconcileBlockTables(uri);
     } catch (e) {
       // Non-fatal: if this fails the push below may still succeed.
-      console.error("[db-push] orphan cleanup skipped:", (e as Error).message);
+      console.error("[db-push] block reconcile skipped:", (e as Error).message);
     }
   }
 
-  // Payload's dev push asks an interactive `prompts` confirm when a change is
-  // destructive (e.g. dropping columns the schema no longer defines, like the
-  // intentionally-omitted portfolio coverImage/slug/year). There's no TTY on
-  // CI, so it stalls. Pre-answer "yes" via prompts.inject so the schema
-  // reconciles non-interactively. Safe: the code schema is the source of truth
-  // and the dropped columns aren't used by the app.
+  // Payload's dev push asks an interactive `prompts` confirm whenever a change
+  // is destructive (dropping a column/table the schema no longer defines).
+  // There's no TTY on CI, so it stalls. Pre-answer "yes" via prompts.inject so
+  // the schema reconciles non-interactively — the code schema is the source of
+  // truth. (This covers Payload's own confirm; the drizzle-kit table-rename
+  // prompt is a separate resolver, avoided by reconcileBlockTables above.)
   try {
     const prompts = require("prompts");
     prompts.inject([true]);

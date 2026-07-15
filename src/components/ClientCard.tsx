@@ -104,9 +104,7 @@ function ClientCard({
           <span className="font-body text-[11px] tabular-nums tracking-wider text-white/60">
             {pad(current)}/{pad(len - 1)}
           </span>
-          <div className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 bg-white/5 backdrop-blur-md">
-            <ArrowUpRight className="w-4 h-4 text-white" />
-          </div>
+          
         </div>
 
         <div
