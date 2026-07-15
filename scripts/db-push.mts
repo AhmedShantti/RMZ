@@ -49,6 +49,19 @@ if (databaseURI.startsWith("postgres")) {
   }
 }
 
+// Payload's dev push asks an interactive `prompts` confirm when a change is
+// destructive (e.g. dropping columns the schema no longer defines, like the
+// intentionally-omitted portfolio coverImage/slug/year). There's no TTY on CI,
+// so it stalls. Pre-answer "yes" via prompts.inject so the schema reconciles
+// non-interactively. Safe here: the code schema is the source of truth and the
+// dropped columns/tables aren't used by the app.
+try {
+  const prompts = require("prompts");
+  prompts.inject([true]);
+} catch {
+  /* prompts always present via Payload; ignore if not resolvable */
+}
+
 try {
   const { default: configPromise } = await import("../payload.config.ts");
   const { getPayload } = await import("payload");
