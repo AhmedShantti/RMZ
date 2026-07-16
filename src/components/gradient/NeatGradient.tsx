@@ -1,5 +1,4 @@
 "use client";
-import { NeatGradient } from "@firecms/neat";
 import { useEffect, useRef } from "react";
 
 const config = {
@@ -171,44 +170,62 @@ export default function Gradient() {
       return; // nothing created → nothing to clean up
     }
 
-    const gradient = new NeatGradient({
-      ref: canvas,
-      ...config,
-      // Retain the single rendered frame on the canvas when we freeze it.
-      preserveDrawingBuffer: reduce,
+    // Lazy-load @firecms/neat (it bundles three.js — the heaviest dependency)
+    // only AFTER hydration, so it's out of the critical bundle and doesn't delay
+    // the hero paint. The canvas shows the black page background (#000) until it
+    // resolves; the gradient's own colour is #0F0F0E, so there's no visible
+    // flash. Real GPUs get the identical animation, just initialised a beat later.
+    let gradient: { destroy?: () => void } | null = null;
+    let cancelled = false;
+
+    import("@firecms/neat").then(({ NeatGradient }) => {
+      if (cancelled || !canvasRef.current) return;
+
+      gradient = new NeatGradient({
+        ref: canvas,
+        ...config,
+        // Retain the single rendered frame on the canvas when we freeze it.
+        preserveDrawingBuffer: reduce,
+      });
+
+      if (reduce) {
+        // Reduced-motion on a capable GPU: render one frame (cheap on a GPU),
+        // then cancel the loop + disconnect the library's auto-resume observers
+        // so it stays a single static frame with no ongoing per-frame work.
+        const g = gradient as unknown as NeatInternals;
+        let frozen = false;
+        try {
+          if (typeof g.requestRef === "number") {
+            cancelAnimationFrame(g.requestRef);
+            frozen = true;
+          }
+          g._isVisible = false;
+          g._visibilityObserver?.disconnect();
+          if (g._visibilityHandler) {
+            document.removeEventListener(
+              "visibilitychange",
+              g._visibilityHandler,
+            );
+            g._visibilityHandler = null;
+          }
+        } catch {
+          frozen = false;
+        }
+        // If the internals moved (e.g. a library bump renamed `requestRef`) the
+        // loop is still running — degraded, not broken (still tab-guarded).
+        // Surface it loudly in dev/staging so it can't ship as a silent regression.
+        if (!frozen && process.env.NODE_ENV !== "production") {
+          console.warn(
+            "[NeatGradient] Could not freeze the static frame — @firecms/neat internal `requestRef` not found. The animation loop may still be running; check for a library version bump.",
+          );
+        }
+      }
     });
 
-    if (reduce) {
-      // Reduced-motion on a capable GPU: render one frame (cheap on a GPU), then
-      // cancel the loop + disconnect the library's auto-resume observers so it
-      // stays a single static frame with no ongoing per-frame work.
-      const g = gradient as unknown as NeatInternals;
-      let frozen = false;
-      try {
-        if (typeof g.requestRef === "number") {
-          cancelAnimationFrame(g.requestRef);
-          frozen = true;
-        }
-        g._isVisible = false;
-        g._visibilityObserver?.disconnect();
-        if (g._visibilityHandler) {
-          document.removeEventListener("visibilitychange", g._visibilityHandler);
-          g._visibilityHandler = null;
-        }
-      } catch {
-        frozen = false;
-      }
-      // If the internals moved (e.g. a library bump renamed `requestRef`) the
-      // loop is still running — degraded, not broken (still tab-guarded).
-      // Surface it loudly in dev/staging so it can't ship as a silent regression.
-      if (!frozen && process.env.NODE_ENV !== "production") {
-        console.warn(
-          "[NeatGradient] Could not freeze the static frame — @firecms/neat internal `requestRef` not found. The animation loop may still be running; check for a library version bump.",
-        );
-      }
-    }
-
-    return () => gradient.destroy?.();
+    return () => {
+      cancelled = true;
+      gradient?.destroy?.();
+    };
   }, []);
 
   return (

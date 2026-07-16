@@ -33,7 +33,7 @@ export default function VideoSection({ leftLabel, rightLabel }: Props) {
           className="flex h-[44px] w-full items-center justify-center md:h-auto md:w-[58px]"
           style={{ backgroundColor: "var(--acc-green)" }}
         >
-          <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:rotate-180 md:[writing-mode:vertical-rl]">
+          <span className="font-body text-[1rem] font-medium uppercase tracking-[0.18em] text-white/90 md:rotate-180 md:[writing-mode:vertical-rl]">
             {leftLabel}
           </span>
         </div>
@@ -64,7 +64,7 @@ export default function VideoSection({ leftLabel, rightLabel }: Props) {
           className="flex h-[44px] w-full items-center justify-center md:h-auto md:w-[58px]"
           style={{ backgroundColor: "var(--acc-orange)" }}
         >
-          <span className="font-body text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/90 md:[writing-mode:vertical-rl]">
+          <span className="font-body text-[1rem] font-medium uppercase tracking-[0.18em] text-white/90 md:[writing-mode:vertical-rl]">
             {rightLabel}
           </span>
         </div>
