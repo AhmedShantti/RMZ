@@ -37,7 +37,7 @@ export default function Nav({
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => setOpen(true)}
-          className="font-display group hover:text-rebel-red flex cursor-pointer items-center gap-2 text-lg italic transition-colors"
+          className="font-display group hover:text-rebel-red flex cursor-pointer items-center gap-2 text-xl italic transition-colors"
         >
           <span aria-hidden="true" className="text-xl leading-none">
             ≡
@@ -47,7 +47,7 @@ export default function Nav({
 
         <Link
           href={letsChatHref}
-          className="font-display hover:text-rebel-red text-lg italic transition-colors"
+          className="font-display hover:text-rebel-red text-xl italic transition-colors"
         >
           {letsChatLabel}
         </Link>
