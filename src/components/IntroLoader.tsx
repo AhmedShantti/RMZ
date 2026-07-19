@@ -26,12 +26,17 @@ import { useReducedMotion } from "@/lib/reducedMotion";
 const KEY = "rmz_intro_seen";
 type Phase = "initial" | "scatter" | "final";
 
-// Timing (ms) — per the prompt's sequence.
-const ENTRY = 600;
-const HOLD = 800;
-const SCATTER = 900;
-const FINAL = 600;
-const REVEAL = 700; // curtain wipe (matches CSS clip-path transition)
+// Timing (ms) — per the prompt's sequence. Tightened from the original
+// 600/800/900/600/700 (~3.6s) to ~1.8s total so the loader stops dominating the
+// above-the-fold filmstrip (Speed Index) on first paint, while keeping the exact
+// same three-phase choreography and easings. Every value below is mirrored by a
+// CSS duration in globals.css (`.intro-block`, `.intro-label`, `.intro-loader`)
+// — keep the two in sync.
+const ENTRY = 350;
+const HOLD = 280;
+const SCATTER = 480;
+const FINAL = 300;
+const REVEAL = 420; // curtain wipe (matches CSS clip-path transition)
 
 export default function IntroLoader({ enabled = true }: { enabled?: boolean }) {
   const reduce = useReducedMotion();
