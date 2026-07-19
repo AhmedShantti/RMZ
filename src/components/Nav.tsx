@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import MenuOverlay, { type MenuItem } from "./MenuOverlay";
+import dynamic from "next/dynamic";
+import type { MenuItem } from "./MenuOverlay";
+
+// The full-screen menu (and its motion library) is interaction-gated: it only
+// loads on the first ≡ Menu press, so it stays off every page's initial
+// hydration path. Once mounted it persists, so the open/close animation is
+// intact for subsequent toggles.
+const MenuOverlay = dynamic(() => import("./MenuOverlay"), { ssr: false });
 
 /**
  * Global top chrome (TASK.md §4): ≡ Menu (top-left, italic serif) opens the
@@ -25,6 +32,7 @@ export default function Nav({
   shortName,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [everOpened, setEverOpened] = useState(false);
 
   return (
     <>
@@ -36,7 +44,10 @@ export default function Nav({
           type="button"
           aria-haspopup="dialog"
           aria-expanded={open}
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setEverOpened(true);
+            setOpen(true);
+          }}
           className="font-display group hover:text-rebel-red flex cursor-pointer items-center gap-2 text-xl italic transition-colors"
         >
           <span aria-hidden="true" className="text-xl leading-none">
@@ -53,13 +64,15 @@ export default function Nav({
         </Link>
       </header>
 
-      <MenuOverlay
-        open={open}
-        onClose={() => setOpen(false)}
-        menuItems={menuItems}
-        tagline={tagline}
-        shortName={shortName}
-      />
+      {everOpened && (
+        <MenuOverlay
+          open={open}
+          onClose={() => setOpen(false)}
+          menuItems={menuItems}
+          tagline={tagline}
+          shortName={shortName}
+        />
+      )}
     </>
   );
 }

@@ -1,12 +1,17 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { motion } from "motion/react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "@/lib/reducedMotion";
 
 /**
  * Restrained scroll reveal (TASK.md §7): cream content rises + fades on entry,
  * once. Under prefers-reduced-motion it renders statically (no transform).
+ *
+ * Implemented with IntersectionObserver + a CSS transition rather than a motion
+ * library so it adds no JS to the initial hydration path — the reveal is pure
+ * compositor work. Timing/easing/movement match the previous Motion version
+ * exactly (0.7s, cubic-bezier(0.16,1,0.3,1), rises `y`px, fires once when ~12%
+ * into the viewport).
  */
 type Props = {
   children: ReactNode;
@@ -22,18 +27,41 @@ export default function Reveal({
   y = 24,
 }: Props) {
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    if (reduce) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      // Matches Motion's viewport margin "-12% 0px -12% 0px".
+      { rootMargin: "-12% 0px -12% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduce]);
 
   if (reduce) return <div className={className}>{children}</div>;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+    <div
+      ref={ref}
       className={className}
+      style={{
+        opacity: shown ? 1 : 0,
+        transform: shown ? "none" : `translateY(${y}px)`,
+        transition: `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+        willChange: "opacity, transform",
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

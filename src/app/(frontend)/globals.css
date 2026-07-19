@@ -549,6 +549,17 @@ body:focus-visible {
   animation-delay: calc(0.25s + var(--i, 0) / var(--rt-span, 1) * 0.5s);
 }
 
+/* ---- Page transition (template.tsx) — cross-fade each route in. Replaces a
+   motion-library wrapper; the global reduced-motion rule zeroes the duration. */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.page-fade {
+  animation: page-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* ---- Reduced motion: kill non-essential animation (TASK.md §8) ---- */
 @media (prefers-reduced-motion: reduce) {
   *,
