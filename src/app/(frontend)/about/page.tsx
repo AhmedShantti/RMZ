@@ -8,7 +8,7 @@ import Reveal from "@/components/Reveal";
 import AccentBlocks from "@/components/AccentBlocks";
 import RunsText from "@/components/RunsText";
 import { getAbout } from "@/lib/cms";
-import ScrollIndicator from "@/components/ScrollIndecator";
+import ScrollIndicator from "@/components/ScrollIndicator";
 
 
 

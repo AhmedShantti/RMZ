@@ -28,7 +28,7 @@ export default async function Home() {
 
   return (
     <>
-      <IntroLoader enabled={home.showIntroLoader} />
+      
       <div style={{ position: 'relative', minHeight: '100vh' }}>
        <Gradient />
        
