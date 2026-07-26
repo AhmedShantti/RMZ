@@ -1,10 +1,12 @@
 import SectionWatermark from "./SectionWatermark";
 import Reveal from "./Reveal";
+import ShowreelSlider from "./ShowreelSlider";
 
 /**
- * VideoSection (Redesigning Stage 2) — a video placeholder flanked by two
- * coloured vertical-text sidebar strips, over the shared "CLIENTS" watermark.
- * Sits directly below the clients collage, above markets/CTA.
+ * VideoSection (Redesigning Stage 2) — a 3-video showreel slider (ShowreelSlider,
+ * auto-advancing left→right) flanked by two coloured vertical-text sidebar
+ * strips, over the shared "CLIENTS" watermark. Sits directly below the clients
+ * collage, above markets/CTA.
  *
  *   Left strip  — brand green, "HOW TO SUCCESS"  (reads bottom → top)
  *   Right strip — brand orange, "HOW TO BE REBEL" (reads top → bottom)
@@ -38,26 +40,8 @@ export default function VideoSection({ leftLabel, rightLabel }: Props) {
           </span>
         </div>
 
-        {/* video placeholder — 16:9 */}
-        {/* TODO: Replace with the real RMZ showreel video */}
-        <div className="relative aspect-video flex-1 bg-[#0e0e0e]">
-          <span
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          >
-            <svg
-              width="78"
-              height="78"
-              viewBox="0 0 80 80"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="rmz-pulse"
-            >
-              <circle cx="40" cy="40" r="39" stroke="white" strokeWidth="1.5" />
-              <path d="M33 26 L57 40 L33 54 Z" fill="white" />
-            </svg>
-          </span>
-        </div>
+        {/* 16:9 showreel — three video placeholders auto-advancing left→right */}
+        <ShowreelSlider />
 
         {/* right strip — orange, reads top→bottom */}
         <div

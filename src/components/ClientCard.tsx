@@ -73,7 +73,7 @@ function ClientCard({
   const pad = (n: number) => (n + 1).toString().padStart(2, "0");
 
   return (
-    <div className="relative w-[300px] h-[400px] rounded-2xl border border-white/10 overflow-hidden">
+    <div className="relative w-[300px] h-[400px] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100">
       <div className="absolute inset-0">
         <ClientImg item={active} />
       </div>
