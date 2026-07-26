@@ -112,25 +112,6 @@
   object-fit: cover;
 }
 
-/* Brand-square cover over each card's photo — full square while the card
-   waits/climbs, dissolved by the deck loop as the card reaches focus.
-   Default 0 so reduced-motion / no-JS shows the photos. */
-.stair-cover {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transform-origin: 50% 50%;
-  /* -webkit- prefix is REQUIRED for iOS Safari to hide the backface of the
-     3D-flipped cover; without it the same-colour backface flashes through as
-     the cover rotates past 90° (the mobile flip "glitch"). will-change keeps
-     it on its own GPU layer so the scrubbed flip doesn't flicker on repaint
-     (GSAP's inline transform carries the actual rotation each frame). */
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  will-change: transform;
-}
-
 /* --- Demo harness hero --- */
 .lab-hero {
   min-height: 100vh;

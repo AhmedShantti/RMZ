@@ -11,8 +11,9 @@ import type { StairRefs } from "./logoSquares.types";
  * The landing section for the traveling squares.
  *
  *   Phase 3 — each `.stair-slot` holds a cropped image (placeholder block
- *   until real photos land; swap for next/image). The landed square fades out
- *   after arrival (see EmergeSquares) so the slot becomes a photo window.
+ *   until real photos land; swap for next/image). The brand squares no longer
+ *   land here — they float behind the section (see EmergeSquares) — so each
+ *   slot is a plain photo window that fades in on scroll.
  *
  *   Phase 4 — a single master ScrollTrigger pins the section and, on update,
  *   drives each slot's `y` at a different multiplier so the three feel like
@@ -60,10 +61,6 @@ export default function AboutStairsSection({
       // the traveling squares stay visible in the section however slowly the
       // user scrolls).
       const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-      const smooth = (t: number) => {
-        const c = clamp01(t);
-        return c * c * (3 - 2 * c);
-      };
 
       const render = (p: number) => {
         const u = p * (slots.length - 1); // one unit per transition
@@ -88,26 +85,6 @@ export default function AboutStairsSection({
             // focused card on top; outgoing yields to incoming mid-transition
             zIndex: Math.round(100 - Math.abs(rel) * 10 - (rel < 0 ? 5 : 0)),
           });
-
-          // Every card wears a repeating brand-colour cover (yellow/orange/
-          // green/yellow…) that flips up to reveal its photo, completing
-          // exactly as the card centres (rel → 0). The traveling logo squares
-          // hand off to these on arrival, so all cards flip identically.
-          const cover = el.querySelector<HTMLElement>(".stair-cover");
-          if (cover) {
-            const prox = smooth(1 - Math.abs(rel) / 0.4); // 1 centred → 0 away
-            // The rotation carries the flip motion; opacity guarantees the
-            // reveal. We fade the cover out as it flips past edge-on (prox 0.5
-            // ≈ 90°) so the photo shows even where backface-visibility is
-            // unreliable (mobile Safari left the flipped cover visible as a
-            // trapezoid over the photo — the glitch).
-            const hidePast = smooth((prox - 0.5) / 0.12);
-            gsap.set(cover, {
-              opacity: 1 - hidePast,
-              rotationX: -180 * prox,
-              transformPerspective: 700,
-            });
-          }
         });
 
         // Counter/paragraph follow the focused card (rounds mid-transition).
@@ -119,9 +96,8 @@ export default function AboutStairsSection({
       render(0);
 
       // Reveal: the section stays invisible on approach and each card fades
-      // in exactly as its traveling square lands on it (same windows as
-      // EmergeSquares' FADE_RANGES — keep in sync). The 4th card (no
-      // traveler), counter and paragraph appear with the last arrival.
+      // in as it steps into place — a staggered staircase reveal. Counter and
+      // paragraph appear with the last card.
       const ARRIVALS: [string, string][] = [
         ["top 42%", "top 30%"],
         ["top 27%", "top 15%"],
@@ -182,23 +158,18 @@ export default function AboutStairsSection({
 
   return (
     <section ref={sectionRef} className="about-stairs">
-      {/* Slots 1–3 wear their brand-square cover (dissolves into the photo at
-          focus); slot 4 is the extra step with no traveling square. */}
+      {/* Photo windows that step down the flight as it's scrolled. */}
       <div ref={yellow} className="stair-slot stair-1">
         <StairImg step={steps[0]} label={IMG_LABELS[0]} />
-        <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
       </div>
       <div ref={orange} className="stair-slot stair-2">
         <StairImg step={steps[1]} label={IMG_LABELS[1]} />
-        <span className="stair-cover" style={{ background: "var(--acc-orange)" }} aria-hidden="true" />
       </div>
       <div ref={green} className="stair-slot stair-3">
         <StairImg step={steps[2]} label={IMG_LABELS[2]} />
-        <span className="stair-cover" style={{ background: "var(--acc-green)" }} aria-hidden="true" />
       </div>
       <div ref={fourth} className="stair-slot stair-4">
         <StairImg step={steps[3]} label={IMG_LABELS[3]} />
-        <span className="stair-cover" style={{ background: "var(--acc-yellow)" }} aria-hidden="true" />
       </div>
 
       {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
