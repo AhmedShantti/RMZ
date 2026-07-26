@@ -22,6 +22,7 @@ export default async function Home() {
       index: String(i + 1).padStart(2, "0"),
       title: s.title,
       blurb: s.blurb,
+      items: s.items,
       featuredOnHome: s.featuredOnHome,
     }))
     .filter((s) => s.featuredOnHome);

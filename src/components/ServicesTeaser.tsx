@@ -1,9 +1,20 @@
 import Link from "next/link";
 import Reveal from "./Reveal";
 
-type TeaserService = { index: string; title: string; blurb: string };
+type TeaserService = {
+  index: string;
+  title: string;
+  blurb: string;
+  items?: string[];
+};
 
-/** Home services teaser (TASK.md §5.4) — short list, links into /services. */
+/**
+ * Home services teaser (TASK.md §5.4) — short list, links into /services.
+ * Hovering a row expands it to reveal that service's related items as a list,
+ * in the same editorial style (smaller italic display, cream-dim). The reveal
+ * uses the grid-rows 0fr→1fr trick so it animates to the content's real height;
+ * static (instant) under prefers-reduced-motion.
+ */
 export default function ServicesTeaser({
   services,
 }: {
@@ -30,10 +41,10 @@ export default function ServicesTeaser({
         <ul className="divide-y divide-cream-dim/12">
           {services.map((s, i) => (
             <Reveal key={s.index} delay={i * 0.04}>
-              <li>
+              <li className="group">
                 <Link
                   href="/services"
-                  className="group flex items-baseline gap-5 py-5 sm:gap-10"
+                  className="flex items-baseline gap-5 py-5 sm:gap-10"
                 >
                   <span className="font-body text-cream-dim w-8 shrink-0 text-xs tabular-nums">
                     {s.index}
@@ -59,6 +70,25 @@ export default function ServicesTeaser({
                     ↗
                   </span>
                 </Link>
+
+                {/* Related items — collapsed by default, expanded on hover.
+                    grid-rows 0fr→1fr animates to the content's real height. */}
+                {s.items && s.items.length > 0 && (
+                  <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:grid-rows-[1fr] motion-reduce:transition-none">
+                    <div className="overflow-hidden">
+                      <ul className="flex flex-col gap-1.5 pb-6 pl-[3.25rem] opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:delay-150 sm:pl-[4.5rem] motion-reduce:transition-none">
+                        {s.items.map((it) => (
+                          <li
+                            key={it}
+                            className="font-display text-cream-dim text-base italic leading-snug sm:text-lg"
+                          >
+                            {it}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
               </li>
             </Reveal>
           ))}
