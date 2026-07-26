@@ -19,48 +19,44 @@ import {
 
 /**
  * EmergeSquares — ONE continuous, scroll-scrubbed journey for the three brand
- * squares, from the logo down into the "What we do" section, where each one
- * settles into a permanent floater that drifts forever behind the section's
- * text. No opacity changes at any point on the MAIN travel element: each
- * square is always fully visible on its primary layer; it starts perfectly
- * overlapping its square inside the logo and physically travels the whole
- * way, sizes interpolating, never fading — EXCEPT for a single, one-way
- * cross-fade handoff to an in-section "floater" element once it arrives at
- * its resting cell (see "Floater handoff" below). There is no return leg:
- * the floater is the journey's destination.
+ * squares: they pop off the logo and then float behind the content, drifting
+ * from section to section (About stairs → "What we do" → Clients → Video),
+ * settling in the last one where they idle forever. They never land on the
+ * stair cards — right after the pop each square cross-fades, once, from its
+ * body-level "main" element onto a z-index:-1 "floater" that carries it the
+ * rest of the way behind the section content.
  *
  * Design for "no cuts / no delay":
- *   - A SINGLE master ScrollTrigger spans logo → "What we do", so there are
- *     no per-phase triggers and thus no seams to jump between.
+ *   - A SINGLE master ScrollTrigger spans logo → Video, so there are no
+ *     per-phase triggers and thus no seams to jump between.
  *   - Each square follows one continuous waypoint path, sampled EVERY frame
  *     from LIVE element rects (getBoundingClientRect), so pinned sections and
  *     resizes can never introduce a stale jump — the position is always the
  *     true current layout.
- *   - Transform-only (translate + scale) on an absolute-in-<body> element, so
- *     it composites on the GPU.
+ *   - Transform-only (translate + scale) on absolute elements, so they
+ *     composite on the GPU.
  *   - All per-frame writes go through gsap.quickSetter instead of gsap.set,
  *     since quickSetter skips tween-instance creation entirely — this is the
  *     dominant cost when a function runs on every scroll tick.
  *
- * The waypoints (progress 0→1) — see PHASE below for the canonical values,
- * shared between the interpolation path (`wps`) and the scroll→phase mapping
- * (`buildCheckpoints`) so the two can never drift out of sync:
- *   LAUNCH  sit exactly on the logo square (same size/pos → invisible seam)
- *   POP     pop to travel size, still on the logo (a small back-eased beat)
- *   LAND    LAND on the matching stair slot — the square becomes that card
- *   LEAVE   still glued to the slot, so it rides the deck as a card, then lifts
- *   HOME    arrive at a fixed random resting cell inside "What we do" —
- *           the journey's end
+ * The waypoints (progress 0→1) — see PHASE (logoSquaresPath) for the canonical
+ * values, shared between the interpolation path (`wps`) and the scroll→phase
+ * mapping (`buildCheckpoints`) so the two can never drift out of sync:
+ *   LAUNCH   sit exactly on the logo square (same size/pos → invisible seam)
+ *   POP      pop to travel size, still on the logo (a small back-eased beat)
+ *   STAIRS   drift to a random cell around the About stairs section
+ *   TEASER   → "What we do"
+ *   CLIENTS  → the clients section
+ *   VIDEO    → the showreel, where it idles forever
  *
  * Floater handoff:
- *   The squares must sit UNDER the section's content. A body-level element
- *   can't (it's above the whole content column), so once a square nears its
- *   HOME cell it hands off to an in-section floater at z-index:-1
- *   (isolation:isolate on the section keeps it behind the text but above the
- *   section's transparent backdrop). The main element cross-fades out and
- *   the floater cross-fades in as HOME approaches; from then on the floater
- *   idles in place forever — independent of further scroll — via a per-square
- *   desynced sine-wave drift (see idleTick), instead of fading back out.
+ *   The squares must sit UNDER each section's content. A body-level element
+ *   can't (it's above the whole content column), so right after the pop each
+ *   square hands off to an in-page floater at z-index:-1 (isolation:isolate on
+ *   the float sections keeps it behind the text but above the transparent
+ *   backdrop). The main element cross-fades out and the floater cross-fades in
+ *   once; from then on the floater's drift centre tracks the live path each
+ *   frame while a per-square desynced sine wobble (see idleTick) plays on top.
  */
 
 type Frac = { x: number; y: number };
@@ -70,7 +66,6 @@ type QuickSetters = {
   y: (v: number) => void;
   scaleX: (v: number) => void;
   scaleY: (v: number) => void;
-  rotationX: (v: number) => void;
   autoAlpha: (v: number) => void;
 };
 
@@ -78,9 +73,8 @@ type PathEntry = {
   el: HTMLElement;
   floater: HTMLElement;
   wps: Waypoint[];
-  slotRef: { current: HTMLDivElement | null };
-  // Fixed random resting cell inside "What we do" — this square's permanent
-  // home once it arrives (picked once per load, not re-rolled on refresh).
+  // Fixed random resting cell in the last float section — this square's
+  // permanent home once it arrives (picked once per load, not re-rolled).
   home: Frac;
   qsEl: QuickSetters;
   qsFloater: Pick<QuickSetters, "x" | "y" | "scaleX" | "scaleY" | "autoAlpha">;
@@ -111,10 +105,6 @@ export default function EmergeSquares({
 
     const cleanupLenis = syncScrollTriggerWithLenis();
     const els: HTMLElement[] = [];
-    // Lower-cost variant for small screens: skip the 3D flip (cheaper
-    // compositing, no perspective layer). The translate/scale journey itself
-    // is unchanged so the animation stays fully intact on mobile, just lighter.
-    const isCompact = window.matchMedia("(max-width: 767px)").matches;
 
     let scrollTriggerInstance: ScrollTrigger | null = null;
     let idleTickRef: (() => void) | null = null;
@@ -138,6 +128,11 @@ export default function EmergeSquares({
       const video = document.querySelector<HTMLElement>(
         'section[aria-label="Showreel"]',
       );
+      // The About stairs section — the first float leg drifts around it (the
+      // squares used to LAND on its cards; now they just float behind it like
+      // every later section). landingRefs still locates it.
+      const stairsSection =
+        landingRefs.yellow.current?.closest<HTMLElement>(".about-stairs") ?? null;
       // The journey needs the full home layout; bail otherwise (e.g. lab).
       if (!startSection || !teaser || !stage) return;
 
@@ -147,30 +142,24 @@ export default function EmergeSquares({
         const r = el.getBoundingClientRect();
         return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.width };
       };
-      // A stair slot's footprint (portrait card — the square fills it exactly).
-      const slotOf = (ref: { current: HTMLElement | null }): Vec => {
-        const el = ref.current;
-        if (!el) return { cx: 0, cy: 0, w: 72, h: 72 };
-        const r = el.getBoundingClientRect();
-        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height };
-      };
       // A 72px float cell at a fixed fractional spot inside a section.
       const cellIn = (el: HTMLElement, f: Frac): Vec => {
         const r = el.getBoundingClientRect();
         return { cx: r.left + r.width * f.x, cy: r.top + r.height * f.y, w: 72, h: 72 };
       };
 
-      // The floater needs a positioned containing block to lay out against;
-      // without this it would resolve against whatever positioned ancestor
-      // happens to exist further up the tree, silently breaking the
-      // local-coordinate math below.
-      if (getComputedStyle(teaser).position === "static") {
-        teaser.style.position = "relative";
+      // The squares rest BEHIND each float section's content: `isolate` makes
+      // the z-index:-1 floaters sit behind the text but in front of the
+      // section's (transparent) backdrop, instead of sinking through the whole
+      // page. `position: relative` gives each section a positioned box so the
+      // stacking context resolves locally.
+      for (const sec of [stairsSection, teaser, clients, video]) {
+        if (!sec) continue;
+        if (getComputedStyle(sec).position === "static") {
+          sec.style.position = "relative";
+        }
+        sec.style.isolation = "isolate";
       }
-      // The squares rest BEHIND this section's content: isolate makes the
-      // z-index:-1 floaters sit behind text but in front of the section's
-      // (transparent) backdrop, instead of sinking through the whole page.
-      teaser.style.isolation = "isolate";
 
       const paths: PathEntry[] = [];
 
@@ -192,11 +181,6 @@ export default function EmergeSquares({
           pointerEvents: "none",
           force3D: true,
           autoAlpha: 1,
-          // Flip-to-reveal: once the square lands on its card it rotates past
-          // 90°; with the backface hidden it vanishes and the card photo
-          // underneath shows through.
-          backfaceVisibility: "hidden",
-          transformPerspective: isCompact ? 0 : 700,
         });
         els.push(el);
 
@@ -223,10 +207,11 @@ export default function EmergeSquares({
         });
         els.push(floater);
 
-        // The stair slot this square lands on / becomes (yellow→1, orange→2,
-        // green→3), matching LogoSquares / AboutStairsSection.
-        const slotRef = landingRefs[color];
         // Fixed random float cells (one per float section), picked once/load.
+        const hs: Frac = {
+          x: gsap.utils.random(0.14, 0.86),
+          y: gsap.utils.random(0.16, 0.82),
+        };
         const home: Frac = {
           x: gsap.utils.random(0.12, 0.88),
           y: gsap.utils.random(0.16, 0.82),
@@ -243,11 +228,10 @@ export default function EmergeSquares({
         const wps: Waypoint[] = [
           { at: PHASE.LAUNCH, get: () => centerOf(anchor) },
           { at: PHASE.POP, ease: back, get: () => ({ ...centerOf(anchor), w: 72, h: 72 }) },
-          // Land ON the stair slot and stay glued to it — the square IS the
-          // card, riding the deck as it animates through the pin.
-          { at: PHASE.LAND, get: () => slotOf(slotRef) },
-          { at: PHASE.LEAVE, get: () => slotOf(slotRef) },
-          // Float legs (behind content): "What we do" → Clients → Video.
+          // Float legs (behind content): About stairs → "What we do" →
+          // Clients → Video. No landing — each square drifts to a random cell
+          // in every section, tracked live so pins/resizes never jump it.
+          { at: PHASE.STAIRS, get: () => cellIn(stairsSection ?? teaser, hs) },
           { at: PHASE.TEASER, get: () => cellIn(teaser, home) },
           { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc) },
           { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv) },
@@ -261,7 +245,6 @@ export default function EmergeSquares({
           y: gsap.quickSetter(el, "y", "px") as (v: number) => void,
           scaleX: gsap.quickSetter(el, "scaleX") as (v: number) => void,
           scaleY: gsap.quickSetter(el, "scaleY") as (v: number) => void,
-          rotationX: gsap.quickSetter(el, "rotationX", "deg") as (v: number) => void,
           // "opacity" (quickSetter doesn't support the virtual "autoAlpha").
           autoAlpha: gsap.quickSetter(el, "opacity") as (v: number) => void,
         };
@@ -277,7 +260,6 @@ export default function EmergeSquares({
           el,
           floater,
           wps,
-          slotRef,
           home,
           qsEl,
           qsFloater,
@@ -305,7 +287,6 @@ export default function EmergeSquares({
       const place = (phase: number) => {
         const sx = window.scrollX;
         const sy = window.scrollY;
-        const vhHalf = window.innerHeight / 2;
 
         // Float layer is positioned relative to the stage wrapper (its
         // containing block), so it can range across every float section.
@@ -328,35 +309,17 @@ export default function EmergeSquares({
         const idleEnv = smoothstep((phase - HANDOFF.TO_FLOATER_END) / IDLE_PAD);
 
         for (const p of paths) {
-          const { wps, slotRef, qsEl, qsFloater } = p;
+          const { wps, qsEl, qsFloater } = p;
           const { cx, cy, w, h } = samplePath(wps, phase);
 
-          // As each slot reaches viewport centre the square must uncover its
-          // photo. Desktop does this with a 3D flip (rotationX + backface
-          // hidden). Mobile skips 3D (janky there), so instead we fade the
-          // square out by the same centre-proximity — transparent when centred
-          // (photo shown), opaque when away (matching its stair cover).
-          let rotationX = 0;
-          let coverFade = 1;
-          if (phase < 0.57) {
-            const slot = slotRef.current;
-            if (slot) {
-              const r = slot.getBoundingClientRect();
-              const dist = Math.abs(r.top + r.height / 2 - vhHalf);
-              const prox = smoothstep(1 - dist / (window.innerHeight * 0.4));
-              if (isCompact) coverFade = 1 - prox;
-              else rotationX = -180 * prox; // negative = bottom edge rises
-            }
-          }
-
           // Main (body-level) layer — always positioned along the path so
-          // there's no jump if floaterAmt snaps back to 0 mid-frame.
+          // there's no jump if floaterAmt snaps back to 0 mid-frame. It only
+          // shows during the pop, then cross-fades out onto the floater.
           qsEl.x(cx + sx - 50);
           qsEl.y(cy + sy - 50);
           qsEl.scaleX(w / 100);
           qsEl.scaleY(h / 100);
-          qsEl.rotationX(rotationX);
-          qsEl.autoAlpha((1 - floaterAmt) * coverFade);
+          qsEl.autoAlpha(1 - floaterAmt);
 
           // Float layer — positioned relative to the stage wrapper's box.
           const localX = cx - stageRect.left - 36;
@@ -421,25 +384,29 @@ export default function EmergeSquares({
       // giving every leg a speed that matches actually scrolling through it.
       // Phase values here are the SAME PHASE constants used by the
       // waypoints above, so the two can't drift out of sync.
-      const stairsEl =
-        landingRefs.yellow.current?.closest<HTMLElement>(".about-stairs") ?? null;
       let cp: [number, number][] = [];
       const buildCheckpoints = () => {
         const vh = window.innerHeight;
         const docTop = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
-        const tTop = docTop(teaser);
         // Phase LAUNCH = the logo centred in the viewport (its section
         // centres the logo, so the section's centre is the logo's centre).
         const logoCentered =
           docTop(startSection) + startSection.offsetHeight / 2 - vh / 2;
-        // Each float leg lands its phase when that section is vertically
-        // centred in the viewport.
+        // Each float leg reaches its phase when that section is vertically
+        // centred in the viewport. The stairs leg spans the section's PIN
+        // (the gap to the teaser checkpoint swallows the pinned scroll), so
+        // the square drifts around the stairs for the whole pin, then moves on.
         const center = (el: HTMLElement) =>
           docTop(el) + el.offsetHeight / 2 - vh / 2;
+        const stTop = docTop(stairsSection ?? teaser);
         const pts: [number, number][] = [
           [logoCentered, PHASE.LAUNCH],
-          [(stairsEl ? docTop(stairsEl) : tTop) - 0.15 * vh, PHASE.LAND],
-          [tTop - vh, PHASE.LEAVE], // stairs done, teaser entering (spans the pin)
+          // The stairs section pins (swallows a big band of scroll). Hold the
+          // squares around their random stairs cells for the WHOLE pin — from
+          // the section entering to the teaser about to enter — then let them
+          // drift on. Two checkpoints at the same phase = a constant-phase band.
+          [stTop - 0.15 * vh, PHASE.STAIRS],
+          [docTop(teaser) - vh, PHASE.STAIRS],
           [center(teaser), PHASE.TEASER],
           [center(clients ?? teaser), PHASE.CLIENTS],
           [center(video ?? teaser), PHASE.VIDEO],

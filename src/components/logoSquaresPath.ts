@@ -16,24 +16,29 @@ export type Waypoint = { at: number; ease?: (t: number) => number; get: () => Ve
 // Canonical phase values — used by BOTH the interpolation waypoints and the
 // scroll-position checkpoints, so the two mappings can never fall out of
 // sync (previously these were separately hardcoded in two places).
+//
+// The squares pop off the logo and then spend the whole journey on the
+// z-index:-1 floater, drifting from section to section behind the content —
+// there is no landing on the stair cards. Float legs:
+//   STAIRS   drift around the About stairs section
+//   TEASER   "What we do"
+//   CLIENTS  the clients section
+//   VIDEO    the showreel — the resting section
 export const PHASE = {
   LAUNCH: 0,
   POP: 0.06,
-  LAND: 0.22,
-  LEAVE: 0.55,
-  // Float legs (all behind content on the z-index:-1 floater): drift through
-  // "What we do", then the Clients section, resting in the Video section.
-  TEASER: 0.7,
-  CLIENTS: 0.85,
+  STAIRS: 0.3,
+  TEASER: 0.55,
+  CLIENTS: 0.78,
   VIDEO: 1,
 } as const;
 
-// One-way cross-fade window: main layer → floater, as the float legs begin.
-// There is no return window — the floater carries the square from the teaser
-// through the clients + video sections and idles there forever.
+// One-way cross-fade window: main layer → floater, right after the pop, so the
+// squares leave the logo and immediately float. There is no return window — the
+// floater carries each square through every section and idles there forever.
 export const HANDOFF = {
-  TO_FLOATER_START: 0.56,
-  TO_FLOATER_END: 0.66,
+  TO_FLOATER_START: 0.08,
+  TO_FLOATER_END: 0.16,
 } as const;
 
 export const smoothstep = (t: number) => {
