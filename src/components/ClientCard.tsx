@@ -47,14 +47,23 @@ function ClientCard({
   const [sweeping, setSweeping] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+  // Live `current` for the interval closure (which is created once).
+  const currentRef = useRef(current);
+  currentRef.current = current;
 
   useEffect(() => {
     const start = () => {
       intervalRef.current = setInterval(() => {
+        // Load the incoming image at sweep START and HOLD it through the whole
+        // sweep — including the upcoming layer's fade-out. Advancing it at sweep
+        // end (the old `setNext(c+2)`) flipped this layer to the *next-next*
+        // image while it was still opaque, flashing that wrong image over the
+        // just-revealed card ~1s later. Now the fade-out layer always shows the
+        // same image as the settled card, so there's nothing to flash.
+        setNext((currentRef.current + 1) % len);
         setSweeping(true);
         timeoutRef.current = setTimeout(() => {
           setCurrent((c) => (c + 1) % len);
-          setNext((c) => (c + 2) % len);
           setSweeping(false);
         }, SWEEP_MS);
       }, INTERVAL_MS);
