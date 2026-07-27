@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useReducedMotion } from "@/lib/reducedMotion";
 
@@ -10,6 +11,8 @@ type RailService = {
   title: string;
   blurb: string;
   items: string[];
+  workImageUrl?: string | null;
+  workImageAlt?: string;
 };
 
 /**
@@ -154,11 +157,23 @@ export default function ServiceRail({ services }: { services: RailService[] }) {
               <span aria-hidden="true">→</span>
             </Link>
 
-            {/* TODO: Replace with real client work photo */}
-            <div className="mt-8 flex aspect-video w-full max-w-md items-center justify-center bg-[#1a1a1a]">
-              <span className="font-body text-sm text-[#666]">
-                [ REPLACE WITH REAL WORK IMAGE ]
-              </span>
+            {/* Client work photo — CMS `workImage` per service; placeholder until set */}
+            <div className="relative mt-8 aspect-video w-full max-w-md overflow-hidden bg-[#1a1a1a]">
+              {svc.workImageUrl ? (
+                <Image
+                  src={svc.workImageUrl}
+                  alt={svc.workImageAlt || svc.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 28rem"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="font-body text-sm text-[#666]">
+                    [ REPLACE WITH REAL WORK IMAGE ]
+                  </span>
+                </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>

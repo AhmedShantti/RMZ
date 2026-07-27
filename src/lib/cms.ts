@@ -278,25 +278,50 @@ export const getServices = cache(() =>
   safe(
     "services",
     async (p) => {
-      const g = await p.findGlobal({ slug: "servicesContent", depth: 0 });
+      // depth 1 so the hero + per-service `workImage` uploads are populated.
+      const g = await p.findGlobal({ slug: "servicesContent", depth: 1 });
+      const hero =
+        g.heroImage && typeof g.heroImage === "object" ? g.heroImage : null;
       const services = g.services?.length
-        ? g.services.map((s) => ({
-            title: s.title,
-            blurb: s.blurb,
-            items: labels(s.items),
-            featuredOnHome: s.featuredOnHome ?? true,
-          }))
-        : servicesDefault.map((s) => ({ ...s, featuredOnHome: true }));
+        ? g.services.map((s) => {
+            const work =
+              s.workImage && typeof s.workImage === "object"
+                ? s.workImage
+                : null;
+            return {
+              title: s.title,
+              blurb: s.blurb,
+              items: labels(s.items),
+              workImageUrl: work?.url ?? null,
+              workImageAlt: work?.alt ?? "",
+              featuredOnHome: s.featuredOnHome ?? true,
+            };
+          })
+        : servicesDefault.map((s) => ({
+            ...s,
+            workImageUrl: null,
+            workImageAlt: "",
+            featuredOnHome: true,
+          }));
       return {
         pageTitle: runs(g.pageTitle, servicesPageDefault.pageTitle),
         lede: f(g.lede, servicesPageDefault.lede),
+        heroImageUrl: hero?.url ?? null,
+        heroImageAlt: hero?.alt ?? "",
         services,
       };
     },
     {
       pageTitle: servicesPageDefault.pageTitle,
       lede: servicesPageDefault.lede,
-      services: servicesDefault.map((s) => ({ ...s, featuredOnHome: true })),
+      heroImageUrl: null,
+      heroImageAlt: "",
+      services: servicesDefault.map((s) => ({
+        ...s,
+        workImageUrl: null,
+        workImageAlt: "",
+        featuredOnHome: true,
+      })),
     },
   ),
 );

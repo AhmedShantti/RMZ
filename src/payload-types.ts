@@ -1063,6 +1063,10 @@ export interface ServicesContent {
     | null;
   lede?: string | null;
   /**
+   * Full-bleed image behind the page title. Leave empty to show the placeholder.
+   */
+  heroImage?: (number | null) | Media;
+  /**
    * Ordered. The number (01, 02…) follows this order.
    */
   services?:
@@ -1075,6 +1079,10 @@ export interface ServicesContent {
               id?: string | null;
             }[]
           | null;
+        /**
+         * Client work photo shown when this service is active. Leave empty to show the placeholder.
+         */
+        workImage?: (number | null) | Media;
         featuredOnHome?: boolean | null;
         id?: string | null;
       }[]
@@ -1545,6 +1553,7 @@ export interface ServicesContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
+  heroImage?: T;
   services?:
     | T
     | {
@@ -1556,6 +1565,7 @@ export interface ServicesContentSelect<T extends boolean = true> {
               label?: T;
               id?: T;
             };
+        workImage?: T;
         featuredOnHome?: T;
         id?: T;
       };
