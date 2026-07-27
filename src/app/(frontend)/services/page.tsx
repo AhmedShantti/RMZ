@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import ServiceRail from "@/components/ServiceRail";
 import RunsText from "@/components/RunsText";
 import { getServices, getMeta } from "@/lib/cms";
@@ -23,18 +24,30 @@ export default async function ServicesPage() {
     title: s.title,
     blurb: s.blurb,
     items: s.items,
+    workImageUrl: s.workImageUrl,
+    workImageAlt: s.workImageAlt,
   }));
 
   return (
     <>
-      {/* Full-bleed service hero image (Redesigning Stage 5) */}
-      {/* TODO: Replace with a real brand/client hero image */}
+      {/* Full-bleed service hero image — CMS `heroImage`, placeholder until set */}
       <section className="relative min-h-[60vh] w-full overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
-          <span className="font-body text-sm tracking-[0.2em] text-[#666]">
-            [ SERVICE HERO IMAGE — REPLACE ]
-          </span>
-        </div>
+        {data.heroImageUrl ? (
+          <Image
+            src={data.heroImageUrl}
+            alt={data.heroImageAlt || "Services"}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
+            <span className="font-body text-sm tracking-[0.2em] text-[#666]">
+              [ SERVICE HERO IMAGE — REPLACE ]
+            </span>
+          </div>
+        )}
         {/* dark overlay so the title stays readable */}
         <div
           aria-hidden="true"

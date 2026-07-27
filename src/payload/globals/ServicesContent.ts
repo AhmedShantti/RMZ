@@ -19,6 +19,16 @@ export const ServicesContent: GlobalConfig = {
     runsField("pageTitle", "Page title"),
     { name: "lede", type: "textarea" },
     {
+      name: "heroImage",
+      type: "upload",
+      relationTo: "media",
+      label: "Hero image",
+      admin: {
+        description:
+          "Full-bleed image behind the page title. Leave empty to show the placeholder.",
+      },
+    },
+    {
       name: "services",
       type: "array",
       labels: { singular: "Service", plural: "Services" },
@@ -31,6 +41,16 @@ export const ServicesContent: GlobalConfig = {
           type: "array",
           labels: { singular: "Sub-item", plural: "Sub-items" },
           fields: [{ name: "label", type: "text", required: true }],
+        },
+        {
+          name: "workImage",
+          type: "upload",
+          relationTo: "media",
+          label: "Work image",
+          admin: {
+            description:
+              "Client work photo shown when this service is active. Leave empty to show the placeholder.",
+          },
         },
         {
           name: "featuredOnHome",
