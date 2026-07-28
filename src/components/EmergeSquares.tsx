@@ -207,11 +207,16 @@ export default function EmergeSquares({
         });
         els.push(floater);
 
-        // Fixed random float cells (one per float section), picked once/load.
-        const hs: Frac = {
-          x: gsap.utils.random(0.14, 0.86),
-          y: gsap.utils.random(0.16, 0.82),
-        };
+        // Fixed random float cells (picked once/load). The stairs leg gets
+        // three cells so the square wanders across the pinned section while it
+        // is scrolled, instead of hovering one spot.
+        const rndCell = (): Frac => ({
+          x: gsap.utils.random(0.12, 0.88),
+          y: gsap.utils.random(0.14, 0.84),
+        });
+        const hs1 = rndCell();
+        const hs2 = rndCell();
+        const hs3 = rndCell();
         const home: Frac = {
           x: gsap.utils.random(0.12, 0.88),
           y: gsap.utils.random(0.16, 0.82),
@@ -230,8 +235,11 @@ export default function EmergeSquares({
           { at: PHASE.POP, ease: back, get: () => ({ ...centerOf(anchor), w: 72, h: 72 }) },
           // Float legs (behind content): About stairs → "What we do" →
           // Clients → Video. No landing — each square drifts to a random cell
-          // in every section, tracked live so pins/resizes never jump it.
-          { at: PHASE.STAIRS, get: () => cellIn(stairsSection ?? teaser, hs) },
+          // in every section, tracked live so pins/resizes never jump it. The
+          // stairs leg has three cells so the square wanders across the pin.
+          { at: PHASE.STAIRS_A, get: () => cellIn(stairsSection ?? teaser, hs1) },
+          { at: PHASE.STAIRS_B, get: () => cellIn(stairsSection ?? teaser, hs2) },
+          { at: PHASE.STAIRS_C, get: () => cellIn(stairsSection ?? teaser, hs3) },
           { at: PHASE.TEASER, get: () => cellIn(teaser, home) },
           { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc) },
           { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv) },
@@ -270,10 +278,10 @@ export default function EmergeSquares({
           idleEnv: 0,
           // Desynced organic drift — different amplitude/period per square and
           // per axis (X≠Y makes it a Lissajous-ish path, not a straight line).
-          ampX: gsap.utils.random(48, 84),
-          ampY: gsap.utils.random(44, 78),
-          periodX: gsap.utils.random(5, 8),
-          periodY: gsap.utils.random(5.5, 8.5),
+          ampX: gsap.utils.random(70, 120),
+          ampY: gsap.utils.random(64, 108),
+          periodX: gsap.utils.random(4, 7),
+          periodY: gsap.utils.random(4.5, 7.5),
         });
       });
 
@@ -399,14 +407,18 @@ export default function EmergeSquares({
         const center = (el: HTMLElement) =>
           docTop(el) + el.offsetHeight / 2 - vh / 2;
         const stTop = docTop(stairsSection ?? teaser);
+        // The stairs section pins (swallows a big band of scroll). Spread the
+        // three stairs sub-phases ACROSS that pin — from the section entering to
+        // the teaser about to enter — so each square wanders between its three
+        // random cells as the pin is scrolled, instead of hovering one spot.
+        const pinStart = stTop - 0.15 * vh;
+        const pinEnd = docTop(teaser) - vh;
+        const pinMid = (pinStart + pinEnd) / 2;
         const pts: [number, number][] = [
           [logoCentered, PHASE.LAUNCH],
-          // The stairs section pins (swallows a big band of scroll). Hold the
-          // squares around their random stairs cells for the WHOLE pin — from
-          // the section entering to the teaser about to enter — then let them
-          // drift on. Two checkpoints at the same phase = a constant-phase band.
-          [stTop - 0.15 * vh, PHASE.STAIRS],
-          [docTop(teaser) - vh, PHASE.STAIRS],
+          [pinStart, PHASE.STAIRS_A],
+          [pinMid, PHASE.STAIRS_B],
+          [pinEnd, PHASE.STAIRS_C],
           [center(teaser), PHASE.TEASER],
           [center(clients ?? teaser), PHASE.CLIENTS],
           [center(video ?? teaser), PHASE.VIDEO],

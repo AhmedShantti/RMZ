@@ -27,9 +27,14 @@ export type Waypoint = { at: number; ease?: (t: number) => number; get: () => Ve
 export const PHASE = {
   LAUNCH: 0,
   POP: 0.06,
-  STAIRS: 0.3,
-  TEASER: 0.55,
-  CLIENTS: 0.78,
+  // The stairs section PINS for a long scroll, so its viewport position is
+  // fixed — a single cell would just hover in place. Three sub-cells let each
+  // square wander across the section as the pin is scrolled.
+  STAIRS_A: 0.22,
+  STAIRS_B: 0.36,
+  STAIRS_C: 0.5,
+  TEASER: 0.65,
+  CLIENTS: 0.83,
   VIDEO: 1,
 } as const;
 

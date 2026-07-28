@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import ServiceRail from "@/components/ServiceRail";
+import ServicesHeroCarousel from "@/components/ServicesHeroCarousel";
 import RunsText from "@/components/RunsText";
 import { getServices, getMeta } from "@/lib/cms";
 
@@ -30,17 +30,10 @@ export default async function ServicesPage() {
 
   return (
     <>
-      {/* Full-bleed service hero image — CMS `heroImage`, placeholder until set */}
+      {/* Full-bleed service hero — CMS `heroImages` carousel, placeholder until set */}
       <section className="relative min-h-[60vh] w-full overflow-hidden">
-        {data.heroImageUrl ? (
-          <Image
-            src={data.heroImageUrl}
-            alt={data.heroImageAlt || "Services"}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+        {data.heroImages.length > 0 ? (
+          <ServicesHeroCarousel images={data.heroImages} />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
             <span className="font-body text-sm tracking-[0.2em] text-[#666]">

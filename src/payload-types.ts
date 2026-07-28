@@ -1063,9 +1063,14 @@ export interface ServicesContent {
     | null;
   lede?: string | null;
   /**
-   * Full-bleed image behind the page title. Leave empty to show the placeholder.
+   * Full-bleed images behind the page title. Two or more auto-cycle as a carousel; one shows statically; empty shows the placeholder.
    */
-  heroImage?: (number | null) | Media;
+  heroImages?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Ordered. The number (01, 02…) follows this order.
    */
@@ -1553,7 +1558,12 @@ export interface ServicesContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
-  heroImage?: T;
+  heroImages?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   services?:
     | T
     | {
