@@ -126,12 +126,14 @@ function VideoCard({ video }: { video: ShowreelVideo }) {
 }
 
 export default function ShowreelMarquee({
-  videos = DEFAULT_VIDEOS,
+  videos,
 }: {
   videos?: ShowreelVideo[];
 }) {
   const reduce = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  // CMS videos when present, else the built-in placeholders.
+  const list = videos && videos.length ? videos : DEFAULT_VIDEOS;
 
   useEffect(() => {
     const root = rootRef.current;
@@ -188,12 +190,12 @@ export default function ShowreelMarquee({
       root.removeEventListener("pointerover", onOver);
       root.removeEventListener("pointerleave", onLeave);
     };
-  }, [reduce, videos.length]);
+  }, [reduce, list.length]);
 
   if (reduce) {
     return (
       <div className="flex w-full flex-wrap justify-center gap-4 px-5">
-        {videos.map((v, i) => (
+        {list.map((v, i) => (
           <VideoCard key={i} video={v} />
         ))}
       </div>
@@ -206,7 +208,7 @@ export default function ShowreelMarquee({
       className="relative flex w-full items-center overflow-x-clip overflow-y-visible"
     >
       <Marquee pauseOnHover className="w-full [--duration:38s] [--gap:1.5rem]">
-        {videos.map((v, i) => (
+        {list.map((v, i) => (
           <VideoCard key={i} video={v} />
         ))}
       </Marquee>

@@ -180,7 +180,7 @@ export interface User {
 export interface Media {
   id: number;
   /**
-   * Describe the image for screen readers + SEO.
+   * Describe the image/video for screen readers + SEO.
    */
   alt: string;
   updatedAt: string;
@@ -899,8 +899,17 @@ export interface HomeContent {
    * The small line under the hero statement.
    */
   heroSubline?: string | null;
-  showreelLeftLabel?: string | null;
-  showreelRightLabel?: string | null;
+  showreelVideos?:
+    | {
+        /**
+         * MP4/WebM video file.
+         */
+        video: number | Media;
+        topLabel?: string | null;
+        bottomLabel?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Portrait client photos with optional sticker badges. Leave empty to use the built-in placeholders.
    */
@@ -1440,8 +1449,14 @@ export interface HomeContentSelect<T extends boolean = true> {
         id?: T;
       };
   heroSubline?: T;
-  showreelLeftLabel?: T;
-  showreelRightLabel?: T;
+  showreelVideos?:
+    | T
+    | {
+        video?: T;
+        topLabel?: T;
+        bottomLabel?: T;
+        id?: T;
+      };
   clients?:
     | T
     | {

@@ -47,10 +47,10 @@ export const homeContent = {
   heroSubline:
     "A creative studio for brands with the courage to challenge the ordinary.",
   teaserCtaLabel: "Start a project",
-  // Showreel section — the two coloured vertical-text strips flanking the video.
+  // Showreel section — the full-width video marquee. Videos are CMS-uploaded;
+  // empty here falls back to the built-in placeholders.
   showreel: {
-    leftLabel: "How to Success",
-    rightLabel: "How to be Rebel",
+    videos: [] as { url: string; topLabel?: string; bottomLabel?: string }[],
   },
   // Clients collage — three portrait photos with optional sticker badges. Photos
   // stay placeholder until real imagery lands; the labels/badges are editable.

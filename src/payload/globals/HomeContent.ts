@@ -40,20 +40,34 @@ export const HomeContent: GlobalConfig = {
       type: "collapsible",
       label: "Showreel",
       admin: {
-        description: "The two coloured vertical-text strips beside the video.",
+        description:
+          "Videos in the full-width marquee. Each plays on hover; its top (green) + bottom (orange) labels show while hovered. Empty shows placeholders.",
       },
       fields: [
         {
-          name: "showreelLeftLabel",
-          type: "text",
-          label: "Left strip (green)",
-          defaultValue: "How to Success",
-        },
-        {
-          name: "showreelRightLabel",
-          type: "text",
-          label: "Right strip (orange)",
-          defaultValue: "How to be Rebel",
+          name: "showreelVideos",
+          type: "array",
+          label: "Videos",
+          labels: { singular: "Video", plural: "Videos" },
+          fields: [
+            {
+              name: "video",
+              type: "upload",
+              relationTo: "media",
+              required: true,
+              admin: { description: "MP4/WebM video file." },
+            },
+            {
+              name: "topLabel",
+              type: "text",
+              label: "Top bar (green)",
+            },
+            {
+              name: "bottomLabel",
+              type: "text",
+              label: "Bottom bar (orange)",
+            },
+          ],
         },
       ],
     },

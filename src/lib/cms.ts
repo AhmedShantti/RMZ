@@ -171,8 +171,20 @@ export const getHome = cache(() =>
         heroSubline: f(g.heroSubline, homeDefault.heroSubline),
         teaserCtaLabel: f(g.teaserCtaLabel, homeDefault.teaserCtaLabel),
         showreel: {
-          leftLabel: f(g.showreelLeftLabel, homeDefault.showreel.leftLabel),
-          rightLabel: f(g.showreelRightLabel, homeDefault.showreel.rightLabel),
+          videos: (
+            Array.isArray(g.showreelVideos) ? g.showreelVideos : []
+          ).flatMap((v) => {
+            const m = v.video && typeof v.video === "object" ? v.video : null;
+            return m?.url
+              ? [
+                  {
+                    url: m.url,
+                    topLabel: v.topLabel ?? undefined,
+                    bottomLabel: v.bottomLabel ?? undefined,
+                  },
+                ]
+              : [];
+          }),
         },
         clients: g.clients?.length
           ? g.clients.map((c) => ({
