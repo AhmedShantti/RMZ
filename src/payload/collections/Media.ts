@@ -13,14 +13,16 @@ export const Media: CollectionConfig = {
   admin: { group: "Library" },
   upload: {
     staticDir: "media",
-    mimeTypes: ["image/*"],
+    mimeTypes: ["image/*", "video/*"],
   },
   fields: [
     {
       name: "alt",
       type: "text",
       required: true,
-      admin: { description: "Describe the image for screen readers + SEO." },
+      admin: {
+        description: "Describe the image/video for screen readers + SEO.",
+      },
     },
   ],
 };

@@ -152,8 +152,7 @@ await updateGlobal("homeContent", {
   heroStatement: homeContent.heroStatement,
   heroSubline: homeContent.heroSubline,
   teaserCtaLabel: homeContent.teaserCtaLabel,
-  showreelLeftLabel: homeContent.showreel.leftLabel,
-  showreelRightLabel: homeContent.showreel.rightLabel,
+  // Showreel videos are uploaded by editors — nothing to seed.
   clients: homeContent.clients,
   // Photos are uploaded by editors; seed the paragraphs only.
   stairs: homeContent.stairs.map((s) => ({ paragraph: s.paragraph })),
