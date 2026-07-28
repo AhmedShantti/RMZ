@@ -51,10 +51,7 @@ export default async function Home() {
      
       <ClientCard heading={home.clientsHeading} clients={home.clientCards} />
       
-      <VideoSection
-        leftLabel={home.showreel.leftLabel}
-        rightLabel={home.showreel.rightLabel}
-      />
+      <VideoSection />
       <MarketsBlock
         asTeaser
         story={contact.heroStory}
