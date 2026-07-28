@@ -19,14 +19,17 @@ export const ServicesContent: GlobalConfig = {
     runsField("pageTitle", "Page title"),
     { name: "lede", type: "textarea" },
     {
-      name: "heroImage",
-      type: "upload",
-      relationTo: "media",
-      label: "Hero image",
+      name: "heroImages",
+      type: "array",
+      label: "Hero images (carousel)",
+      labels: { singular: "Hero image", plural: "Hero images" },
       admin: {
         description:
-          "Full-bleed image behind the page title. Leave empty to show the placeholder.",
+          "Full-bleed images behind the page title. Two or more auto-cycle as a carousel; one shows statically; empty shows the placeholder.",
       },
+      fields: [
+        { name: "image", type: "upload", relationTo: "media", required: true },
+      ],
     },
     {
       name: "services",

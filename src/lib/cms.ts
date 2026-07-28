@@ -280,8 +280,12 @@ export const getServices = cache(() =>
     async (p) => {
       // depth 1 so the hero + per-service `workImage` uploads are populated.
       const g = await p.findGlobal({ slug: "servicesContent", depth: 1 });
-      const hero =
-        g.heroImage && typeof g.heroImage === "object" ? g.heroImage : null;
+      const heroImages = (
+        Array.isArray(g.heroImages) ? g.heroImages : []
+      ).flatMap((h) => {
+        const m = h.image && typeof h.image === "object" ? h.image : null;
+        return m?.url ? [{ url: m.url, alt: m.alt ?? "" }] : [];
+      });
       const services = g.services?.length
         ? g.services.map((s) => {
             const work =
@@ -306,16 +310,14 @@ export const getServices = cache(() =>
       return {
         pageTitle: runs(g.pageTitle, servicesPageDefault.pageTitle),
         lede: f(g.lede, servicesPageDefault.lede),
-        heroImageUrl: hero?.url ?? null,
-        heroImageAlt: hero?.alt ?? "",
+        heroImages,
         services,
       };
     },
     {
       pageTitle: servicesPageDefault.pageTitle,
       lede: servicesPageDefault.lede,
-      heroImageUrl: null,
-      heroImageAlt: "",
+      heroImages: [] as { url: string; alt: string }[],
       services: servicesDefault.map((s) => ({
         ...s,
         workImageUrl: null,
