@@ -5,21 +5,9 @@ import { createPortal } from "react-dom";
 import { gsap, ScrollTrigger, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { useReducedMotion } from "@/lib/reducedMotion";
 
-/**
- * Showreel marquee — a full-width row of large videos that moves left→right as
- * the page is scrolled (scroll-scrubbed, not a continuous auto-loop). Hovering
- * a video opens a spotlight: the rest of the page is covered by an 80% black
- * overlay and the hovered clip plays, centred and enlarged, with its title
- * below. The spotlight is a body-level portal so it sits cleanly above the whole
- * page (below only the nav/menu chrome). Touch / no-hover / reduced-motion get a
- * static row with no scroll movement and no spotlight.
- *
- * Placeholders for now — pass `videos` with a `url` to drop real clips in.
- */
 export type ShowreelVideo = {
   url?: string | null;
   poster?: string | null;
-  /** Shown in the spotlight overlay on hover. */
   title?: string;
 };
 
@@ -47,11 +35,27 @@ function PlayGlyph({ size = 64 }: { size?: number }) {
   );
 }
 
-function VideoCard({ idx, video }: { idx: number; video: ShowreelVideo }) {
+function VideoCard({
+  idx,
+  video,
+  active,
+  onClick,
+  cardRef,
+}: {
+  idx: number;
+  video: ShowreelVideo;
+  active: boolean;
+  onClick: () => void;
+  cardRef?: (el: HTMLElement | null) => void;
+}) {
   return (
     <figure
+      ref={cardRef}
       data-idx={idx}
-      className="showreel-card relative shrink-0 overflow-hidden rounded-lg border border-white/10 bg-[#0e0e0e]"
+      onClick={onClick}
+      className={`showreel-card relative shrink-0 cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-[#0e0e0e] transition-transform duration-300 ${
+        active ? "z-20 scale-110" : "scale-100"
+      }`}
       style={{ width: CARD_W, aspectRatio: "16 / 9" }}
     >
       {video.url ? (
@@ -85,74 +89,87 @@ export default function ShowreelMarquee({
   const reduce = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
+  const activeCardRef = useRef<HTMLElement | null>(null);
+
   const [focused, setFocused] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
-  // CMS videos when present, else the built-in placeholders.
+
   const list = videos && videos.length ? videos : DEFAULT_VIDEOS;
 
   useEffect(() => setMounted(true), []);
 
-  // Scroll-driven left→right movement: map the section's scroll progress to the
-  // row's translateX. As the page scrolls down the row slides right (from fully
-  // shifted-left to its origin), so the videos read left→right.
   useEffect(() => {
-    if (reduce) return;
-    const root = rootRef.current;
-    const row = rowRef.current;
-    if (!root || !row) return;
+  if (reduce) return;
 
-    const cleanupLenis = syncScrollTriggerWithLenis();
-    const section = root.closest("section") ?? root;
-    const setX = gsap.quickSetter(row, "x", "px") as (v: number) => void;
+  const root = rootRef.current;
+  const row = rowRef.current;
 
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: "top bottom",
-      end: "bottom top",
-      scrub: true,
-      onUpdate: (self) => {
-        const overflow = Math.max(0, row.scrollWidth - root.clientWidth);
-        setX(-overflow * (1 - self.progress));
-      },
-    });
-    return () => {
-      st.kill();
-      cleanupLenis();
-    };
-  }, [reduce, list.length]);
+  if (!root || !row) return;
 
-  // Hover focus — pointer over any card opens the spotlight; leaving the row
-  // closes it. Only on real hover devices.
-  useEffect(() => {
-    if (reduce) return;
-    const root = rootRef.current;
-    if (!root) return;
-    const canHover = window.matchMedia(
-      "(hover: hover) and (pointer: fine)",
-    ).matches;
-    if (!canHover) return;
+  const cleanupLenis = syncScrollTriggerWithLenis();
 
-    const onOver = (e: PointerEvent) => {
-      const card = (e.target as Element | null)?.closest<HTMLElement>(
-        ".showreel-card",
-      );
-      if (card?.dataset.idx) setFocused(Number(card.dataset.idx));
-    };
-    const onLeave = () => setFocused(null);
-    root.addEventListener("pointerover", onOver);
-    root.addEventListener("pointerleave", onLeave);
-    return () => {
-      root.removeEventListener("pointerover", onOver);
-      root.removeEventListener("pointerleave", onLeave);
-    };
-  }, [reduce]);
+  const section = root.closest("section") ?? root;
 
-  // Static, non-scrolling fallback (reduced-motion / SSR-safe base).
+  const setX = gsap.quickSetter(row, "x", "px") as (v: number) => void;
+
+  const st = ScrollTrigger.create({
+    trigger: section,
+    start: "top bottom",
+    end: "bottom top",
+    scrub: true,
+    onUpdate: (self) => {
+      const overflow = Math.max(0, row.scrollWidth - root.clientWidth);
+      setX(-overflow * (1 - self.progress));
+    },
+  });
+
+  return () => {
+    st.kill();
+    cleanupLenis();
+  };
+}, [reduce, list.length]);
+
+useEffect(() => {
+  if (focused === null) return;
+
+  const handleClick = (e: MouseEvent) => {
+    if (
+      activeCardRef.current &&
+      !activeCardRef.current.contains(e.target as Node)
+    ) {
+      setFocused(null);
+    }
+  };
+
+  const handleKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape") setFocused(null);
+  };
+
+  document.addEventListener("mousedown", handleClick);
+  document.addEventListener("keydown", handleKey);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClick);
+    document.removeEventListener("keydown", handleKey);
+  };
+}, [focused]);
+
   if (reduce) {
     return (
       <div className="flex w-full flex-wrap justify-center gap-4 px-5">
         {list.map((v, i) => (
-          <VideoCard key={i} idx={i} video={v} />
+          <VideoCard
+          key={i}
+          idx={i}
+          video={v}
+          active={focused === i}
+          cardRef={(el) => {
+            if (focused === i) activeCardRef.current = el;
+          }}
+          onClick={() =>
+            setFocused((prev) => (prev === i ? null : i))
+          }
+          />
         ))}
       </div>
     );
@@ -167,22 +184,41 @@ export default function ShowreelMarquee({
         className="flex w-max items-center gap-6 px-6 will-change-transform"
       >
         {list.map((v, i) => (
-          <VideoCard key={i} idx={i} video={v} />
+          <VideoCard
+            key={i}
+            idx={i}
+            video={v}
+            active={focused === i}
+            onClick={() =>
+              setFocused((prev) => (prev === i ? null : i))
+            }
+          />
         ))}
       </div>
 
-      {/* Spotlight overlay — body-level portal so it covers the whole page. */}
       {mounted &&
         createPortal(
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed inset-0 z-[45] transition-opacity duration-300 ease-out"
+            className={`fixed inset-0 z-[45] transition-opacity duration-300 ease-out ${
+              active ? "" : "pointer-events-none"
+            }`}
             style={{ opacity: active ? 1 : 0 }}
           >
-            <div className="absolute inset-0 bg-black/80" />
+            <div
+              className="absolute inset-0 bg-black/80"
+              onClick={() => setFocused(null)}
+            />
+
             {active && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-6">
-                <div className="relative aspect-video w-[min(80vw,1100px)] overflow-hidden rounded-xl bg-[#0e0e0e] shadow-2xl">
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-6"
+                onClick={() => setFocused(null)}
+              >
+                <div
+                  className="relative aspect-video w-[min(80vw,1100px)] overflow-hidden rounded-xl bg-[#0e0e0e] shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {active.url ? (
                     <video
                       key={focused}
@@ -200,6 +236,7 @@ export default function ShowreelMarquee({
                     </div>
                   )}
                 </div>
+
                 {active.title && (
                   <h3 className="font-display text-cream text-center text-3xl italic sm:text-5xl">
                     {active.title}
