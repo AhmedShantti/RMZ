@@ -10,7 +10,10 @@
   "scripts": {
     "dev": "next dev",
     "dev:webpack": "next dev --webpack",
-    "build": "node scripts/db-push.mts && node scripts/generate-importmap.mts && next build",
+    "build": "payload migrate && node scripts/generate-importmap.mts && next build",
+    "migrate": "payload migrate",
+    "migrate:create": "payload migrate:create",
+    "migrate:status": "payload migrate:status",
     "start": "next start",
     "lint": "eslint",
     "payload": "payload",
