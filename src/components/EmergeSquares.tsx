@@ -128,6 +128,11 @@ export default function EmergeSquares({
       const video = document.querySelector<HTMLElement>(
         'section[aria-label="Showreel"]',
       );
+      // The markets / CTA block — the LAST float leg, at the end of the page,
+      // where the squares come to rest.
+      const markets = document.querySelector<HTMLElement>(
+        'section[aria-label="Markets and contact"]',
+      );
       // The About stairs section — the first float leg drifts around it (the
       // squares used to LAND on its cards; now they just float behind it like
       // every later section). landingRefs still locates it.
@@ -153,7 +158,7 @@ export default function EmergeSquares({
       // the section, so the floaters — a sibling with a higher z-index — always
       // paint above it. `position: relative` gives each section a positioned
       // box so the stacking context resolves locally.
-      for (const sec of [stairsSection, teaser, clients, video]) {
+      for (const sec of [stairsSection, teaser, clients, video, markets]) {
         if (!sec) continue;
         if (getComputedStyle(sec).position === "static") {
           sec.style.position = "relative";
@@ -231,20 +236,25 @@ export default function EmergeSquares({
           x: gsap.utils.random(0.14, 0.86),
           y: gsap.utils.random(0.2, 0.78),
         };
+        const hm: Frac = {
+          x: gsap.utils.random(0.12, 0.88),
+          y: gsap.utils.random(0.18, 0.82),
+        };
 
         const wps: Waypoint[] = [
           { at: PHASE.LAUNCH, get: () => centerOf(anchor) },
           { at: PHASE.POP, ease: back, get: () => ({ ...centerOf(anchor), w: 72, h: 72 }) },
-          // Float legs (behind content): About stairs → "What we do" →
-          // Clients → Video. No landing — each square drifts to a random cell
-          // in every section, tracked live so pins/resizes never jump it. The
-          // stairs leg has three cells so the square wanders across the pin.
+          // Float legs (above content): About stairs → "What we do" → Clients →
+          // Video → Markets (end of page). No landing — each square drifts to a
+          // random cell in every section, tracked live so pins/resizes never
+          // jump it. The stairs leg has three cells so it wanders across the pin.
           { at: PHASE.STAIRS_A, get: () => cellIn(stairsSection ?? teaser, hs1) },
           { at: PHASE.STAIRS_B, get: () => cellIn(stairsSection ?? teaser, hs2) },
           { at: PHASE.STAIRS_C, get: () => cellIn(stairsSection ?? teaser, hs3) },
           { at: PHASE.TEASER, get: () => cellIn(teaser, home) },
           { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc) },
           { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv) },
+          { at: PHASE.MARKETS, get: () => cellIn(markets ?? video ?? teaser, hm) },
         ];
 
         // quickSetter per numeric property: this is the dominant perf win
@@ -424,6 +434,7 @@ export default function EmergeSquares({
           [center(teaser), PHASE.TEASER],
           [center(clients ?? teaser), PHASE.CLIENTS],
           [center(video ?? teaser), PHASE.VIDEO],
+          [center(markets ?? video ?? teaser), PHASE.MARKETS],
         ];
         // Keep scroll values strictly increasing so the piecewise map is sane.
         for (let k = 1; k < pts.length; k++) {
@@ -453,10 +464,11 @@ export default function EmergeSquares({
         // Track from when the logo enters (so it sits on the logo before
         // centre); phaseAt clamps to 0 until the logo is centred.
         start: "top bottom",
-        // Span through the last float leg so the video section's phase is
-        // reached (and held) as the user scrolls it into view.
-        endTrigger: video ?? teaser,
-        end: "bottom center",
+        // Span through the last float leg (the markets block at the end of the
+        // page) so the squares keep drifting all the way down instead of
+        // resting in the video section.
+        endTrigger: markets ?? video ?? teaser,
+        end: "bottom bottom",
         onUpdate: (self) => place(phaseAt(self.scroll())),
         onRefresh: (self) => {
           buildCheckpoints();

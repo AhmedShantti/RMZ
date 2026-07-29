@@ -22,7 +22,7 @@ export default function VideoSection({
       aria-label="Showreel"
       className="relative w-full overflow-hidden py-24"
     >
-      <SectionWatermark text="CLIENTS" />
+      
 
       <Reveal className="relative z-10 w-full">
         <ShowreelMarquee videos={videos} />

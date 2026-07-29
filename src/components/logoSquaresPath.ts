@@ -17,25 +17,26 @@ export type Waypoint = { at: number; ease?: (t: number) => number; get: () => Ve
 // scroll-position checkpoints, so the two mappings can never fall out of
 // sync (previously these were separately hardcoded in two places).
 //
-// The squares pop off the logo and then spend the whole journey on the
-// z-index:-1 floater, drifting from section to section behind the content —
-// there is no landing on the stair cards. Float legs:
+// The squares pop off the logo and then float from section to section over the
+// whole page — there is no landing on the stair cards. Float legs:
 //   STAIRS   drift around the About stairs section
 //   TEASER   "What we do"
 //   CLIENTS  the clients section
-//   VIDEO    the showreel — the resting section
+//   VIDEO    the showreel
+//   MARKETS  the markets / CTA block — the end of the page, where it rests
 export const PHASE = {
   LAUNCH: 0,
   POP: 0.06,
   // The stairs section PINS for a long scroll, so its viewport position is
   // fixed — a single cell would just hover in place. Three sub-cells let each
   // square wander across the section as the pin is scrolled.
-  STAIRS_A: 0.22,
-  STAIRS_B: 0.36,
-  STAIRS_C: 0.5,
-  TEASER: 0.65,
-  CLIENTS: 0.83,
-  VIDEO: 1,
+  STAIRS_A: 0.2,
+  STAIRS_B: 0.32,
+  STAIRS_C: 0.44,
+  TEASER: 0.58,
+  CLIENTS: 0.72,
+  VIDEO: 0.86,
+  MARKETS: 1,
 } as const;
 
 // One-way cross-fade window: main layer → floater, right after the pop, so the
