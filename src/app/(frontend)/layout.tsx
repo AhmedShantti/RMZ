@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+import CursorGlow from "@/components/CursorGlow";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSiteSettings();
@@ -40,13 +41,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${ivarDisplay.variable} h-full`}>
-      <body className="text-cream min-h-full">
-        <a href="#main" className="skip-link">
-          Skip to content
-        </a>
-
+      <body className="text-cream min-h-full bg-black relative">
         {/* Global stage layers (TASK.md §6): red light UNDER grain UNDER content */}
-        
+        <CursorGlow className="fixed inset-0" style={{ zIndex: 9999 }} />
 
         <SmoothScroll />
         <Nav
@@ -59,7 +56,7 @@ export default async function RootLayout({
 
         <div
           className="relative flex min-h-screen flex-col"
-          style={{ zIndex: "var(--z-content)" }}
+          style={{ zIndex: "var(--z-content, 10)" }}
         >
           <main id="main" className="flex-1">
             {children}
