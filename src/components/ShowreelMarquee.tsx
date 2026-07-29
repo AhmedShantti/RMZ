@@ -1,124 +1,76 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Marquee } from "./ui/marquee";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { gsap, ScrollTrigger, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { useReducedMotion } from "@/lib/reducedMotion";
 
 /**
- * Showreel marquee — a full-width, continuous right-to-left row of large videos.
- * Hovering one pauses the row, scales that video up (centred on itself) and
- * plays it, while the rest blur back so the playing one is the focus. The
- * hovered video also reveals its own top + bottom label bars (the old green/
- * orange strips, now per-video). Touch / no-hover devices and reduced-motion
- * get a static, non-scrolling row (no play/scale/bars).
+ * Showreel marquee — a full-width row of large videos that moves left→right as
+ * the page is scrolled (scroll-scrubbed, not a continuous auto-loop). Hovering
+ * a video opens a spotlight: the rest of the page is covered by an 80% black
+ * overlay and the hovered clip plays, centred and enlarged, with its title
+ * below. The spotlight is a body-level portal so it sits cleanly above the whole
+ * page (below only the nav/menu chrome). Touch / no-hover / reduced-motion get a
+ * static row with no scroll movement and no spotlight.
  *
- * Placeholders for now (play button + label) — pass `videos` with a `url` to
- * drop real clips in; each becomes a muted, looping <video> that plays on hover.
+ * Placeholders for now — pass `videos` with a `url` to drop real clips in.
  */
 export type ShowreelVideo = {
   url?: string | null;
   poster?: string | null;
-  label?: string;
-  /** Bars revealed on the hovered/scaled video — different per video. */
-  topLabel?: string;
-  bottomLabel?: string;
+  /** Shown in the spotlight overlay on hover. */
+  title?: string;
 };
 
 const DEFAULT_VIDEOS: ShowreelVideo[] = [
-  {
-    label: "Video 1 — replace",
-    topLabel: "How to success",
-    bottomLabel: "How to be rebel",
-  },
-  {
-    label: "Video 2 — replace",
-    topLabel: "Think different",
-    bottomLabel: "Break the mould",
-  },
-  {
-    label: "Video 3 — replace",
-    topLabel: "Create bold",
-    bottomLabel: "Stay rebel",
-  },
+  { title: "How to succeed" },
+  { title: "Think different" },
+  { title: "Create bold" },
 ];
 
 const CARD_W = "clamp(300px, 56vw, 760px)";
-const BAR_TRANSITION =
-  "opacity 0.4s ease, transform 0.45s cubic-bezier(0.16,1,0.3,1)";
 
-function VideoCard({ video }: { video: ShowreelVideo }) {
+function PlayGlyph({ size = 64 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 80 80"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle cx="40" cy="40" r="39" stroke="white" strokeWidth="1.5" />
+      <path d="M33 26 L57 40 L33 54 Z" fill="white" />
+    </svg>
+  );
+}
+
+function VideoCard({ idx, video }: { idx: number; video: ShowreelVideo }) {
   return (
     <figure
+      data-idx={idx}
       className="showreel-card relative shrink-0 overflow-hidden rounded-lg border border-white/10 bg-[#0e0e0e]"
-      style={{
-        width: CARD_W,
-        aspectRatio: "16 / 9",
-        transformOrigin: "center center",
-        willChange: "transform, filter",
-        transition:
-          "transform 0.5s cubic-bezier(0.16,1,0.3,1), filter 0.5s ease",
-      }}
+      style={{ width: CARD_W, aspectRatio: "16 / 9" }}
     >
       {video.url ? (
         <video
-          className="showreel-video absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           src={video.url}
           poster={video.poster ?? undefined}
           muted
-          loop
           playsInline
           preload="metadata"
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
-          <svg
-            width="64"
-            height="64"
-            viewBox="0 0 80 80"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle cx="40" cy="40" r="39" stroke="white" strokeWidth="1.5" />
-            <path d="M33 26 L57 40 L33 54 Z" fill="white" />
-          </svg>
-          {video.label && (
+          <PlayGlyph />
+          {video.title && (
             <span className="font-body absolute bottom-3 left-3 text-[11px] uppercase tracking-wide text-white/40">
-              {video.label}
+              {video.title}
             </span>
           )}
-        </div>
-      )}
-
-      {/* Top / bottom label bars — hidden until the card is the hovered focus. */}
-      {video.topLabel && (
-        <div
-          className="showreel-bar-top pointer-events-none absolute inset-x-0 top-0 z-10 flex h-10 items-center justify-center"
-          style={{
-            backgroundColor: "var(--acc-green)",
-            opacity: 0,
-            transform: "translateY(-100%)",
-            transition: BAR_TRANSITION,
-          }}
-        >
-          <span className="font-body text-[0.72rem] font-medium uppercase tracking-[0.2em] text-white/95">
-            {video.topLabel}
-          </span>
-        </div>
-      )}
-      {video.bottomLabel && (
-        <div
-          className="showreel-bar-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex h-10 items-center justify-center"
-          style={{
-            backgroundColor: "var(--acc-orange)",
-            opacity: 0,
-            transform: "translateY(100%)",
-            transition: BAR_TRANSITION,
-          }}
-        >
-          <span className="font-body text-[0.72rem] font-medium uppercase tracking-[0.2em] text-white/95">
-            {video.bottomLabel}
-          </span>
         </div>
       )}
     </figure>
@@ -132,86 +84,132 @@ export default function ShowreelMarquee({
 }) {
   const reduce = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   // CMS videos when present, else the built-in placeholders.
   const list = videos && videos.length ? videos : DEFAULT_VIDEOS;
 
+  useEffect(() => setMounted(true), []);
+
+  // Scroll-driven left→right movement: map the section's scroll progress to the
+  // row's translateX. As the page scrolls down the row slides right (from fully
+  // shifted-left to its origin), so the videos read left→right.
   useEffect(() => {
+    if (reduce) return;
+    const root = rootRef.current;
+    const row = rowRef.current;
+    if (!root || !row) return;
+
+    const cleanupLenis = syncScrollTriggerWithLenis();
+    const section = root.closest("section") ?? root;
+    const setX = gsap.quickSetter(row, "x", "px") as (v: number) => void;
+
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: true,
+      onUpdate: (self) => {
+        const overflow = Math.max(0, row.scrollWidth - root.clientWidth);
+        setX(-overflow * (1 - self.progress));
+      },
+    });
+    return () => {
+      st.kill();
+      cleanupLenis();
+    };
+  }, [reduce, list.length]);
+
+  // Hover focus — pointer over any card opens the spotlight; leaving the row
+  // closes it. Only on real hover devices.
+  useEffect(() => {
+    if (reduce) return;
     const root = rootRef.current;
     if (!root) return;
-    const canHover =
-      typeof window !== "undefined" &&
-      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (reduce || !canHover) return;
-
-    const items = Array.from(
-      root.querySelectorAll<HTMLElement>(".showreel-card"),
-    ).map((el) => ({
-      el,
-      video: el.querySelector<HTMLVideoElement>(".showreel-video"),
-      top: el.querySelector<HTMLElement>(".showreel-bar-top"),
-      bottom: el.querySelector<HTMLElement>(".showreel-bar-bottom"),
-    }));
-    if (!items.length) return;
-
-    const apply = (focused: HTMLElement | null) => {
-      for (const { el, video, top, bottom } of items) {
-        const isFocus = el === focused;
-        el.style.transform = isFocus ? "scale(1.1)" : "";
-        el.style.filter =
-          focused && !isFocus ? "blur(5px) brightness(0.6)" : "";
-        el.style.zIndex = isFocus ? "3" : "1";
-        if (top) {
-          top.style.opacity = isFocus ? "1" : "0";
-          top.style.transform = isFocus ? "translateY(0)" : "translateY(-100%)";
-        }
-        if (bottom) {
-          bottom.style.opacity = isFocus ? "1" : "0";
-          bottom.style.transform = isFocus
-            ? "translateY(0)"
-            : "translateY(100%)";
-        }
-        if (video) {
-          if (isFocus) void video.play().catch(() => {});
-          else video.pause();
-        }
-      }
-    };
+    const canHover = window.matchMedia(
+      "(hover: hover) and (pointer: fine)",
+    ).matches;
+    if (!canHover) return;
 
     const onOver = (e: PointerEvent) => {
       const card = (e.target as Element | null)?.closest<HTMLElement>(
         ".showreel-card",
       );
-      if (card) apply(card);
+      if (card?.dataset.idx) setFocused(Number(card.dataset.idx));
     };
-    const onLeave = () => apply(null);
+    const onLeave = () => setFocused(null);
     root.addEventListener("pointerover", onOver);
     root.addEventListener("pointerleave", onLeave);
     return () => {
       root.removeEventListener("pointerover", onOver);
       root.removeEventListener("pointerleave", onLeave);
     };
-  }, [reduce, list.length]);
+  }, [reduce]);
 
+  // Static, non-scrolling fallback (reduced-motion / SSR-safe base).
   if (reduce) {
     return (
       <div className="flex w-full flex-wrap justify-center gap-4 px-5">
         {list.map((v, i) => (
-          <VideoCard key={i} video={v} />
+          <VideoCard key={i} idx={i} video={v} />
         ))}
       </div>
     );
   }
 
+  const active = focused != null ? list[focused] : null;
+
   return (
-    <div
-      ref={rootRef}
-      className="relative flex w-full items-center overflow-x-clip overflow-y-visible"
-    >
-      <Marquee pauseOnHover className="w-full [--duration:38s] [--gap:1.5rem]">
+    <div ref={rootRef} className="relative w-full overflow-hidden">
+      <div
+        ref={rowRef}
+        className="flex w-max items-center gap-6 px-6 will-change-transform"
+      >
         {list.map((v, i) => (
-          <VideoCard key={i} video={v} />
+          <VideoCard key={i} idx={i} video={v} />
         ))}
-      </Marquee>
+      </div>
+
+      {/* Spotlight overlay — body-level portal so it covers the whole page. */}
+      {mounted &&
+        createPortal(
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 z-[45] transition-opacity duration-300 ease-out"
+            style={{ opacity: active ? 1 : 0 }}
+          >
+            <div className="absolute inset-0 bg-black/80" />
+            {active && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-6">
+                <div className="relative aspect-video w-[min(80vw,1100px)] overflow-hidden rounded-xl bg-[#0e0e0e] shadow-2xl">
+                  {active.url ? (
+                    <video
+                      key={focused}
+                      className="h-full w-full object-cover"
+                      src={active.url}
+                      poster={active.poster ?? undefined}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <PlayGlyph size={88} />
+                    </div>
+                  )}
+                </div>
+                {active.title && (
+                  <h3 className="font-display text-cream text-center text-3xl italic sm:text-5xl">
+                    {active.title}
+                  </h3>
+                )}
+              </div>
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -50,7 +50,7 @@ export const homeContent = {
   // Showreel section — the full-width video marquee. Videos are CMS-uploaded;
   // empty here falls back to the built-in placeholders.
   showreel: {
-    videos: [] as { url: string; topLabel?: string; bottomLabel?: string }[],
+    videos: [] as { url: string; title?: string }[],
   },
   // Clients collage — three portrait photos with optional sticker badges. Photos
   // stay placeholder until real imagery lands; the labels/badges are editable.

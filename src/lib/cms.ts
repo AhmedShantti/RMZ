@@ -176,13 +176,7 @@ export const getHome = cache(() =>
           ).flatMap((v) => {
             const m = v.video && typeof v.video === "object" ? v.video : null;
             return m?.url
-              ? [
-                  {
-                    url: m.url,
-                    topLabel: v.topLabel ?? undefined,
-                    bottomLabel: v.bottomLabel ?? undefined,
-                  },
-                ]
+              ? [{ url: m.url, title: v.title ?? undefined }]
               : [];
           }),
         },
