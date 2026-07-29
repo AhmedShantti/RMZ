@@ -905,8 +905,7 @@ export interface HomeContent {
          * MP4/WebM video file.
          */
         video: number | Media;
-        topLabel?: string | null;
-        bottomLabel?: string | null;
+        title?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -1453,8 +1452,7 @@ export interface HomeContentSelect<T extends boolean = true> {
     | T
     | {
         video?: T;
-        topLabel?: T;
-        bottomLabel?: T;
+        title?: T;
         id?: T;
       };
   clients?:

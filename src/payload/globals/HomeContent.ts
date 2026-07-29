@@ -41,7 +41,7 @@ export const HomeContent: GlobalConfig = {
       label: "Showreel",
       admin: {
         description:
-          "Videos in the full-width marquee. Each plays on hover; its top (green) + bottom (orange) labels show while hovered. Empty shows placeholders.",
+          "Videos in the full-width marquee (move left→right on scroll). Hovering one plays it centred over an 80% black overlay with its title. Empty shows placeholders.",
       },
       fields: [
         {
@@ -58,14 +58,9 @@ export const HomeContent: GlobalConfig = {
               admin: { description: "MP4/WebM video file." },
             },
             {
-              name: "topLabel",
+              name: "title",
               type: "text",
-              label: "Top bar (green)",
-            },
-            {
-              name: "bottomLabel",
-              type: "text",
-              label: "Bottom bar (orange)",
+              label: "Title (shown on hover)",
             },
           ],
         },
