@@ -561,9 +561,9 @@ body:focus-visible {
 }
 
 /* ---- Markets grid items (MarketsColumns) — hover colour swap ----
-   The text colour reverses on hover using the same two brand colours: a cream
-   market turns red, the red (home) market turns cream. It also goes bold and
-   scales up. No background — only the text colour changes. */
+   Every item is cream (beige) and turns red on hover — uniform across all of
+   them. It also goes bold and scales up. No background — only the text colour
+   changes. */
 .market-item {
   --mk: var(--cream); /* base text colour */
   --mk-hover: var(--rebel-red); /* reversed colour on hover */
@@ -573,15 +573,8 @@ body:focus-visible {
     transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
     color 0.35s ease;
 }
-.market-item[data-home="true"] {
-  --mk: var(--rebel-red);
-  --mk-hover: var(--cream);
-}
 .market-item .market-line {
   color: var(--cream-dim);
-}
-.market-item[data-home="true"] .market-line {
-  color: var(--rebel-red);
 }
 .market-item:hover {
   color: var(--mk-hover);
