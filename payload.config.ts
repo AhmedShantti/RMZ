@@ -79,7 +79,7 @@ export default buildConfig({
     ? // `push: true` auto-syncs the schema (creates tables) on init, so the
       // admin works on a fresh prod Postgres without a separate migrate step.
       // For stricter prod control, set push:false and use Payload migrations.
-      postgresAdapter({ pool: { connectionString: databaseURI }, push: true })
+      postgresAdapter({ pool: { connectionString: databaseURI }, push: false })
     : sqliteAdapter({ client: { url: databaseURI } }),
   sharp,
   plugins: [
