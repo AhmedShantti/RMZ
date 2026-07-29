@@ -23,7 +23,7 @@ import {
  * from section to section (About stairs → "What we do" → Clients → Video),
  * settling in the last one where they idle forever. They never land on the
  * stair cards — right after the pop each square cross-fades, once, from its
- * body-level "main" element onto a z-index:-1 "floater" that carries it the
+ * body-level "main" element onto an above-content "floater" that carries it the
  * rest of the way behind the section content.
  *
  * Design for "no cuts / no delay":
@@ -50,13 +50,13 @@ import {
  *   VIDEO    → the showreel, where it idles forever
  *
  * Floater handoff:
- *   The squares must sit UNDER each section's content. A body-level element
- *   can't (it's above the whole content column), so right after the pop each
- *   square hands off to an in-page floater at z-index:-1 (isolation:isolate on
- *   the float sections keeps it behind the text but above the transparent
- *   backdrop). The main element cross-fades out and the floater cross-fades in
- *   once; from then on the floater's drift centre tracks the live path each
- *   frame while a per-square desynced sine wobble (see idleTick) plays on top.
+ *   The squares float ABOVE the page content (but under the fixed nav). Right
+ *   after the pop each square hands off from its body-level "main" element to an
+ *   in-page floater at z-index 30; isolation:isolate on each float section traps
+ *   that section's internal z-index below the floater so it stays on top. The
+ *   main element cross-fades out and the floater cross-fades in once; from then
+ *   on the floater's drift centre tracks the live path each frame while a
+ *   per-square desynced sine wobble (see idleTick) plays on top.
  */
 
 type Frac = { x: number; y: number };
@@ -117,9 +117,9 @@ export default function EmergeSquares({
       const teaser = document.querySelector<HTMLElement>(
         'section[aria-label="What we do"]',
       );
-      // The z-index:-1 float layer lives in the page's content wrapper so it
-      // paints behind EVERY section's content (teaser, clients, video) but
-      // above the gradient — no per-section reparenting needed.
+      // The float layer lives in the page's content wrapper so it paints ABOVE
+      // every section's content (stairs, teaser, clients, video) yet stays
+      // under the fixed nav — no per-section reparenting needed.
       const stage = document.querySelector<HTMLElement>("[data-squares-stage]");
       // Later float legs (fall back to the teaser cell if a section is absent).
       const clients = document.querySelector<HTMLElement>(
@@ -148,11 +148,11 @@ export default function EmergeSquares({
         return { cx: r.left + r.width * f.x, cy: r.top + r.height * f.y, w: 72, h: 72 };
       };
 
-      // The squares rest BEHIND each float section's content: `isolate` makes
-      // the z-index:-1 floaters sit behind the text but in front of the
-      // section's (transparent) backdrop, instead of sinking through the whole
-      // page. `position: relative` gives each section a positioned box so the
-      // stacking context resolves locally.
+      // The squares float ABOVE each section's content. `isolate` traps each
+      // float section's internal z-index (e.g. the stairs cards' z-100) inside
+      // the section, so the floaters — a sibling with a higher z-index — always
+      // paint above it. `position: relative` gives each section a positioned
+      // box so the stacking context resolves locally.
       for (const sec of [stairsSection, teaser, clients, video]) {
         if (!sec) continue;
         if (getComputedStyle(sec).position === "static") {
@@ -184,20 +184,22 @@ export default function EmergeSquares({
         });
         els.push(el);
 
-        // Float layer (z-index:-1) — lives in the page content wrapper so it
-        // paints behind every section's content. Carries the square from the
-        // teaser through the clients + video sections. Starts invisible;
+        // Float layer — lives in the page content wrapper and paints ABOVE
+        // every section's content (isolation on each float section keeps that
+        // section's internal z-index below this; the stage sits under the fixed
+        // nav, so the squares never cover the chrome). Carries the square from
+        // the stairs through the clients + video sections. Starts invisible;
         // cross-fades in once, as the square hands off from the main layer.
         const floater = document.createElement("div");
         floater.className = `sq sq-${color} sq-travel`;
-        stage.insertBefore(floater, stage.firstChild);
+        stage.appendChild(floater);
         gsap.set(floater, {
           position: "absolute",
           top: 0,
           left: 0,
           width: 72,
           height: 72,
-          zIndex: -1,
+          zIndex: 30, // above page content, below the fixed nav (stage is z 1)
           pointerEvents: "none",
           // Plain opacity, NOT autoAlpha — autoAlpha also sets
           // visibility:hidden, and since every later frame only touches
@@ -290,7 +292,7 @@ export default function EmergeSquares({
       // arrival at its stair card, hands off (shrinks out) to that card's
       // cover, which does the flip (AboutStairsSection) — so every card
       // reveals its photo with the same deck-driven flip. As it nears its
-      // HOME cell it cross-fades to the in-section floater at z-index:-1,
+      // HOME cell it cross-fades to the in-section floater above the content,
       // once, and stays there.
       const place = (phase: number) => {
         const sx = window.scrollX;
