@@ -63,7 +63,7 @@ export default async function ProjectPage(props: PageProps<"/portfolio/[slug]">)
         client={project.client}
         year={project.year}
         result={project.result}
-        cover={project.cover}
+        
       />
 
       <ProjectBlocks blocks={project.blocks} />
