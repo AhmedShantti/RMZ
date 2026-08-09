@@ -1,13 +1,10 @@
 import Link from "next/link";
 import AccentBlocks from "@/components/AccentBlocks";
 import Reveal from "@/components/Reveal";
-import ProjectImage from "./ProjectImage";
-import type { Visual } from "@/content/portfolio";
 
 /**
  * Case-study hero. Reads as PageIntro (kicker + big italic-serif statement) with
- * the project's meta row and main visual under it — so a project page announces
- * itself the same way every other inner page does.
+ * the project's meta row under it.
  */
 type Props = {
   name: string;
@@ -15,7 +12,6 @@ type Props = {
   client: string;
   year: string;
   result?: string;
-  cover?: Visual;
 };
 
 export default function ProjectHero({
@@ -24,7 +20,6 @@ export default function ProjectHero({
   client,
   year,
   result,
-  cover,
 }: Props) {
   return (
     <header className="relative px-5 pt-32 sm:px-8 sm:pt-40">
@@ -73,18 +68,6 @@ export default function ProjectHero({
           </dl>
         </Reveal>
       </div>
-
-      {/* Main visual — the one image on the page that isn't lazy-loaded. Renders
-          its placeholder when no cover has been uploaded yet, so the hero keeps
-          its shape while the CMS is still being filled in. */}
-      <Reveal delay={0.2} className="mx-auto mt-16 max-w-6xl">
-        <ProjectImage
-          visual={cover ?? { alt: "", ratio: "16/9" }}
-          ratio={cover?.ratio ?? "16/9"}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 92vw, 1152px"
-          priority
-        />
-      </Reveal>
     </header>
   );
 }
