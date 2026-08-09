@@ -41,7 +41,6 @@ export async function generateMetadata(
       title: `${project.name} — ${project.discipline}`,
       description,
       type: "article",
-      ...(project.cover?.src ? { images: [project.cover.src] } : {}),
     },
   };
 }
@@ -63,7 +62,6 @@ export default async function ProjectPage(props: PageProps<"/portfolio/[slug]">)
         client={project.client}
         year={project.year}
         result={project.result}
-        
       />
 
       <ProjectBlocks blocks={project.blocks} />
