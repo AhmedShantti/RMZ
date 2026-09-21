@@ -53,7 +53,7 @@ export default function Nav({
           <span aria-hidden="true" className="text-xl leading-none">
             ≡
           </span>
-          <span>Menu</span>
+          <span>Explore</span>
         </button>
 
         <Link

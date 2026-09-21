@@ -216,11 +216,19 @@ export const getHome = cache(() =>
           ? g.clientCards.map((c) => {
               const photo =
                 c.photo && typeof c.photo === "object" ? c.photo : null;
+              // Same slug rule as getPortfolio; unpublished projects have no
+              // page (getProject 404s), so they don't get a link.
+              const project =
+                c.project && typeof c.project === "object" ? c.project : null;
               return {
                 name: f(c.name, ""),
                 category: f(c.category, ""),
                 photoUrl: photo?.url ?? null,
                 alt: photo?.alt ?? "",
+                href:
+                  project && project._status === "published"
+                    ? `/portfolio/${f(project.slug, slugify(project.name))}`
+                    : null,
               };
             })
           : homeDefault.clientCards,

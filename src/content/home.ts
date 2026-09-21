@@ -26,6 +26,8 @@ export type ClientCardItem = {
   category: string;
   photoUrl: string | null;
   alt: string;
+  /** The linked portfolio project's page (/portfolio/<slug>); none = not clickable. */
+  href?: string | null;
 };
 
 /**
