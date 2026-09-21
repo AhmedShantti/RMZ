@@ -120,6 +120,16 @@ export const HomeContent: GlobalConfig = {
           relationTo: "media",
           label: "Photo",
         },
+        {
+          name: "project",
+          type: "relationship",
+          relationTo: "portfolioProjects",
+          label: "Portfolio project",
+          admin: {
+            description:
+              "Clicking this card opens this project's case study. Leave empty and the card is not clickable.",
+          },
+        },
       ],
     },
     {

@@ -932,6 +932,10 @@ export interface HomeContent {
         name: string;
         category?: string | null;
         photo?: (number | null) | Media;
+        /**
+         * Clicking this card opens this project's case study. Leave empty and the card is not clickable.
+         */
+        project?: (number | null) | PortfolioProject;
         id?: string | null;
       }[]
     | null;
@@ -1470,6 +1474,7 @@ export interface HomeContentSelect<T extends boolean = true> {
         name?: T;
         category?: T;
         photo?: T;
+        project?: T;
         id?: T;
       };
   stairs?:
