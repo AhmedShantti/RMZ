@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { homeContent, type ClientCardItem } from "@/content/home";
 
@@ -80,9 +79,6 @@ function ClientCard({
 
   const active = clients[current];
   const upcoming = clients[next];
-  // The client whose photo is on screen: `upcoming` is what's showing for the
-  // whole sweep, `active` otherwise. Derived every render, never captured.
-  const shown = sweeping ? upcoming : active;
   const pad = (n: number) => (n + 1).toString().padStart(2, "0");
 
   return (
@@ -132,17 +128,6 @@ function ClientCard({
           </p>
         </div>
       </div>
-
-      {/* Stretched link over the whole card. Sits outside the animated layers
-          and the timer, and reads `shown` fresh each render. Inset focus ring —
-          the card's overflow-hidden would clip the global +3px offset. */}
-      {shown.href && (
-        <Link
-          href={shown.href}
-          aria-label={`${shown.name} — view project`}
-          className="absolute inset-0 focus-visible:rounded-2xl! focus-visible:outline-offset-[-3px]!"
-        />
-      )}
     </div>
   );
 }
