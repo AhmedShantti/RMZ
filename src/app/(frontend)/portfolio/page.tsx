@@ -36,8 +36,10 @@ export default async function PortfolioPage() {
         lede={page.lede}
       />
 
-      <section className="px-5 pb-28 sm:px-8 sm:pb-36">
-        <div className="mx-auto max-w-6xl">
+      <section className="pb-28 sm:pb-36">
+        {/* 90% of the page width, centered — wider than the hero above on
+            purpose; at least 16px of side space is preserved at any width. */}
+        <div className="mx-auto w-[min(90%,calc(100%-32px))]">
           <div className="flex flex-col gap-14 sm:gap-[72px]">
             {groups.map((group) => {
               const headingId = `category-${group.slug}`;
@@ -46,7 +48,7 @@ export default async function PortfolioPage() {
                   <Reveal className="flex items-baseline justify-between gap-4">
                     <h2
                       id={headingId}
-                      className="font-display text-cream text-[clamp(22px,2.4vw,30px)] italic"
+                      className="font-display text-cream text-[clamp(24px,2.6vw,36px)] italic"
                     >
                       {group.label}
                     </h2>
@@ -60,11 +62,11 @@ export default async function PortfolioPage() {
 
                   <div className="bg-cream/25 mt-[14px] h-px w-full" />
 
-                  <ul className="category-row mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 sm:gap-6 lg:gap-9">
+                  <ul className="category-row mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 sm:gap-7 xl:gap-10">
                     {group.projects.map((p) => (
                       <li
                         key={p.slug}
-                        className="w-[85%] flex-none snap-start sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-72px)/3)]"
+                        className="w-[88%] flex-none snap-start sm:w-[calc((100%-28px)/2)] xl:w-[calc((100%-80px)/3)]"
                       >
                         <Link
                           href={`/portfolio/${p.slug}`}
@@ -76,7 +78,7 @@ export default async function PortfolioPage() {
                                 src={p.cover.src}
                                 alt={`${p.name} cover image`}
                                 fill
-                                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 45vw, 30vw"
+                                sizes="(max-width: 640px) 88vw, (max-width: 1279px) 45vw, 30vw"
                                 className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
                               />
                             ) : (
@@ -87,10 +89,10 @@ export default async function PortfolioPage() {
                               </div>
                             )}
                           </div>
-                          <p className="font-body text-cream-dim mt-4 text-xs tracking-[0.2em] uppercase">
+                          <p className="font-body text-cream-dim mt-4 text-[12px] tracking-[0.2em] uppercase sm:mt-5 sm:text-[13px]">
                             {p.market} · {group.label}
                           </p>
-                          <h3 className="font-display text-cream mt-1 text-[22px]">
+                          <h3 className="font-display text-cream mt-1 text-[clamp(22px,1.8vw,30px)]">
                             {p.name}
                           </h3>
                         </Link>
