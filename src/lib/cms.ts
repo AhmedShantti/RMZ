@@ -21,6 +21,7 @@ import type {
   MockupKind,
   Project,
   ProjectBlock,
+  ProjectCategory,
   Visual,
   VisualRatio,
 } from "@/content/portfolio";
@@ -599,6 +600,29 @@ function toBlock(b: CmsBlock): ProjectBlock | null {
  * existed) falls back to a slug derived from its name, so it still has a
  * reachable URL rather than 404ing.
  */
+/** A populated `categories` doc, once depth ≥ 1 has resolved the relationship. */
+type CmsCategory = { id: number; title: string; slug?: string | null; sortOrder: number };
+
+/**
+ * The `category` relationship is required in the CMS, so this is always a
+ * populated doc in practice. The synthetic fallback (derived from the legacy
+ * `discipline` field) only guards against an unpopulated relationship —
+ * unrelated to the whole-collection `projectsDefault` fallback above — so a
+ * project never crashes the page for want of a category.
+ */
+const toCategory = (raw: unknown, fallbackTitle: string): ProjectCategory => {
+  if (raw && typeof raw === "object") {
+    const c = raw as CmsCategory;
+    return {
+      id: c.id,
+      title: c.title,
+      slug: f(c.slug, slugify(c.title)),
+      sortOrder: c.sortOrder,
+    };
+  }
+  return { id: 0, title: fallbackTitle, slug: slugify(fallbackTitle), sortOrder: 0 };
+};
+
 export const getPortfolio = cache(() =>
   safe(
     "portfolio",
@@ -608,7 +632,8 @@ export const getPortfolio = cache(() =>
         sort: "order",
         limit: 100,
         where: { _status: { equals: "published" } },
-        // depth 2: blocks → upload field → the media doc (url + alt).
+        // depth 2: blocks → upload field → the media doc (url + alt); also
+        // populates the `category` relationship.
         depth: 2,
       });
       if (!res.docs.length) return projectsDefault;
@@ -626,6 +651,8 @@ export const getPortfolio = cache(() =>
           client: d.client,
           market: d.market,
           discipline: d.discipline,
+          category: toCategory(d.category, d.discipline),
+          sortOrder: d.sortOrder,
           year: f(d.year, ""),
           result: d.resultLine,
           cover,

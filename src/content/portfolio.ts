@@ -77,14 +77,27 @@ export type ProjectBlock =
   | { type: "video"; heading?: string; url?: string; poster?: Visual; caption?: string }
   | { type: "summary"; heading?: string; body: string; quote?: string; quoteAuthor?: string };
 
+/** The `categories` collection doc a project belongs to, as /portfolio groups by. */
+export type ProjectCategory = {
+  id: number;
+  title: string;
+  slug: string;
+  /** Order among categories on /portfolio — lower shows first. */
+  sortOrder: number;
+};
+
 export type Project = {
   /** URL segment — /portfolio/[slug]. Unique. */
   slug: string;
   name: string;
   client: string;
   market: string;
-  /** The discipline doubles as the project's category. */
+  /** Legacy — superseded by `category`. Still shown on the case-study hero. */
   discipline: string;
+  /** Groups this project on /portfolio; also orders it within that group via `sortOrder`. */
+  category: ProjectCategory;
+  /** Order within its category on /portfolio — lower shows first. */
+  sortOrder: number;
   year: string;
   /** One-line result, shown on the card and under the hero. */
   result: string;
@@ -102,6 +115,8 @@ export const projects: Project[] = [
     client: "Maydan Coffee Co.",
     market: "Egyptian",
     discipline: "Brand Identity",
+    category: { id: 1, title: "Brand Identity", slug: "brand-identity", sortOrder: 0 },
+    sortOrder: 0,
     year: "2024",
     result: "A street-corner roaster turned a regional name.",
     cover: { alt: "Maydan Coffee Co. brand identity", ratio: "4/3" },
@@ -175,6 +190,8 @@ export const projects: Project[] = [
     client: "Carrera Automotive",
     market: "Gulf",
     discipline: "Campaign",
+    category: { id: 2, title: "Campaign", slug: "campaign", sortOrder: 1 },
+    sortOrder: 0,
     year: "2025",
     result: "Launch films that doubled showroom footfall.",
     cover: { alt: "Carrera Lab launch campaign", ratio: "16/9" },
@@ -222,6 +239,8 @@ export const projects: Project[] = [
     client: "Olive & Ash Kitchen",
     market: "Levantine",
     discipline: "Packaging",
+    category: { id: 3, title: "Packaging", slug: "packaging", sortOrder: 2 },
+    sortOrder: 0,
     year: "2024",
     result: "Shelf presence that reads from across the aisle.",
     cover: { alt: "Olive & Ash packaging range", ratio: "4/5" },
@@ -266,6 +285,8 @@ export const projects: Project[] = [
     client: "Noor Decorations",
     market: "Arab",
     discipline: "Web & App",
+    category: { id: 4, title: "Web & App", slug: "web-and-app", sortOrder: 3 },
+    sortOrder: 0,
     year: "2025",
     result: "A catalogue people actually finish scrolling.",
     cover: { alt: "Noor Living web and app design", ratio: "16/9" },
@@ -323,6 +344,8 @@ export const projects: Project[] = [
     client: "Sahil Resorts",
     market: "Gulf",
     discipline: "Content Strategy",
+    category: { id: 5, title: "Content Strategy", slug: "content-strategy", sortOrder: 4 },
+    sortOrder: 0,
     year: "2025",
     result: "A voice that sounds like the coast, not a brochure.",
     cover: { alt: "Sahil Resorts content direction", ratio: "16/9" },
@@ -349,6 +372,8 @@ export const projects: Project[] = [
     client: "Tahrir Press",
     market: "Egyptian",
     discipline: "Print Design",
+    category: { id: 6, title: "Print Design", slug: "print-design", sortOrder: 5 },
+    sortOrder: 0,
     year: "2023",
     result: "An editorial system that respects the reader.",
     cover: { alt: "Tahrir Press editorial system", ratio: "3/2" },

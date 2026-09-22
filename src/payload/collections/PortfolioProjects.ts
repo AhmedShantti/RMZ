@@ -65,7 +65,40 @@ export const PortfolioProjects: CollectionConfig = {
       type: "row",
       fields: [
         { name: "market", type: "text", required: true, admin: { width: "50%" } },
-        { name: "discipline", type: "text", required: true, admin: { width: "50%" } },
+        {
+          name: "discipline",
+          type: "text",
+          required: true,
+          admin: {
+            width: "50%",
+            description: "Legacy — superseded by the category relationship below.",
+          },
+        },
+      ],
+    },
+    {
+      type: "row",
+      fields: [
+        {
+          name: "category",
+          type: "relationship",
+          relationTo: "categories",
+          required: true,
+          admin: {
+            width: "50%",
+            description: "Groups this project on /portfolio.",
+          },
+        },
+        {
+          name: "sortOrder",
+          type: "number",
+          required: true,
+          defaultValue: 0,
+          admin: {
+            width: "50%",
+            description: "Order within its category on /portfolio — lower shows first.",
+          },
+        },
       ],
     },
     {

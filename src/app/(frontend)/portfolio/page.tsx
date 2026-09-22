@@ -5,14 +5,7 @@ import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import RunsText from "@/components/RunsText";
 import { getPortfolio, getPortfolioPage, getMeta } from "@/lib/cms";
-
-// Tile heights — equal 300px on mobile, varied on desktop for the editorial
-// masonry feel (no two adjacent tiles share a height).
-const PORTFOLIO_HEIGHTS = [
-  "h-[300px] sm:h-[420px]",
-  "h-[300px] sm:h-[300px]",
-  "h-[300px] sm:h-[360px]",
-];
+import { groupProjectsByCategory } from "@/lib/portfolioGrouping";
 
 export async function generateMetadata(): Promise<Metadata> {
   const m = await getMeta("portfolioContent", {
@@ -33,6 +26,8 @@ export default async function PortfolioPage() {
     getPortfolio(),
   ]);
 
+  const groups = groupProjectsByCategory(projects);
+
   return (
     <>
       <PageIntro
@@ -43,61 +38,69 @@ export default async function PortfolioPage() {
 
       <section className="px-5 pb-28 sm:px-8 sm:pb-36">
         <div className="mx-auto max-w-6xl">
-          {/* Editorial varied-height masonry. Column-based (true no-JS masonry)
-              so adjacent tiles differ in height and pack flush.
-              Each tile opens that project's case study at /portfolio/<slug>. */}
-          <Reveal>
-            <ul className="columns-1 [column-gap:2px] sm:columns-2 lg:columns-3">
-              {projects.map((p, i) => (
-                <li
-                  key={p.slug}
-                  className={`mb-[2px] break-inside-avoid ${PORTFOLIO_HEIGHTS[i % PORTFOLIO_HEIGHTS.length]}`}
-                >
-                  <Link
-                    href={`/portfolio/${p.slug}`}
-                    aria-label={`${p.name} — ${p.discipline} for ${p.client}`}
-                    className="group relative block h-full w-full overflow-hidden"
-                  >
-                    {/* cover — fills + scales on hover. Falls back to the
-                        placeholder tile until real photography lands. */}
-                    <div className="absolute inset-0 bg-[#1a1a1a] transition-transform duration-300 ease-out group-hover:scale-[1.03]">
-                      {p.cover?.src ? (
-                        <Image
-                          src={p.cover.src}
-                          alt={p.cover.alt}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <span className="font-body absolute inset-0 flex items-center justify-center text-sm text-[#666]">
-                          [ PROJECT IMAGE — REPLACE ]
-                        </span>
-                      )}
-                    </div>
-                    {/* darken on hover + a base gradient so text stays readable */}
-                    <div
+          <div className="flex flex-col gap-14 sm:gap-[72px]">
+            {groups.map((group) => {
+              const headingId = `category-${group.slug}`;
+              return (
+                <section key={group.key} aria-labelledby={headingId}>
+                  <Reveal className="flex items-baseline justify-between gap-4">
+                    <h2
+                      id={headingId}
+                      className="font-display text-cream text-[clamp(22px,2.4vw,30px)] italic"
+                    >
+                      {group.label}
+                    </h2>
+                    <span
                       aria-hidden="true"
-                      className="absolute inset-0 transition-colors duration-300 group-hover:bg-black/25"
-                      style={{
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0) 55%)",
-                      }}
-                    />
-                    {/* name overlay — bottom-left, no background box */}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <p className="font-body text-cream-dim mb-1 text-[0.65rem] uppercase tracking-[0.2em]">
-                        {p.market} · {p.discipline}
-                      </p>
-                      <h2 className="font-display text-2xl italic leading-tight text-white">
-                        {p.name}
-                      </h2>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
+                      className="font-body text-cream-dim shrink-0 text-xs tracking-[0.2em]"
+                    >
+                      {String(group.projects.length).padStart(2, "0")}
+                    </span>
+                  </Reveal>
+
+                  <div className="bg-cream/25 mt-[14px] h-px w-full" />
+
+                  <ul className="category-row mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 sm:gap-6 lg:gap-9">
+                    {group.projects.map((p) => (
+                      <li
+                        key={p.slug}
+                        className="w-[85%] flex-none snap-start sm:w-[calc((100%-24px)/2)] lg:w-[calc((100%-72px)/3)]"
+                      >
+                        <Link
+                          href={`/portfolio/${p.slug}`}
+                          className="group focus-visible:outline-cream block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                        >
+                          <div className="relative aspect-[5/4] w-full overflow-hidden bg-[#151313]">
+                            {p.cover?.src ? (
+                              <Image
+                                src={p.cover.src}
+                                alt={`${p.name} cover image`}
+                                fill
+                                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 45vw, 30vw"
+                                className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center px-4">
+                                <span className="font-display text-cream-dim text-center italic">
+                                  {p.name}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="font-body text-cream-dim mt-4 text-xs tracking-[0.2em] uppercase">
+                            {p.market} · {group.label}
+                          </p>
+                          <h3 className="font-display text-cream mt-1 text-[22px]">
+                            {p.name}
+                          </h3>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              );
+            })}
+          </div>
 
           <p className="font-body text-cream-dim mt-8 text-xs">
             * Placeholder projects — replace with real case studies.

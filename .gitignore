@@ -48,3 +48,6 @@ next-env.d.ts
 /rmz.db-shm
 /rmz.db-wal
 /media
+
+# DB backups (pg_dump etc. — never commit)
+*.dump

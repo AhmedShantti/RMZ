@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    categories: Category;
     portfolioProjects: PortfolioProject;
     careerRoles: CareerRole;
     'contact-submissions': ContactSubmission;
@@ -81,6 +82,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     portfolioProjects: PortfolioProjectsSelect<false> | PortfolioProjectsSelect<true>;
     careerRoles: CareerRolesSelect<false> | CareerRolesSelect<true>;
     'contact-submissions': ContactSubmissionsSelect<false> | ContactSubmissionsSelect<true>;
@@ -197,6 +199,24 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
+  /**
+   * Derived from the title. Not used in a URL today — reserved for a future category page.
+   */
+  slug?: string | null;
+  /**
+   * Order on /portfolio — lower shows first.
+   */
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolioProjects".
  */
 export interface PortfolioProject {
@@ -208,7 +228,18 @@ export interface PortfolioProject {
   slug?: string | null;
   client: string;
   market: string;
+  /**
+   * Legacy — superseded by the category relationship below.
+   */
   discipline: string;
+  /**
+   * Groups this project on /portfolio.
+   */
+  category: number | Category;
+  /**
+   * Order within its category on /portfolio — lower shows first.
+   */
+  sortOrder: number;
   /**
    * e.g. 2025
    */
@@ -488,6 +519,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'categories';
+        value: number | Category;
+      } | null)
+    | ({
         relationTo: 'portfolioProjects';
         value: number | PortfolioProject;
       } | null)
@@ -585,6 +620,17 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolioProjects_select".
  */
 export interface PortfolioProjectsSelect<T extends boolean = true> {
@@ -593,6 +639,8 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
   client?: T;
   market?: T;
   discipline?: T;
+  category?: T;
+  sortOrder?: T;
   year?: T;
   resultLine?: T;
   coverImage?: T;

@@ -9,6 +9,7 @@ import sharp from "sharp";
 
 import { Users } from "./src/payload/collections/Users.ts";
 import { Media } from "./src/payload/collections/Media.ts";
+import { Categories } from "./src/payload/collections/Categories.ts";
 import { PortfolioProjects } from "./src/payload/collections/PortfolioProjects.ts";
 import { CareerRoles } from "./src/payload/collections/CareerRoles.ts";
 import { ContactSubmissions } from "./src/payload/collections/ContactSubmissions.ts";
@@ -55,6 +56,7 @@ export default buildConfig({
   collections: [
     Users,
     Media,
+    Categories,
     PortfolioProjects,
     CareerRoles,
     ContactSubmissions,
