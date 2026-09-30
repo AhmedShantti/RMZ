@@ -1,6 +1,7 @@
 "use client";
 
 import type { SquareRefs } from "./logoSquares.types";
+import { LOGO_TRIO } from "@/lib/logoSquareSize";
 
 /**
  * The three static brand squares that live inside the "RMZ" logo mark. They
@@ -16,11 +17,20 @@ import type { SquareRefs } from "./logoSquares.types";
  *    logo image box, measured from the artwork's pixels (aspect 691:211).
  */
 
-// Trio bounding boxes inside LOGO-b.svg, % of the image box.
-const TRIO: Record<keyof SquareRefs, { left: string; width: string; top: string; height: string }> = {
-  yellow: { left: "34.88%", top: "0%", width: "7.38%", height: "23.7%" },
-  orange: { left: "46.45%", top: "0%", width: "7.38%", height: "23.7%" },
-  green: { left: "58.18%", top: "0%", width: "7.24%", height: "23.7%" },
+// Trio bounding boxes inside LOGO-b.svg, % of the image box — shared with the
+// About page's scroll squares (see lib/logoSquareSize).
+type Box = { left: string; width: string; top: string; height: string };
+const pct = (n: number) => `${n}%`;
+const box = (k: keyof typeof LOGO_TRIO): Box => ({
+  left: pct(LOGO_TRIO[k].left),
+  top: pct(LOGO_TRIO[k].top),
+  width: pct(LOGO_TRIO[k].width),
+  height: pct(LOGO_TRIO[k].height),
+});
+const TRIO: Record<keyof SquareRefs, Box> = {
+  yellow: box("yellow"),
+  orange: box("orange"),
+  green: box("green"),
 };
 
 export default function LogoSquares({

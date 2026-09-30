@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
 import { useAboutProgress } from "./AboutAnimationContext";
+import { logoSquareSize, type LogoSquareColor } from "@/lib/logoSquareSize";
 
 /**
  * AboutScrollSquares — a scroll-driven, 7-stage animation of the three brand
@@ -30,10 +31,14 @@ import { useAboutProgress } from "./AboutAnimationContext";
  *
  * prefers-reduced-motion → render Stage 1 permanently (no scroll animation).
  *
+ * SIZE: the keyframe `size` values only drive the PATH (positions, and the
+ * corner-pivot swing of rotated stages). What is drawn is always the shared
+ * logo-square size (lib/logoSquareSize) — the same size as the squares on the
+ * Home page — centred on the keyframe box's centre, so the movement is
+ * unchanged.
+ *
  * NOTE: KF, State, GREEN, RED, YELLOW, and sample() are exported so other
- * components (e.g. ColorPaletteSection) can read the exact same keyframe
- * data and position themselves relative to the real square positions at any
- * given scroll progress, instead of duplicating/guessing positions.
+ * components can read the exact same keyframe data.
  */
 
 export const COLORS = {
@@ -136,24 +141,31 @@ export default function AboutScrollSquares() {
   const progress = useAboutProgress();
 
   useEffect(() => {
-    const pairs: [HTMLDivElement | null, KF[]][] = [
-      [greenRef.current, GREEN],
-      [redRef.current, RED],
-      [yellowRef.current, YELLOW],
+    // `red` is the logo's orange square.
+    const pairs: [HTMLDivElement | null, KF[], LogoSquareColor][] = [
+      [greenRef.current, GREEN, "green"],
+      [redRef.current, RED, "orange"],
+      [yellowRef.current, YELLOW, "yellow"],
     ];
 
     // Transform-only (translate + scale + rotate) so the browser composites on
     // the GPU — no per-frame layout/paint (animating width/height would thrash
     // layout and stutter the smooth scroll). Base size is 100px; scale to size.
-    const write = (el: HTMLDivElement | null, s: State) => {
+    const write = (el: HTMLDivElement | null, s: State, edge: number) => {
       if (!el) return;
-      el.style.transform = `translate3d(${s.x}px, ${s.y}px, 0) scale(${s.size / 100}) rotate(${s.rotate}deg)`;
+      // Centre of the original keyframe box (which pivoted about its top-left
+      // corner), then draw the fixed-size square around that same centre.
+      const half = s.size / 2;
+      const rad = (s.rotate * Math.PI) / 180;
+      const cx = s.x + half * (Math.cos(rad) - Math.sin(rad));
+      const cy = s.y + half * (Math.sin(rad) + Math.cos(rad));
+      el.style.transform = `translate3d(${cx - 50}px, ${cy - 50}px, 0) scale(${edge / 100}) rotate(${s.rotate}deg)`;
     };
 
     const render = (p: number) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      for (const [el, kfs] of pairs) write(el, sample(kfs, p, vw, vh));
+      for (const [el, kfs, color] of pairs) write(el, sample(kfs, p, vw, vh), logoSquareSize(color, vw));
     };
 
     // Reduced motion → lock to Stage 1, update only on resize.
@@ -173,7 +185,7 @@ export default function AboutScrollSquares() {
     left: 0,
     width: 100,
     height: 100,
-    transformOrigin: "0 0",
+    transformOrigin: "50% 50%",
     borderRadius: 0,
     willChange: "transform",
   };

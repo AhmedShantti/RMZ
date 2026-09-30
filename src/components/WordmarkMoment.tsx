@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Logo from "./Logo";
 import { useReducedMotion } from "@/lib/reducedMotion";
+import { LOGO_BOX_CSS } from "@/lib/logoSquareSize";
 
 /**
  * The rmz wordmark moment (TASK.md §5.3, storyboard p.4): the large cream `rmz`
@@ -63,8 +64,10 @@ export default function WordmarkMoment({
       <div aria-hidden="true" className="pointer-events-none absolute inset-0" />
       <div
         ref={boxRef}
-        className="relative w-[clamp(260px,52vw,620px)]"
-        style={reduce ? undefined : { willChange: "transform, opacity" }}
+        className="relative"
+        // Width comes from the shared logo-box clamp (lib/logoSquareSize), the
+        // same value the About page's scroll squares derive their size from.
+        style={{ width: LOGO_BOX_CSS, ...(reduce ? {} : { willChange: "transform, opacity" }) }}
       >
         {/* Large centred rmz signature lockup (real brand SVG) */}
         <Logo variant="signature" className="w-full" />

@@ -11,7 +11,7 @@ import type { Run } from "@/components/RunsText";
 import { site as siteDefault } from "@/content/site";
 import { mainNav } from "@/content/nav";
 import { homeContent as homeDefault, DEFAULT_STAIR_TITLES } from "@/content/home";
-import { aboutContent as aboutDefault } from "@/content/about";
+import { aboutContent as aboutDefault, type AboutImage } from "@/content/about";
 import { servicesPage as servicesPageDefault, services as servicesDefault } from "@/content/services";
 import { markets as marketsDefault } from "@/content/markets";
 import { contactContent as contactDefault } from "@/content/contact";
@@ -270,7 +270,21 @@ export const getAbout = cache(() =>
   safe(
     "about",
     async (p) => {
-      const g = await p.findGlobal({ slug: "aboutContent", depth: 0 });
+      // depth 1 so the banner + section images are populated with their media docs.
+      const g = await p.findGlobal({ slug: "aboutContent", depth: 1 });
+      const pct = (v: unknown) =>
+        typeof v === "number" && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 50;
+      const img = (
+        media: unknown,
+        alt: string | null | undefined,
+        fx: unknown,
+        fy: unknown,
+        fallbackAlt: string,
+      ): AboutImage | null => {
+        const m = media && typeof media === "object" ? (media as { url?: string | null; alt?: string | null }) : null;
+        if (!m?.url) return null;
+        return { url: m.url, alt: f(alt, m.alt ?? fallbackAlt), focalX: pct(fx), focalY: pct(fy) };
+      };
       const cp = g.colorPalette ?? {};
       return {
         pageTitle: runs(g.pageTitle, aboutDefault.pageTitle),
@@ -281,11 +295,13 @@ export const getAbout = cache(() =>
           line2Rest: f(cp.line2Rest, aboutDefault.colorPalette.line2Rest),
           line3: f(cp.line3, aboutDefault.colorPalette.line3),
         },
+        banner: img(g.bannerImage, g.bannerAlt, g.bannerFocalX, g.bannerFocalY, "Rebel Mind Zone"),
         sections: g.sections?.length
           ? g.sections.map((s) => ({
               kicker: s.kicker,
               title: s.title,
               body: (s.body ?? []).map((b) => b.text),
+              image: img(s.image, s.imageAlt, s.focalX, s.focalY, s.title),
             }))
           : aboutDefault.sections,
         closingStatement: runs(
@@ -298,6 +314,7 @@ export const getAbout = cache(() =>
       pageTitle: aboutDefault.pageTitle,
       lede: aboutDefault.lede,
       colorPalette: aboutDefault.colorPalette,
+      banner: aboutDefault.banner,
       sections: aboutDefault.sections,
       closingStatement: aboutDefault.closingStatement,
     },
