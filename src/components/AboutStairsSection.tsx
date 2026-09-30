@@ -173,27 +173,32 @@ export default function AboutStairsSection({
       </div>
 
       {/* Phase 5 — counter (bottom-left, oversized per the reference) + the
-          step title on the same line. Number and title share `activeStep` and
-          the same keyed fade, so they change as one unit. */}
+          step title: beside the number when it fits, wrapping directly under
+          it when it doesn't. Number and title share `activeStep` and the same
+          keyed fade, so they change as one unit. */}
       <div
         className="stairs-counter font-body"
         role="status"
         aria-live="polite"
         aria-atomic="true"
       >
-        <span
-          key={`n${activeStep}`}
-          className="stairs-counter-swap current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]"
-        >
-          0{activeStep + 1}
+        <span className="stairs-counter-num">
+          <span
+            key={`n${activeStep}`}
+            className="stairs-counter-swap current font-display text-cream italic leading-none"
+          >
+            0{activeStep + 1}
+          </span>
+          <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
         </span>
-        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
-        <span
-          key={`t${activeStep}`}
-          className="stairs-counter-title stairs-counter-swap"
-        >
-          — {stepTitle(steps, activeStep)}
-        </span>
+        {stepTitle(steps, activeStep) && (
+          <span
+            key={`t${activeStep}`}
+            className="stairs-counter-title stairs-counter-swap"
+          >
+            {stepTitle(steps, activeStep)}
+          </span>
+        )}
       </div>
 
       {/* Phase 5 — paragraph (top-right, off the travel diagonal);

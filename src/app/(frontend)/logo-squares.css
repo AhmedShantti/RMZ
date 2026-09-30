@@ -122,34 +122,66 @@
 
 /* --- Counter + paragraph (Phase 5) — above the cards (deck z ≤ 100) --- */
 .stairs-counter {
+  /* Numeral size: 8rem on phones / 12rem from `sm`, but never more than a
+     fraction of the viewport height (short landscape screens). */
+  --stairs-num: min(8rem, 22svh);
+  /* Title: 16–20px on phones, ~22px tablet, up to 28px desktop. */
+  --stairs-title-size: clamp(1rem, 0.85rem + 1.2vw, 1.75rem);
   position: absolute;
   bottom: 6vh;
-  left: 6vw;
-  z-index: 120;
+  bottom: 6svh;
+  /* Bounded by the section's own edges (logical, RTL-safe), so the box can
+     never run past the viewport. Desktop keeps the 6vw inset. */
+  inset-inline-start: 6vw;
+  inset-inline-end: 0;
+  max-width: 64rem;
+  z-index: 120; /* above the cards (deck z ≤ 100); the fixed nav sits above the whole stage */
+  text-align: start;
   font-variant-numeric: tabular-nums;
-  /* One line: numeral, "/ 04", then the small title. The title takes the rest
-     of the row (fixed max width) and truncates, so different title lengths
-     never shift the layout. */
+  /* Row 1: numeral + "/ 04", then the title if it fits; otherwise the title
+     wraps onto row 2 (and may itself wrap to two lines) directly under the
+     number, left-aligned. Rows pack from the top and the height is reserved
+     for numeral + 2 title lines, so the numeral never moves when titles
+     change. */
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  white-space: nowrap;
-  width: min(88vw, 34rem);
+  align-content: flex-start;
+  row-gap: 0.35rem;
+  min-height: calc(var(--stairs-num) + 0.35rem + 2 * 1.35 * var(--stairs-title-size));
 }
-.stairs-counter > .current,
-.stairs-counter > .total {
+@media (min-width: 640px) {
+  .stairs-counter {
+    --stairs-num: min(12rem, 26svh);
+  }
+}
+@media (max-width: 640px) {
+  .stairs-counter {
+    inset-inline-start: 0; /* the 80% column already gives the page gutter */
+  }
+}
+.stairs-counter-num {
+  display: inline-flex;
+  align-items: baseline;
   flex: none;
+  margin-inline-end: 0.75rem;
+}
+.stairs-counter-num .current {
+  font-size: var(--stairs-num);
 }
 .stairs-counter-title {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   min-width: 0;
-  margin-left: 0.6rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.75rem;
+  font-size: var(--stairs-title-size);
+  line-height: 1.35;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  /* dimmer than the number — colour, not opacity (the fade animation owns opacity) */
-  color: color-mix(in srgb, var(--cream-dim) 65%, transparent);
+  overflow-wrap: break-word;
+  /* slightly dimmer than the number — colour, not opacity (the fade
+     animation owns opacity); the shadow keeps it readable over images and
+     the lighter background */
+  color: color-mix(in srgb, var(--cream-dim) 90%, transparent);
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.55);
 }
 .stairs-counter-swap {
   animation: sqFadeIn 0.4s ease both;

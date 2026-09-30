@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { getLenis } from "@/lib/lenis";
 import { useReducedMotion } from "@/lib/reducedMotion";
+import ShowreelModal from "./ShowreelModal";
 
 export type ShowreelVideo = {
   url?: string | null;
@@ -72,6 +73,14 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
   const [inView, setInView] = useState(false);
   const [near, setNear] = useState(false);
   const [hd, setHd] = useState(false);
+  // Standalone view (lightbox) of one video, opened by clicking the slider.
+  const [modal, setModal] = useState<{ i: number; time: number; opener: HTMLElement } | null>(null);
+  const modalRef = useRef(false);
+  useEffect(() => {
+    modalRef.current = modal !== null;
+  }, [modal]);
+  const press = useRef<{ x: number; y: number } | null>(null);
+  const lastSwipe = useRef(0);
 
   useEffect(() => {
     const mq = window.matchMedia(HD_QUERY);
@@ -105,10 +114,10 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
   useEffect(() => {
     videoEls.current.forEach((v, i) => {
       if (!v) return;
-      if (i === active && inView) v.play().catch(() => {});
+      if (i === active && inView && !modal) v.play().catch(() => {});
       else v.pause();
     });
-  }, [active, inView, reduce]);
+  }, [active, inView, reduce, modal]);
 
   // Scroll is within the pinned stretch, edges included (ScrollTrigger's own
   // `isActive` is false at exactly progress 0 and 1).
@@ -150,7 +159,7 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
 
       const settle = () => {
         const st = stRef.current;
-        if (!st || !st.isActive) return;
+        if (!st || !st.isActive || modalRef.current) return;
         // Wait out Lenis's own smoothing before deciding where to land.
         if (getLenis()?.isScrolling === "smooth") return schedule();
         const pos = st.progress * last;
@@ -188,7 +197,7 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
       stRef.current = st;
 
       const onKey = (e: KeyboardEvent) => {
-        if (!inRange() || e.altKey || e.ctrlKey || e.metaKey) return;
+        if (modalRef.current || !inRange() || e.altKey || e.ctrlKey || e.metaKey) return;
         const t = e.target as HTMLElement | null;
         if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
         if (t?.isContentEditable) return;
@@ -223,17 +232,34 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
   const onTouchEnd = (e: React.TouchEvent) => {
     const s = touch.current;
     touch.current = null;
-    if (!s || !inRange()) return;
+    if (!s || modalRef.current || !inRange()) return;
     const t = e.changedTouches[0];
     const dx = t.clientX - s.x;
     const dy = t.clientY - s.y;
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
       // Next tick: Lenis is still in its touch state right at touchend and
       // would ignore a scrollTo issued now.
+      lastSwipe.current = e.timeStamp;
       const next = activeRef.current + (dx < 0 ? 1 : -1);
       setTimeout(() => goTo(next), 50);
     }
   };
+
+  // Open only for a real click/tap on the active video — never after a swipe or drag.
+  const openModal = (i: number, el: HTMLElement) => {
+    const v = list[i];
+    if (!v?.url || modalRef.current) return;
+    modalRef.current = true;
+    setModal({ i, time: videoEls.current[i]?.currentTime ?? 0, opener: el });
+  };
+  const onFigureClick = (i: number, e: React.MouseEvent<HTMLElement>) => {
+    const p = press.current;
+    press.current = null;
+    if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > 8) return;
+    if (e.timeStamp - lastSwipe.current < 500) return;
+    openModal(i, e.currentTarget);
+  };
+  const closeModal = useCallback(() => setModal(null), []);
 
   const src = (v: ShowreelVideo) => (hd && v.hdUrl ? v.hdUrl : v.url) ?? undefined;
   const preload = (i: number) =>
@@ -274,6 +300,7 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
   }
 
   return (
+    <>
     <div
       ref={stageRef}
       data-squares-video
@@ -294,7 +321,26 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
             style={{ width: `${100 / count}%` }}
             aria-hidden={i !== active}
           >
-            <figure className={BOX}>
+            <figure
+              className={`${BOX} group ${v.url && i === active ? "cursor-pointer" : ""}`}
+              {...(v.url && i === active
+                ? {
+                    role: "button",
+                    tabIndex: 0,
+                    "aria-label": v.title ? `Play video with sound: ${v.title}` : "Play video with sound",
+                    onPointerDown: (e: React.PointerEvent) => {
+                      press.current = { x: e.clientX, y: e.clientY };
+                    },
+                    onClick: (e: React.MouseEvent<HTMLElement>) => onFigureClick(i, e),
+                    onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        openModal(i, e.currentTarget);
+                      }
+                    },
+                  }
+                : { tabIndex: -1 })}
+            >
               {v.url ? (
                 <video
                   ref={(el) => {
@@ -311,6 +357,17 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
                 />
               ) : (
                 <Placeholder title={v.title} />
+              )}
+              {v.url && i === active && (
+                <span
+                  aria-hidden="true"
+                  className="font-body pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-[10px] uppercase tracking-wider text-white/80 transition-colors group-hover:border-white/50 group-hover:text-white"
+                >
+                  <svg width="9" height="9" viewBox="0 0 12 12" fill="currentColor">
+                    <path d="M2 1l9 5-9 5z" />
+                  </svg>
+                  Play with sound
+                </span>
               )}
             </figure>
           </div>
@@ -339,5 +396,18 @@ export default function ShowreelSwipe({ videos }: { videos?: ShowreelVideo[] }) 
         {list[active]?.title && <span className="text-white/40">— {list[active].title}</span>}
       </div>
     </div>
+
+    {modal && list[modal.i]?.url && (
+      <ShowreelModal
+        src={(list[modal.i].hdUrl || list[modal.i].url) as string}
+        poster={list[modal.i].poster}
+        title={list[modal.i].title}
+        startTime={modal.time}
+        frameClassName={BOX}
+        returnFocusTo={modal.opener}
+        onClose={closeModal}
+      />
+    )}
+    </>
   );
 }
