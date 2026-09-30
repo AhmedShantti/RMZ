@@ -950,9 +950,17 @@ export interface HomeContent {
   showreelVideos?:
     | {
         /**
-         * MP4/WebM video file.
+         * MP4/WebM video file (standard quality — used on phones/tablets).
          */
         video: number | Media;
+        /**
+         * 1080p+ MP4/WebM of the same video. Used on wide screens, where the video is shown at ~80% of the viewport width — 640×360 sources look soft there.
+         */
+        hdVideo?: (number | null) | Media;
+        /**
+         * Shown while the video loads.
+         */
+        poster?: (number | null) | Media;
         title?: string | null;
         id?: string | null;
       }[]
@@ -993,6 +1001,10 @@ export interface HomeContent {
   stairs?:
     | {
         photo?: (number | null) | Media;
+        /**
+         * Small label shown next to the counter (e.g. 01 / 04 — Questioning First). Leave empty to use the built-in default.
+         */
+        title?: string | null;
         paragraph: string;
         id?: string | null;
       }[]
@@ -1504,6 +1516,8 @@ export interface HomeContentSelect<T extends boolean = true> {
     | T
     | {
         video?: T;
+        hdVideo?: T;
+        poster?: T;
         title?: T;
         id?: T;
       };
@@ -1529,6 +1543,7 @@ export interface HomeContentSelect<T extends boolean = true> {
     | T
     | {
         photo?: T;
+        title?: T;
         paragraph?: T;
         id?: T;
       };

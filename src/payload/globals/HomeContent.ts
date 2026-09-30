@@ -41,7 +41,7 @@ export const HomeContent: GlobalConfig = {
       label: "Showreel",
       admin: {
         description:
-          "Videos in the full-width marquee (move left→right on scroll). Hovering one plays it centred over an 80% black overlay with its title. Empty shows placeholders.",
+          "Videos in the pinned swipe showreel: scrolling through the section slides from one video to the next (one scroll step each). Only the active video plays. Empty shows placeholders.",
       },
       fields: [
         {
@@ -55,12 +55,29 @@ export const HomeContent: GlobalConfig = {
               type: "upload",
               relationTo: "media",
               required: true,
-              admin: { description: "MP4/WebM video file." },
+              admin: { description: "MP4/WebM video file (standard quality — used on phones/tablets)." },
+            },
+            {
+              name: "hdVideo",
+              type: "upload",
+              relationTo: "media",
+              label: "High-res version (optional)",
+              admin: {
+                description:
+                  "1080p+ MP4/WebM of the same video. Used on wide screens, where the video is shown at ~80% of the viewport width — 640×360 sources look soft there.",
+              },
+            },
+            {
+              name: "poster",
+              type: "upload",
+              relationTo: "media",
+              label: "Poster image (optional)",
+              admin: { description: "Shown while the video loads." },
             },
             {
               name: "title",
               type: "text",
-              label: "Title (shown on hover)",
+              label: "Title (shown under the video)",
             },
           ],
         },
@@ -148,6 +165,15 @@ export const HomeContent: GlobalConfig = {
           type: "upload",
           relationTo: "media",
           label: "Photo",
+        },
+        {
+          name: "title",
+          type: "text",
+          label: "Title (2–4 words)",
+          admin: {
+            description:
+              "Small label shown next to the counter (e.g. 01 / 04 — Questioning First). Leave empty to use the built-in default.",
+          },
         },
         {
           name: "paragraph",

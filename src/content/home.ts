@@ -10,6 +10,8 @@ export type ClientPhoto = {
 export type StairStep = {
   photoUrl: string | null;
   alt: string;
+  /** Short label (2–4 words) shown beside the counter. */
+  title: string;
   paragraph: string;
 };
 
@@ -35,6 +37,14 @@ export type ClientCardItem = {
  * before the CMS). Used as the component fallback AND as the seed source for
  * the `homeContent` global. Keep in sync with the CMS schema shape.
  */
+/** Fallback counter titles per stairs step, used when the CMS title is empty. */
+export const DEFAULT_STAIR_TITLES = [
+  "Questioning First",
+  "Discipline Meets Boldness",
+  "Work Meets World",
+  "The Story Climbs",
+];
+
 export const homeContent = {
   showIntroLoader: true,
   heroKicker: "Creative Rebellion",
@@ -52,7 +62,7 @@ export const homeContent = {
   // Showreel section — the full-width video marquee. Videos are CMS-uploaded;
   // empty here falls back to the built-in placeholders.
   showreel: {
-    videos: [] as { url: string; title?: string }[],
+    videos: [] as { url: string; hdUrl?: string; poster?: string; title?: string }[],
   },
   // Clients collage — three portrait photos with optional sticker badges. Photos
   // stay placeholder until real imagery lands; the labels/badges are editable.
@@ -64,10 +74,10 @@ export const homeContent = {
   // Logo-squares stairs — exactly 4 steps (the animation lands 3 squares on the
   // first three cards + one extra). Each step: a photo + its paragraph.
   stairs: [
-    { photoUrl: null, alt: "", paragraph: "Step one — where the idea is born. Placeholder copy describing the first image." },
-    { photoUrl: null, alt: "", paragraph: "Step two — discipline shapes the boldness. Placeholder copy for the second image." },
-    { photoUrl: null, alt: "", paragraph: "Step three — the work meets the world. Placeholder copy for the third image." },
-    { photoUrl: null, alt: "", paragraph: "Step four — the story keeps climbing. Placeholder copy for the fourth image." },
+    { photoUrl: null, alt: "", title: DEFAULT_STAIR_TITLES[0], paragraph: "Step one — where the idea is born. Placeholder copy describing the first image." },
+    { photoUrl: null, alt: "", title: DEFAULT_STAIR_TITLES[1], paragraph: "Step two — discipline shapes the boldness. Placeholder copy for the second image." },
+    { photoUrl: null, alt: "", title: DEFAULT_STAIR_TITLES[2], paragraph: "Step three — the work meets the world. Placeholder copy for the third image." },
+    { photoUrl: null, alt: "", title: DEFAULT_STAIR_TITLES[3], paragraph: "Step four — the story keeps climbing. Placeholder copy for the fourth image." },
   ] as StairStep[],
   // Marquee cards — the scrolling row the three brand squares morph into. Brand
   // colours cycle in code; photos stay placeholder until real imagery lands.
@@ -79,12 +89,13 @@ export const homeContent = {
   // Rotating client showcase (ClientsSection). Heading + cards are CMS-driven;
   // photos stay placeholder until real imagery lands.
   clientsHeading: "Clients",
+  // TODO(BTS): upload three behind-the-scenes photos in the CMS (/studio → Home →
+  // Client cards) — bts-1, bts-2, bts-3: portrait 3:4, 1200×1600px (min 720×960),
+  // JPG or WebP, ≤ ~300 KB each, with descriptive alt text on the media item.
+  // Until then each card shows its placeholder label.
   clientCards: [
-    { name: "Client one", category: "Restaurants", photoUrl: null, alt: "" },
-    { name: "Client two", category: "Automotive", photoUrl: null, alt: "" },
-    { name: "Client three", category: "Decorations", photoUrl: null, alt: "" },
-    { name: "Client four", category: "Restaurants", photoUrl: null, alt: "" },
-    { name: "Client five", category: "Automotive", photoUrl: null, alt: "" },
-    { name: "Client six", category: "Decorations", photoUrl: null, alt: "" },
+    { name: "bts-1 — add photo", category: "Behind the scenes", photoUrl: null, alt: "" },
+    { name: "bts-2 — add photo", category: "Behind the scenes", photoUrl: null, alt: "" },
+    { name: "bts-3 — add photo", category: "Behind the scenes", photoUrl: null, alt: "" },
   ] as ClientCardItem[],
 };

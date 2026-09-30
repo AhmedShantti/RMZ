@@ -10,7 +10,7 @@ import type { Run } from "@/components/RunsText";
 // so the public site is correct either way.
 import { site as siteDefault } from "@/content/site";
 import { mainNav } from "@/content/nav";
-import { homeContent as homeDefault } from "@/content/home";
+import { homeContent as homeDefault, DEFAULT_STAIR_TITLES } from "@/content/home";
 import { aboutContent as aboutDefault } from "@/content/about";
 import { servicesPage as servicesPageDefault, services as servicesDefault } from "@/content/services";
 import { markets as marketsDefault } from "@/content/markets";
@@ -176,8 +176,19 @@ export const getHome = cache(() =>
             Array.isArray(g.showreelVideos) ? g.showreelVideos : []
           ).flatMap((v) => {
             const m = v.video && typeof v.video === "object" ? v.video : null;
+            const hd =
+              v.hdVideo && typeof v.hdVideo === "object" ? v.hdVideo : null;
+            const poster =
+              v.poster && typeof v.poster === "object" ? v.poster : null;
             return m?.url
-              ? [{ url: m.url, title: v.title ?? undefined }]
+              ? [
+                  {
+                    url: m.url,
+                    hdUrl: hd?.url ?? undefined,
+                    poster: poster?.url ?? undefined,
+                    title: v.title ?? undefined,
+                  },
+                ]
               : [];
           }),
         },
@@ -198,6 +209,10 @@ export const getHome = cache(() =>
               return {
                 photoUrl: photo?.url ?? null,
                 alt: photo?.alt ?? "",
+                title: f(
+                  s.title,
+                  DEFAULT_STAIR_TITLES[i] ?? homeDefault.stairs[i]?.title ?? "",
+                ),
                 paragraph: f(
                   s.paragraph,
                   homeDefault.stairs[i]?.paragraph ?? "",
