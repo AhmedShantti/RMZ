@@ -127,6 +127,32 @@
   left: 6vw;
   z-index: 120;
   font-variant-numeric: tabular-nums;
+  /* One line: numeral, "/ 04", then the small title. The title takes the rest
+     of the row (fixed max width) and truncates, so different title lengths
+     never shift the layout. */
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+  width: min(88vw, 34rem);
+}
+.stairs-counter > .current,
+.stairs-counter > .total {
+  flex: none;
+}
+.stairs-counter-title {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-left: 0.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* dimmer than the number — colour, not opacity (the fade animation owns opacity) */
+  color: color-mix(in srgb, var(--cream-dim) 65%, transparent);
+}
+.stairs-counter-swap {
+  animation: sqFadeIn 0.4s ease both;
 }
 /* Positioning lives on the wrapper (GSAP fades it — the inner <p>'s keyed
    crossfade animation would override inline opacity via fill-mode). Top-right
@@ -158,6 +184,12 @@
   .stairs-paragraph {
     font-size: 1.05rem;
     line-height: 1.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stairs-counter-swap,
+  .stairs-paragraph {
+    animation: none;
   }
 }
 @keyframes sqFadeIn {

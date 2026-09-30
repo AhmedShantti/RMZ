@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
-import { homeContent, type StairStep } from "@/content/home";
+import { homeContent, DEFAULT_STAIR_TITLES, type StairStep } from "@/content/home";
 import type { StairRefs } from "./logoSquares.types";
 
 /**
@@ -172,12 +172,28 @@ export default function AboutStairsSection({
         <StairImg step={steps[3]} label={IMG_LABELS[3]} />
       </div>
 
-      {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
-      <div className="stairs-counter font-body" aria-hidden="true">
-        <span className="current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]">
+      {/* Phase 5 — counter (bottom-left, oversized per the reference) + the
+          step title on the same line. Number and title share `activeStep` and
+          the same keyed fade, so they change as one unit. */}
+      <div
+        className="stairs-counter font-body"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span
+          key={`n${activeStep}`}
+          className="stairs-counter-swap current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]"
+        >
           0{activeStep + 1}
         </span>
         <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
+        <span
+          key={`t${activeStep}`}
+          className="stairs-counter-title stairs-counter-swap"
+        >
+          — {stepTitle(steps, activeStep)}
+        </span>
       </div>
 
       {/* Phase 5 — paragraph (top-right, off the travel diagonal);
@@ -190,6 +206,9 @@ export default function AboutStairsSection({
     </section>
   );
 }
+
+const stepTitle = (steps: StairStep[], i: number) =>
+  steps[i]?.title?.trim() || DEFAULT_STAIR_TITLES[i] || "";
 
 /** Cropped photo window — the CMS photo (object-cover) or a labelled placeholder. */
 function StairImg({ step, label }: { step?: StairStep; label: string }) {
