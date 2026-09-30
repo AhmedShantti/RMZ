@@ -58,7 +58,7 @@ export default function HeroCursorField({
           </p>
         )}
 
-        <h1 className="display-statement text-cream mx-auto max-w-5xl text-center text-[clamp(2.6rem,8.2vw,7rem)]">
+        <h1 className="display-statement text-cream mx-auto max-w-10xl text-center text-[clamp(2.6rem,8.2vw,7rem)]">
           <RunsText runs={statement} reveal />
         </h1>
 
@@ -76,7 +76,7 @@ export default function HeroCursorField({
           href="/contact"
           // Hover uses `filter` (not opacity/transform) so it never fights the
           // entrance animation on a property it also drives.
-          className="font-body bg-cream text-ink inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold uppercase tracking-wider transition-[filter] duration-200 hover:brightness-95"
+          className="font-body bg-cream text-ink inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm font-semibold tracking-wider transition-[filter] duration-200 hover:brightness-95"
         >
           Start a project
           <span aria-hidden="true">→</span>

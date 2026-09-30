@@ -1,7 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" fill="#000000"/>
-  <rect x="16" y="12" width="8" height="8" fill="#8DC63F"/>
-  <rect x="28" y="12" width="8" height="8" fill="#E85D1E"/>
-  <rect x="40" y="12" width="8" height="8" fill="#FDC82F"/>
-  <text x="32" y="52" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="800" letter-spacing="-3" fill="#EFE5CC">rmz</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 184.21 184.21">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ffca26;
+      }
+
+      .cls-2 {
+        fill: #f86015;
+      }
+
+      .cls-3 {
+        fill: #d52518;
+      }
+
+      .cls-4 {
+        fill: #9acc42;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <rect class="cls-3" x="0" width="184.21" height="184.21" rx="12.66" ry="12.66"/>
+    <rect class="cls-2" x="74.99" y="74.99" width="34.22" height="34.22"/>
+    <rect class="cls-4" x="126.11" y="74.99" width="34.22" height="34.22"/>
+    <rect class="cls-1" x="23.88" y="74.99" width="34.22" height="34.22"/>
+  </g>
 </svg>

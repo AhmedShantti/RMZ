@@ -51,3 +51,6 @@ next-env.d.ts
 
 # DB backups (pg_dump etc. — never commit)
 *.dump
+
+# Content/data audits — working notes, not project source
+/content-audit

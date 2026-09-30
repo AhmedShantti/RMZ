@@ -103,7 +103,7 @@ export default function MenuOverlay({
 
           <div className="relative flex items-center justify-between px-5 py-5 sm:px-8">
             <span className="font-display text-cream-dim text-sm italic">
-              {shortName} — menu
+              {shortName} — Expolre
             </span>
             <button
               type="button"
