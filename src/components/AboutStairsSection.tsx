@@ -1,10 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { gsap, ScrollTrigger, useGSAP, syncScrollTriggerWithLenis } from "@/lib/gsap";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
-import { homeContent, type StairStep } from "@/content/home";
+import { homeContent, DEFAULT_STAIR_TITLES, type StairStep } from "@/content/home";
+import {
+  STAIR_OFFSETS,
+  STAIR_RATIOS,
+  STAIR_STEPS_MAX,
+  STAIRS_DEFAULTS,
+  TITLE_SIZES,
+  type StairsSettings,
+} from "@/lib/homeSettings";
 import type { StairRefs } from "./logoSquares.types";
 
 /**
@@ -23,27 +31,35 @@ import type { StairRefs } from "./logoSquares.types";
  *   state for the counter + crossfading paragraph.
  */
 
-const IMG_LABELS = [
-  "[ STEP 1 PHOTO — REPLACE ]",
-  "[ STEP 2 PHOTO — REPLACE ]",
-  "[ STEP 3 PHOTO — REPLACE ]",
-  "[ STEP 4 PHOTO — REPLACE ]",
-];
+const imgLabel = (i: number) => `[ STEP ${i + 1} PHOTO — REPLACE ]`;
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
 
 export default function AboutStairsSection({
   landingRefs,
-  steps = homeContent.stairs,
+  steps: stepsProp = homeContent.stairs,
+  settings = STAIRS_DEFAULTS,
 }: {
   landingRefs: StairRefs;
   /** CMS-driven step content (photo + paragraph); falls back to the default. */
   steps?: StairStep[];
+  /** CMS-driven sizing/typography (already clamped by normalizeStairsSettings). */
+  settings?: StairsSettings;
 }) {
-  const { yellow, orange, green } = landingRefs;
   const sectionRef = useRef<HTMLElement>(null);
+  // Step count comes from the CMS list (the section adapts to 1…8 items).
+  const steps = stepsProp.slice(0, STAIR_STEPS_MAX);
   const TOTAL = steps.length;
-  // 4th deck card — internal only (the logo has 3 squares to travel, so it
-  // isn't a Flip landing target and stays out of the landingRefs API).
-  const fourth = useRef<HTMLDivElement>(null);
+  const strideFactor = STAIR_OFFSETS[settings.offset];
+  // One element per step. The first three double as the landingRefs the
+  // EmergeSquares journey reads (it only uses them to locate this section).
+  const slotEls = useRef<(HTMLDivElement | null)[]>([]);
+  const setSlot = (i: number) => (el: HTMLDivElement | null) => {
+    slotEls.current[i] = el;
+    if (i === 0) landingRefs.yellow.current = el;
+    if (i === 1) landingRefs.orange.current = el;
+    if (i === 2) landingRefs.green.current = el;
+  };
   const [activeStep, setActiveStep] = useState(0);
 
   useGSAP(
@@ -51,7 +67,7 @@ export default function AboutStairsSection({
       if (prefersReducedMotion()) return;
 
       const cleanupLenis = syncScrollTriggerWithLenis();
-      const slots = [yellow, orange, green, fourth];
+      const slots = slotEls.current.slice(0, TOTAL);
 
       // Continuous diagonal staircase: every card sits STEP·(i − u) down-right
       // of the centre — uniform spacing, all steps visible at once, the whole
@@ -67,10 +83,9 @@ export default function AboutStairsSection({
         // Big diagonal stride (reference arrangement): the previous card sits
         // far up-left and the next far down-right, both partially cropped by
         // the viewport edges.
-        const stride = Math.min(window.innerWidth, window.innerHeight) * 0.45;
+        const stride = Math.min(window.innerWidth, window.innerHeight) * strideFactor;
 
-        slots.forEach((ref, i) => {
-          const el = ref.current;
+        slots.forEach((el, i) => {
           if (!el) return;
           const rel = i - u; // + waiting → 0 focused → − exited
           const wait = clamp01(rel);
@@ -104,9 +119,9 @@ export default function AboutStairsSection({
         ["top 12%", "top top"],
         ["top 12%", "top top"],
       ];
-      slots.forEach((ref, i) => {
-        const el = ref.current;
+      slots.forEach((el, i) => {
         if (!el) return;
+        const arrival = ARRIVALS[Math.min(i, ARRIVALS.length - 1)];
         gsap.fromTo(
           el,
           { opacity: 0 },
@@ -116,8 +131,8 @@ export default function AboutStairsSection({
             ease: "none",
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: ARRIVALS[i][0],
-              end: ARRIVALS[i][1],
+              start: arrival[0],
+              end: arrival[1],
               scrub: true,
             },
           },
@@ -145,7 +160,7 @@ export default function AboutStairsSection({
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
-        end: `+=${(slots.length - 1) * 1000}`,
+        end: `+=${Math.max(1, slots.length - 1) * 1000}`,
         pin: true,
         scrub: 1,
         onUpdate: (self) => render(self.progress),
@@ -153,31 +168,56 @@ export default function AboutStairsSection({
 
       return cleanupLenis;
     },
-    { scope: sectionRef },
+    { scope: sectionRef, dependencies: [TOTAL, strideFactor], revertOnUpdate: true },
   );
 
-  return (
-    <section ref={sectionRef} className="about-stairs">
-      {/* Photo windows that step down the flight as it's scrolled. */}
-      <div ref={yellow} className="stair-slot stair-1">
-        <StairImg step={steps[0]} label={IMG_LABELS[0]} />
-      </div>
-      <div ref={orange} className="stair-slot stair-2">
-        <StairImg step={steps[1]} label={IMG_LABELS[1]} />
-      </div>
-      <div ref={green} className="stair-slot stair-3">
-        <StairImg step={steps[2]} label={IMG_LABELS[2]} />
-      </div>
-      <div ref={fourth} className="stair-slot stair-4">
-        <StairImg step={steps[3]} label={IMG_LABELS[3]} />
-      </div>
+  const sectionStyle = {
+    "--stair-scale": settings.imageScale / 100,
+    "--stair-ratio": STAIR_RATIOS[settings.aspect],
+  } as CSSProperties;
 
-      {/* Phase 5 — counter (bottom-left, oversized per the reference) */}
-      <div className="stairs-counter font-body" aria-hidden="true">
-        <span className="current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]">
-          0{activeStep + 1}
+  return (
+    <section ref={sectionRef} className="about-stairs" style={sectionStyle}>
+      {/* Photo windows that step down the flight as it's scrolled. */}
+      {steps.map((step, i) => (
+        <div key={i} ref={setSlot(i)} className="stair-slot" style={{ zIndex: i + 1 }}>
+          <StairImg step={step} label={imgLabel(i)} index={i} />
+        </div>
+      ))}
+
+      {/* Phase 5 — counter (bottom-left, oversized per the reference) + the
+          step title on the same line (wrapping under it when it doesn't fit).
+          Number and title share `activeStep` and the same keyed fade, so they
+          change as one unit; the block has a reserved height, so titles of any
+          length never shift the layout. */}
+      <div
+        className="stairs-counter font-body"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        style={{ "--stairs-title-size": TITLE_SIZES[settings.titleSize] } as CSSProperties}
+      >
+        <span className="stairs-counter-num">
+          <span
+            key={`n${activeStep}`}
+            className="stairs-counter-swap current font-display text-cream text-[8rem] italic leading-none sm:text-[12rem]"
+          >
+            {pad2(activeStep + 1)}
+          </span>
+          <span className="total text-cream-dim text-lg"> / {pad2(TOTAL)}</span>
         </span>
-        <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
+        {stepTitle(steps, activeStep) && (
+          <span
+            key={`t${activeStep}`}
+            className="stairs-counter-title stairs-counter-swap"
+            style={{
+              textTransform: settings.titleUppercase ? "uppercase" : "none",
+              color: `color-mix(in srgb, var(--cream-dim) ${Math.round(settings.titleOpacity * 100)}%, transparent)`,
+            }}
+          >
+            — {stepTitle(steps, activeStep)}
+          </span>
+        )}
       </div>
 
       {/* Phase 5 — paragraph (top-right, off the travel diagonal);
@@ -191,15 +231,25 @@ export default function AboutStairsSection({
   );
 }
 
-/** Cropped photo window — the CMS photo (object-cover) or a labelled placeholder. */
-function StairImg({ step, label }: { step?: StairStep; label: string }) {
+const stepTitle = (steps: StairStep[], i: number) => {
+  const step = steps[i];
+  if (!step || step.showTitle === false) return "";
+  return step.title?.trim() || DEFAULT_STAIR_TITLES[i] || "";
+};
+
+/** Cropped photo window — the CMS photo (object-cover, editor-set focus) or a labelled placeholder. */
+function StairImg({ step, label, index }: { step?: StairStep; label: string; index: number }) {
   if (step?.photoUrl) {
     return (
       <Image
         src={step.photoUrl}
-        alt={step.alt}
+        alt={step.alt?.trim() || step.title?.trim() || `Step ${index + 1}`}
         fill
-        sizes="(max-width: 640px) 240px, 26vw"
+        // Cards are up to ~36vw wide (≤ 86vw on phones); 2x DPR needs the
+        // larger candidates, so ask for the real rendered width + quality 85.
+        sizes="(max-width: 640px) 86vw, 40vw"
+        quality={85}
+        style={{ objectPosition: step.imagePosition }}
         className="stair-img object-cover"
       />
     );

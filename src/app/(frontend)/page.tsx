@@ -46,12 +46,12 @@ export default async function Home() {
         subline={home.heroSubline}
       />
       {/* Wordmark + logo squares → emerge → stairs (pinned) */}
-      <HomeLogoStairs stairs={home.stairs} />
+      <HomeLogoStairs stairs={home.stairs} settings={home.stairsSettings} />
       <ServicesTeaser services={featured}  />
      
       <ClientCard heading={home.clientsHeading} clients={home.clientCards} />
       
-      <VideoSection videos={home.showreel.videos} />
+      <VideoSection videos={home.showreel.videos} settings={home.showreel.settings} />
       <MarketsBlock
         asTeaser
         story={contact.heroStory}

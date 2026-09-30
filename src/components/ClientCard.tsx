@@ -9,15 +9,18 @@ const INTERVAL_MS = 5000;
 const SWEEP_MS = 900;
 const STAGGER_MS = 420;
 
+/** Fallback alt when the CMS photo has none — the cards show behind-the-scenes content. */
+const BTS_ALT = "Behind the scenes at Rebel Mind Zone";
+
 /** Cropped client photo (object-cover) or a labelled placeholder. */
 function ClientImg({ item }: { item: ClientCardItem }) {
   if (item.photoUrl) {
     return (
       <Image
         src={item.photoUrl}
-        alt={item.alt || item.name}
+        alt={item.alt || BTS_ALT}
         fill
-        sizes="300px"
+        sizes="(max-width: 639px) 100vw, (max-width: 899px) 50vw, 360px"
         className="object-cover"
       />
     );
@@ -86,7 +89,7 @@ function ClientCard({
   const pad = (n: number) => (n + 1).toString().padStart(2, "0");
 
   return (
-    <div className="relative w-[300px] h-[400px] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100">
+    <div className="relative aspect-[3/4] w-[min(360px,calc(100vw-3rem))] sm:w-[min(360px,calc((100vw-4.5rem)/2))] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100">
       <div className="absolute inset-0">
         <ClientImg item={active} />
       </div>
@@ -160,7 +163,9 @@ export default function ClientsSection({
   clients?: ClientCardItem[];
 } = {}) {
   if (!clients?.length) return null;
-  const last = clients.length - 1;
+  // Spread the three cards' starting points evenly through the list (6 → 0/2/4,
+  // 3 → 0/1/2) so they never all show the same photo at once.
+  const offset = (i: number) => Math.floor((clients.length * i) / 3);
   return (
     <section data-squares-clients className="w-full py-24 px-6">
       <div className="max-w-6xl mx-auto flex flex-col items-center">
@@ -169,8 +174,8 @@ export default function ClientsSection({
         </h2>
         <div className="flex flex-wrap gap-6 justify-center">
           <ClientCard clients={clients} startOffset={0} delay={0} accent="var(--acc-yellow)" />
-          <ClientCard clients={clients} startOffset={Math.min(2, last)} delay={STAGGER_MS} accent="var(--acc-orange)" />
-          <ClientCard clients={clients} startOffset={Math.min(4, last)} delay={STAGGER_MS * 2} accent="var(--acc-green)" />
+          <ClientCard clients={clients} startOffset={offset(1)} delay={STAGGER_MS} accent="var(--acc-orange)" />
+          <ClientCard clients={clients} startOffset={offset(2)} delay={STAGGER_MS * 2} accent="var(--acc-green)" />
         </div>
       </div>
     </section>

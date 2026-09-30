@@ -105,7 +105,7 @@ async function seedAdmin() {
 }
 
 async function updateGlobal(slug: string, data: AnyObj) {
-  await payload.updateGlobal({ slug: slug as never, data: data as never });
+  await payload.updateGlobal({ slug: slug as never, data: data as never, context: { seed: true } });
   payload.logger.info(`Seeded global: ${slug}`);
 }
 

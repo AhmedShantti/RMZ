@@ -10,7 +10,13 @@ import type { Run } from "@/components/RunsText";
 // so the public site is correct either way.
 import { site as siteDefault } from "@/content/site";
 import { mainNav } from "@/content/nav";
-import { homeContent as homeDefault } from "@/content/home";
+import { homeContent as homeDefault, DEFAULT_STAIR_TITLES } from "@/content/home";
+import {
+  STAIR_STEPS_MAX,
+  normalizeImagePosition,
+  normalizeShowreelSettings,
+  normalizeStairsSettings,
+} from "@/lib/homeSettings";
 import { aboutContent as aboutDefault } from "@/content/about";
 import { servicesPage as servicesPageDefault, services as servicesDefault } from "@/content/services";
 import { markets as marketsDefault } from "@/content/markets";
@@ -176,11 +182,41 @@ export const getHome = cache(() =>
             Array.isArray(g.showreelVideos) ? g.showreelVideos : []
           ).flatMap((v) => {
             const m = v.video && typeof v.video === "object" ? v.video : null;
+            const hd =
+              v.hdVideo && typeof v.hdVideo === "object" ? v.hdVideo : null;
+            const poster =
+              v.poster && typeof v.poster === "object" ? v.poster : null;
             return m?.url
-              ? [{ url: m.url, title: v.title ?? undefined }]
+              ? [
+                  {
+                    url: m.url,
+                    hdUrl: hd?.url ?? undefined,
+                    poster: poster?.url ?? undefined,
+                    title: v.title?.trim() || undefined,
+                    ariaLabel: v.ariaLabel?.trim() || undefined,
+                  },
+                ]
               : [];
           }),
+          settings: normalizeShowreelSettings({
+            videoWidth: g.showreelVideoWidth,
+            aspect: g.showreelAspectRatio,
+            objectFit: g.showreelObjectFit,
+            showCounter: g.showreelShowCounter,
+            showDots: g.showreelShowDots,
+            showCaptions: g.showreelShowCaptions,
+            transitionSpeed: g.showreelTransitionSpeed,
+            scrollPerVideo: g.showreelScrollPerVideo,
+          }),
         },
+        stairsSettings: normalizeStairsSettings({
+          titleSize: g.stairsTitleSize,
+          titleUppercase: g.stairsTitleUppercase,
+          titleOpacity: g.stairsTitleOpacity,
+          imageScale: g.stairsImageScale,
+          offset: g.stairsOffset,
+          aspect: g.stairsAspectRatio,
+        }),
         clients: g.clients?.length
           ? g.clients.map((c) => ({
               label: f(c.label, ""),
@@ -192,12 +228,18 @@ export const getHome = cache(() =>
             }))
           : homeDefault.clients,
         stairs: g.stairs?.length
-          ? g.stairs.map((s, i) => {
+          ? g.stairs.slice(0, STAIR_STEPS_MAX).map((s, i) => {
               const photo =
                 s.photo && typeof s.photo === "object" ? s.photo : null;
               return {
                 photoUrl: photo?.url ?? null,
-                alt: photo?.alt ?? "",
+                alt: f(s.alt, photo?.alt ?? ""),
+                title: f(
+                  s.title,
+                  DEFAULT_STAIR_TITLES[i] ?? homeDefault.stairs[i]?.title ?? "",
+                ),
+                showTitle: s.showTitle ?? true,
+                imagePosition: normalizeImagePosition(s.imagePosition),
                 paragraph: f(
                   s.paragraph,
                   homeDefault.stairs[i]?.paragraph ?? "",
@@ -242,6 +284,7 @@ export const getHome = cache(() =>
       heroSubline: homeDefault.heroSubline,
       teaserCtaLabel: homeDefault.teaserCtaLabel,
       showreel: homeDefault.showreel,
+      stairsSettings: homeDefault.stairsSettings,
       clients: homeDefault.clients,
       stairs: homeDefault.stairs,
       marqueeCards: homeDefault.marqueeCards,

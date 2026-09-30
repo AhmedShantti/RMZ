@@ -64,10 +64,16 @@
      (pin-spacer), so extra height would only push the counter below the fold
      while pinned. */
   min-height: 100vh;
-  /* Portrait cards, scaled to the viewport like the reference (~26vw wide) —
-     mobile overrides below. */
-  --stair-w: clamp(240px, 26vw, 400px);
-  --stair-h: clamp(300px, 34vw, 520px);
+  /* Card size: the base width scales with the viewport, then the CMS
+     `imageScale` (--stair-scale) and aspect ratio (--stair-ratio, height ÷
+     width) are applied. Capped so a card never exceeds 86vw or 78vh. */
+  --stair-base-w: clamp(240px, 26vw, 400px);
+  --stair-w: min(
+    calc(var(--stair-base-w) * var(--stair-scale, 1.25)),
+    86vw,
+    calc(78vh / var(--stair-ratio, 1.3333))
+  );
+  --stair-h: calc(var(--stair-w) * var(--stair-ratio, 1.3333));
 }
 .stair-slot {
   position: absolute;
@@ -83,27 +89,12 @@
 }
 /* Card-deck layout: all slots share the viewport centre (calc offsets,
    NOT css transforms — GSAP owns `transform` for the y/scale choreography).
-   Later cards stack above earlier ones so the incoming card climbs over the
-   outgoing one. */
-.stair-1,
-.stair-2,
-.stair-3,
-.stair-4 {
+   Stacking (z-index) is set per step in the markup, so any number of steps
+   works; later cards stack above earlier ones. */
+.stair-slot {
   top: calc(50% - var(--stair-h) / 2);
   left: calc(50% - var(--stair-w) / 2);
   will-change: transform, opacity;
-}
-.stair-1 {
-  z-index: 1;
-}
-.stair-2 {
-  z-index: 2;
-}
-.stair-3 {
-  z-index: 3;
-}
-.stair-4 {
-  z-index: 4;
 }
 .stair-slot img {
   display: block;
@@ -122,11 +113,43 @@
 
 /* --- Counter + paragraph (Phase 5) — above the cards (deck z ≤ 100) --- */
 .stairs-counter {
+  --stairs-num: 8rem; /* numeral size (matches the text-[8rem] / sm:text-[12rem] in the markup) */
   position: absolute;
   bottom: 6vh;
   left: 6vw;
   z-index: 120;
   font-variant-numeric: tabular-nums;
+  /* Row 1: numeral + "/ 04" + the title if it fits; otherwise the title wraps
+     to row 2 (up to two lines). The block's height is reserved for both, and
+     rows pack from the top, so the numeral never moves when titles change. */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  align-content: flex-start;
+  width: min(88vw, 40rem);
+  min-height: calc(var(--stairs-num) + 3 * var(--stairs-title-size, 1.25rem) + 0.5rem);
+}
+@media (min-width: 640px) {
+  .stairs-counter {
+    --stairs-num: 12rem;
+  }
+}
+.stairs-counter-num {
+  display: inline-flex;
+  align-items: baseline;
+  flex: none;
+  margin-right: 0.6rem;
+}
+.stairs-counter-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--stairs-title-size, 1.25rem);
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  /* colour (set inline) carries the dimming — the fade animation owns opacity */
+}
+.stairs-counter-swap {
+  animation: sqFadeIn 0.4s ease both;
 }
 /* Positioning lives on the wrapper (GSAP fades it — the inner <p>'s keyed
    crossfade animation would override inline opacity via fill-mode). Top-right
@@ -137,18 +160,20 @@
   top: 14vh; /* above the focused card's top line */
   right: 0;
   z-index: 120;
-  max-width: 320px;
+  /* Never wider than the free space beside the (now larger) focused card. */
+  max-width: clamp(150px, calc(50% - var(--stair-w) / 2 - 1.5rem), 320px);
 }
 .stairs-paragraph {
   animation: sqFadeIn 0.4s ease both;
+  font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  line-height: 1.5;
 }
 
 /* Mobile — smaller cards, same centered deck (spec cleanup note). */
 @media (max-width: 640px) {
   .about-stairs {
-    /* Scale the card with the viewport so it fits small phones too. */
-    --stair-w: min(240px, 64vw);
-    --stair-h: min(312px, 83vw);
+    /* Smaller base on phones (the CMS scale + caps still apply). */
+    --stair-base-w: min(240px, 64vw);
   }
   .stairs-paragraph-wrap {
     top: 11vh;
@@ -158,6 +183,12 @@
   .stairs-paragraph {
     font-size: 1.05rem;
     line-height: 1.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stairs-counter-swap,
+  .stairs-paragraph {
+    animation: none;
   }
 }
 @keyframes sqFadeIn {

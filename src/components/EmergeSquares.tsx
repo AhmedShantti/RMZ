@@ -125,9 +125,11 @@ export default function EmergeSquares({
       const clients = document.querySelector<HTMLElement>(
         "[data-squares-clients]",
       );
-      const video = document.querySelector<HTMLElement>(
-        'section[aria-label="Showreel"]',
-      );
+      // The showreel's pinned stage (stays on-screen while pinned, so the
+      // float cell never leaves the viewport); falls back to the section.
+      const video =
+        document.querySelector<HTMLElement>("[data-squares-video]") ??
+        document.querySelector<HTMLElement>('section[aria-label="Showreel"]');
       // The markets / CTA block — the LAST float leg, at the end of the page,
       // where the squares come to rest.
       const markets = document.querySelector<HTMLElement>(
@@ -141,16 +143,22 @@ export default function EmergeSquares({
       // The journey needs the full home layout; bail otherwise (e.g. lab).
       if (!startSection || !teaser || !stage) return;
 
-      const back = gsap.parseEase("back.out(1.7)");
+      // The squares keep ONE constant size for the whole journey: the size of
+      // the logo's own squares (a fixed responsive value — the logo box is
+      // clamp()-sized by viewport width, never by scroll). It's read from an
+      // anchor's layout width (unaffected by transforms), so it only changes
+      // on resize, never while scrolling.
+      const sizeOf = (el: HTMLElement) => el.offsetWidth || 72;
       // A square's own footprint (viewport centre + width/height as a square).
       const centerOf = (el: HTMLElement): Vec => {
         const r = el.getBoundingClientRect();
-        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.width };
+        const w = sizeOf(el);
+        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w, h: w };
       };
-      // A 72px float cell at a fixed fractional spot inside a section.
-      const cellIn = (el: HTMLElement, f: Frac): Vec => {
+      // A float cell at a fixed fractional spot inside a section, same size.
+      const cellIn = (el: HTMLElement, f: Frac, size: number): Vec => {
         const r = el.getBoundingClientRect();
-        return { cx: r.left + r.width * f.x, cy: r.top + r.height * f.y, w: 72, h: 72 };
+        return { cx: r.left + r.width * f.x, cy: r.top + r.height * f.y, w: size, h: size };
       };
 
       // The squares float ABOVE each section's content. `isolate` traps each
@@ -243,18 +251,18 @@ export default function EmergeSquares({
 
         const wps: Waypoint[] = [
           { at: PHASE.LAUNCH, get: () => centerOf(anchor) },
-          { at: PHASE.POP, ease: back, get: () => ({ ...centerOf(anchor), w: 72, h: 72 }) },
+          { at: PHASE.POP, get: () => centerOf(anchor) },
           // Float legs (above content): About stairs → "What we do" → Clients →
           // Video → Markets (end of page). No landing — each square drifts to a
           // random cell in every section, tracked live so pins/resizes never
           // jump it. The stairs leg has three cells so it wanders across the pin.
-          { at: PHASE.STAIRS_A, get: () => cellIn(stairsSection ?? teaser, hs1) },
-          { at: PHASE.STAIRS_B, get: () => cellIn(stairsSection ?? teaser, hs2) },
-          { at: PHASE.STAIRS_C, get: () => cellIn(stairsSection ?? teaser, hs3) },
-          { at: PHASE.TEASER, get: () => cellIn(teaser, home) },
-          { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc) },
-          { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv) },
-          { at: PHASE.MARKETS, get: () => cellIn(markets ?? video ?? teaser, hm) },
+          { at: PHASE.STAIRS_A, get: () => cellIn(stairsSection ?? teaser, hs1, sizeOf(anchor)) },
+          { at: PHASE.STAIRS_B, get: () => cellIn(stairsSection ?? teaser, hs2, sizeOf(anchor)) },
+          { at: PHASE.STAIRS_C, get: () => cellIn(stairsSection ?? teaser, hs3, sizeOf(anchor)) },
+          { at: PHASE.TEASER, get: () => cellIn(teaser, home, sizeOf(anchor)) },
+          { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc, sizeOf(anchor)) },
+          { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv, sizeOf(anchor)) },
+          { at: PHASE.MARKETS, get: () => cellIn(markets ?? video ?? teaser, hm, sizeOf(anchor)) },
         ];
 
         // quickSetter per numeric property: this is the dominant perf win

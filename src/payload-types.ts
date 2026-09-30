@@ -947,13 +947,45 @@ export interface HomeContent {
    * The small line under the hero statement.
    */
   heroSubline?: string | null;
+  /**
+   * Desktop/tablet width, 70–100 (capped at 1800px). Phones are always full-width. Recommended: 85–95.
+   */
+  showreelVideoWidth?: number | null;
+  showreelAspectRatio?: ('16:9' | '21:9' | '4:5' | 'source') | null;
+  showreelObjectFit?: ('cover' | 'contain') | null;
+  showreelShowCounter?: boolean | null;
+  showreelShowDots?: boolean | null;
+  /**
+   * Shows each video's caption next to the counter, when it has one.
+   */
+  showreelShowCaptions?: boolean | null;
+  showreelTransitionSpeed?: ('fast' | 'normal' | 'slow') | null;
+  /**
+   * How far the visitor scrolls (while the section is pinned) to move to the next video.
+   */
+  showreelScrollPerVideo?: ('short' | 'normal' | 'long') | null;
   showreelVideos?:
     | {
         /**
-         * MP4/WebM video file.
+         * MP4/WebM video file (standard quality — used on phones/tablets).
          */
         video: number | Media;
+        /**
+         * 1080p+ MP4/WebM of the same video. Used on wide screens, where the video is shown at ~80% of the viewport width — 640×360 sources look soft there.
+         */
+        hdVideo?: (number | null) | Media;
+        /**
+         * Shown while the video loads.
+         */
+        poster?: (number | null) | Media;
+        /**
+         * Shown next to the counter when 'Show captions' is on.
+         */
         title?: string | null;
+        /**
+         * Read by screen readers. Falls back to the caption.
+         */
+        ariaLabel?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -988,11 +1020,50 @@ export interface HomeContent {
       }[]
     | null;
   /**
-   * Exactly four steps — the animation lands three logo squares on the first three cards plus one extra. Each: a photo + its paragraph. Leave a photo empty to show the placeholder.
+   * Scales with the screen width. Recommended: Large.
+   */
+  stairsTitleSize?: ('small' | 'medium' | 'large' | 'xl') | null;
+  stairsTitleUppercase?: boolean | null;
+  /**
+   * 0.4 (faint) – 1 (same as the number). Recommended: 0.55–0.7.
+   */
+  stairsTitleOpacity?: number | null;
+  /**
+   * Card size, 80–140. 100 = the original size; the default 125 is 25% larger. Recommended: 110–130.
+   */
+  stairsImageScale?: number | null;
+  /**
+   * Distance between one step and the next in the staircase.
+   */
+  stairsOffset?: ('tight' | 'normal' | 'wide') | null;
+  stairsAspectRatio?: ('3:4' | '4:5' | '1:1' | '16:9') | null;
+  /**
+   * 2–8 steps. The counter (01 / NN) and the scroll length follow the number of steps — add, remove or drag to reorder. Each step: image, alt text, title and paragraph.
    */
   stairs?:
     | {
+        /**
+         * Recommended: at least 1200px on the long edge.
+         */
         photo?: (number | null) | Media;
+        /**
+         * Describes the image for screen readers. Falls back to the media item's alt, then the title.
+         */
+        alt?: string | null;
+        /**
+         * Which part of the image stays visible when it is cropped to the card shape.
+         */
+        imagePosition?:
+          | ('center' | 'top' | 'bottom' | 'left' | 'right' | 'top left' | 'top right' | 'bottom left' | 'bottom right')
+          | null;
+        /**
+         * Small label shown next to the counter (e.g. 01 / 04 — Questioning First). Empty = the built-in default for steps 1–4.
+         */
+        title?: string | null;
+        /**
+         * Untick to hide this step's title (the counter still shows).
+         */
+        showTitle?: boolean | null;
         paragraph: string;
         id?: string | null;
       }[]
@@ -1500,11 +1571,22 @@ export interface HomeContentSelect<T extends boolean = true> {
         id?: T;
       };
   heroSubline?: T;
+  showreelVideoWidth?: T;
+  showreelAspectRatio?: T;
+  showreelObjectFit?: T;
+  showreelShowCounter?: T;
+  showreelShowDots?: T;
+  showreelShowCaptions?: T;
+  showreelTransitionSpeed?: T;
+  showreelScrollPerVideo?: T;
   showreelVideos?:
     | T
     | {
         video?: T;
+        hdVideo?: T;
+        poster?: T;
         title?: T;
+        ariaLabel?: T;
         id?: T;
       };
   clients?:
@@ -1525,10 +1607,20 @@ export interface HomeContentSelect<T extends boolean = true> {
         project?: T;
         id?: T;
       };
+  stairsTitleSize?: T;
+  stairsTitleUppercase?: T;
+  stairsTitleOpacity?: T;
+  stairsImageScale?: T;
+  stairsOffset?: T;
+  stairsAspectRatio?: T;
   stairs?:
     | T
     | {
         photo?: T;
+        alt?: T;
+        imagePosition?: T;
+        title?: T;
+        showTitle?: T;
         paragraph?: T;
         id?: T;
       };
