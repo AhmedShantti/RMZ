@@ -47,6 +47,10 @@ export type PageBannerProps = {
   placeholderLabel?: string;
   placement?: "absolute" | "flow";
   className?: string;
+  /** Scales the darkening gradients over the photo (1 = default, lower = lighter). */
+  overlayStrength?: number;
+  /** % of the banner height where the bottom fade-out starts (default 55; higher = less fade). */
+  fadeFrom?: number;
 };
 
 export default function PageBanner({
@@ -60,6 +64,8 @@ export default function PageBanner({
   placeholderLabel,
   placement = "flow",
   className = "",
+  overlayStrength = 1,
+  fadeFrom = 55,
 }: PageBannerProps) {
   if (!image && !placeholderLabel) return <>{children}</>;
 
@@ -68,7 +74,8 @@ export default function PageBanner({
     isolation: "isolate",
     ...(placement === "absolute" ? { zIndex: -2 } : {}),
   };
-  const mask = "linear-gradient(to bottom, #000 55%, transparent 100%)";
+  const mask = `linear-gradient(to bottom, #000 ${fadeFrom}%, transparent 100%)`;
+  const a = (n: number) => +(n * overlayStrength).toFixed(3);
 
   return (
     <div
@@ -108,7 +115,7 @@ export default function PageBanner({
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 35%, rgba(0,0,0,0) 70%), linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 22%)",
+              `linear-gradient(to top, rgba(0,0,0,${a(0.6)}) 0%, rgba(0,0,0,${a(0.3)}) 35%, rgba(0,0,0,0) 70%), linear-gradient(to bottom, rgba(0,0,0,${a(0.45)}) 0%, rgba(0,0,0,0) 22%)`,
           }}
         />
       </div>

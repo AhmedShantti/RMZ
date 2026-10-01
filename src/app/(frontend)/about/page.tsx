@@ -103,6 +103,8 @@ export default async function AboutPage() {
         title={about.bannerTitle}
         headingLevel="h2" // the page's h1 is the PageIntro title below
         placeholderLabel="[ ABOUT BANNER — 2400×1350 · UPLOAD IN /studio ]"
+        overlayStrength={0.4} // lighter darkening over the photo
+        fadeFrom={78} // fade out only near the bottom edge
       >
         <AboutScrollSquares />
       </PageBanner>
@@ -111,11 +113,12 @@ export default async function AboutPage() {
           behind it and provides the scroll space). The colour-palette sentences
           that used to follow were removed; aboutContent.colorPalette is no
           longer rendered. */}
-      <section id="about-hero" className="relative min-h-screen" />
+      <section id="about-hero" className="relative h-[50svh] sm:h-[65svh]" />
 
       <PageIntro
         kicker="About"
         accent={false}
+        tight
         title={<RunsText runs={about.pageTitle} />}
         lede={about.lede}
       />
