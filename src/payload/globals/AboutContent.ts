@@ -54,6 +54,16 @@ export const AboutContent: GlobalConfig = {
           },
         },
         {
+          name: "bannerTitle",
+          type: "textarea",
+          label: "Banner title",
+          admin: {
+            rows: 2,
+            description:
+              "Heading shown at the bottom of the About banner. Leave empty to hide. Press Enter for a manual line break (about 2–8 words works best).",
+          },
+        },
+        {
           name: "bannerAlt",
           type: "text",
           label: "Alt text (required with an image)",
