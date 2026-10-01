@@ -238,6 +238,30 @@ html.lenis body {
   }
 }
 
+/* PageBanner title scrim — a soft radial gradient behind the title only,
+   anchored at the inline-start edge (mirrored in RTL by the component). Wider
+   on narrow screens so it still covers the whole title line. */
+.page-banner-scrim {
+  background: radial-gradient(
+    ellipse 80% 70% at 0% 52%,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.6) 40%,
+    rgba(0, 0, 0, 0.32) 68%,
+    rgba(0, 0, 0, 0) 92%
+  );
+}
+@media (max-width: 640px) {
+  .page-banner-scrim {
+    background: radial-gradient(
+      ellipse 135% 70% at 0% 52%,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      rgba(0, 0, 0, 0.32) 68%,
+      rgba(0, 0, 0, 0) 92%
+    );
+  }
+}
+
 /* ---- Focus visibility (a11y, TASK.md §8) ---- */
 :focus-visible {
   outline: 2px solid var(--rebel-red);

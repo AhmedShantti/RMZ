@@ -4,6 +4,7 @@ import * as migration_20260922_101455_add_categories from './20260922_101455_add
 import * as migration_20260930_100000_home_stairs_title_showreel_hd from './20260930_100000_home_stairs_title_showreel_hd';
 import * as migration_20260930_140000_about_banner_zigzag_images from './20260930_140000_about_banner_zigzag_images';
 import * as migration_20261001_100000_about_banner_title from './20261001_100000_about_banner_title';
+import * as migration_20261001_120000_portfolio_banner from './20261001_120000_portfolio_banner';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261001_100000_about_banner_title.up,
     down: migration_20261001_100000_about_banner_title.down,
     name: '20261001_100000_about_banner_title',
+  },
+  {
+    up: migration_20261001_120000_portfolio_banner.up,
+    down: migration_20261001_120000_portfolio_banner.down,
+    name: '20261001_120000_portfolio_banner',
   },
 ];

@@ -4,8 +4,7 @@ import { getMeta } from "@/lib/cms";
 import AboutAnimationController from "@/components/AboutAnimationController";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
-import AboutBanner from "@/components/AboutBanner";
-import AboutBannerTitle from "@/components/AboutBannerTitle";
+import PageBanner from "@/components/PageBanner";
 import Image from "next/image";
 import RunsText from "@/components/RunsText";
 import { getAbout } from "@/lib/cms";
@@ -92,18 +91,27 @@ export default async function AboutPage() {
       
       
       
-      {/* Animated squares overlay (fixed, z-50) + hero badge (z-60) */}
-      <AboutScrollSquares />
-
-      {/* Full-bleed banner (behind the squares overlay and the fixed header) */}
-      <AboutBanner image={about.banner} />
+      {/* Full-bleed banner + animated title (behind the header and page content).
+          The fixed scroll-squares overlay is its overlay slot: above the photo,
+          below the title. */}
+      <PageBanner
+        placement="absolute"
+        image={about.banner ? { url: about.banner.url } : null}
+        alt={about.banner?.alt}
+        focalX={about.banner?.focalX}
+        focalY={about.banner?.focalY}
+        title={about.bannerTitle}
+        headingLevel="h2" // the page's h1 is the PageIntro title below
+        placeholderLabel="[ ABOUT BANNER — 2400×1350 · UPLOAD IN /studio ]"
+      >
+        <AboutScrollSquares />
+      </PageBanner>
 
       {/* SECTION 1 — Hero (squares' Stage 1 stage; no text — the banner sits
-          behind it). The colour-palette sentences that used to follow were
-          removed; aboutContent.colorPalette is no longer rendered. */}
-      <section id="about-hero" className="relative min-h-screen">
-        <AboutBannerTitle title={about.bannerTitle} />
-      </section>
+          behind it and provides the scroll space). The colour-palette sentences
+          that used to follow were removed; aboutContent.colorPalette is no
+          longer rendered. */}
+      <section id="about-hero" className="relative min-h-screen" />
 
       <PageIntro
         kicker="About"

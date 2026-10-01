@@ -2,6 +2,10 @@ import type { Run } from "@/components/RunsText";
 
 /** Portfolio page header — default + seed source. */
 export const portfolioPage = {
+  // Banner at the top of the page. TODO: upload a landscape image (≥2400px wide)
+  // in /studio → Portfolio → Banner. No image = no banner (page unchanged).
+  banner: null as { url: string; alt: string; focalX: number; focalY: number } | null,
+  bannerTitle: "",
   pageTitle: [
     { text: "We solved the problems of", style: "normal", tone: "cream" },
     { text: "dozens", style: "italic", tone: "cream" },

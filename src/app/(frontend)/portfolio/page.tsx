@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import PageBanner from "@/components/PageBanner";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import RunsText from "@/components/RunsText";
@@ -30,7 +31,23 @@ export default async function PortfolioPage() {
 
   return (
     <>
+      {/* Banner only when an image is set in the CMS — otherwise the page is
+          exactly as before. The page's h1 is the PageIntro title below, so the
+          banner title is an h2. */}
+      {page.banner && (
+        <PageBanner
+          placement="flow"
+          image={{ url: page.banner.url }}
+          alt={page.banner.alt}
+          focalX={page.banner.focalX}
+          focalY={page.banner.focalY}
+          title={page.bannerTitle}
+          headingLevel="h2"
+        />
+      )}
+
       <PageIntro
+        tight={Boolean(page.banner)}
         kicker="Portfolio"
         title={<RunsText runs={page.pageTitle} />}
         lede={page.lede}

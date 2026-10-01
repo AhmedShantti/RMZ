@@ -11,11 +11,15 @@ type Props = {
   lede?: string;
   /** The small accent-square trio beside the kicker (default on). */
   accent?: boolean;
+  /** A banner sits right above: use a short top padding instead of clearing the fixed nav. */
+  tight?: boolean;
 };
 
-export default function PageIntro({ kicker, title, lede, accent = true }: Props) {
+export default function PageIntro({ kicker, title, lede, accent = true, tight = false }: Props) {
   return (
-    <header className="relative px-5 pb-12 pt-32 sm:px-8 sm:pb-16 sm:pt-40">
+    <header
+      className={`relative px-5 pb-12 ${tight ? "pt-10" : "pt-32"} sm:px-8 sm:pb-16 ${tight ? "sm:pt-14" : "sm:pt-40"}`}
+    >
       <div className="mx-auto max-w-6xl">
         <Reveal className="mb-6 flex items-center gap-4">
           {accent && <AccentBlocks size={12} />}
