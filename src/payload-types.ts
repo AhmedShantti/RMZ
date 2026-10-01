@@ -1059,6 +1059,22 @@ export interface AboutContent {
       }[]
     | null;
   lede?: string | null;
+  /**
+   * Landscape, at least 2400px wide (about 2400×1350 is ideal), JPG/WebP, ideally under 500 KB.
+   */
+  bannerImage?: (number | null) | Media;
+  /**
+   * Describes the banner for screen readers.
+   */
+  bannerAlt?: string | null;
+  /**
+   * 0 = left, 100 = right. Which part stays visible when the banner is cropped.
+   */
+  bannerFocalX?: number | null;
+  /**
+   * 0 = top, 100 = bottom.
+   */
+  bannerFocalY?: number | null;
   colorPalette?: {
     line1?: string | null;
     line2Lead?: string | null;
@@ -1066,7 +1082,7 @@ export interface AboutContent {
     line3?: string | null;
   };
   /**
-   * Idea / character / personality, in order.
+   * Idea / character / personality, in order. Each section can have an image; sections alternate image-left / image-right. A section without an image is shown as full-width text.
    */
   sections?:
     | {
@@ -1078,6 +1094,19 @@ export interface AboutContent {
               id?: string | null;
             }[]
           | null;
+        /**
+         * Portrait 4:5, about 1200×1500px, JPG/WebP around 300 KB. Shown beside this section.
+         */
+        image?: (number | null) | Media;
+        imageAlt?: string | null;
+        /**
+         * 0 = left, 100 = right.
+         */
+        focalX?: number | null;
+        /**
+         * 0 = top, 100 = bottom.
+         */
+        focalY?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -1581,6 +1610,10 @@ export interface AboutContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
+  bannerImage?: T;
+  bannerAlt?: T;
+  bannerFocalX?: T;
+  bannerFocalY?: T;
   colorPalette?:
     | T
     | {
@@ -1600,6 +1633,10 @@ export interface AboutContentSelect<T extends boolean = true> {
               text?: T;
               id?: T;
             };
+        image?: T;
+        imageAlt?: T;
+        focalX?: T;
+        focalY?: T;
         id?: T;
       };
   closingStatement?:

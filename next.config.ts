@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     // sizes. This is what lets <Image> shrink the CMS PNGs (~450-500 KiB each)
     // to a fraction of the bytes without any visual change.
     formats: ["image/avif", "image/webp"],
+    // 75 (default) + 85/90 for the About banner and section images.
+    qualities: [75, 85, 90],
     // Payload serves media through its own route on the app's own domain
     // (https://<deployment>.vercel.app/api/media/file/...). Next treats an
     // absolute URL as remote even when it's same-origin, so the host must be

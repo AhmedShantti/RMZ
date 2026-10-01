@@ -189,7 +189,7 @@ export default function AboutStairsSection({
           >
             0{activeStep + 1}
           </span>
-          <span className="total text-cream-dim text-lg"> / 0{TOTAL}</span>
+         
         </span>
         {stepTitle(steps, activeStep) && (
           <span
@@ -223,7 +223,7 @@ function StairImg({ step, label }: { step?: StairStep; label: string }) {
         src={step.photoUrl}
         alt={step.alt}
         fill
-        sizes="(max-width: 640px) 240px, 26vw"
+        sizes="(max-width: 640px) 260px, min(28.1vw, 432px)"
         className="stair-img object-cover"
       />
     );

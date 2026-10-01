@@ -66,8 +66,12 @@
   min-height: 100vh;
   /* Portrait cards, scaled to the viewport like the reference (~26vw wide) —
      mobile overrides below. */
-  --stair-w: clamp(240px, 26vw, 400px);
-  --stair-h: clamp(300px, 34vw, 520px);
+  /* Cards are 8% larger than the original clamp() sizes. Slots are centred
+     with top/left = 50% − size/2, so growth is symmetric about the same centre:
+     positions/offsets are unchanged and the gaps between cards just shrink. */
+  --stair-scale: 1.08;
+  --stair-w: calc(clamp(240px, 26vw, 400px) * var(--stair-scale));
+  --stair-h: calc(clamp(300px, 34vw, 520px) * var(--stair-scale));
 }
 .stair-slot {
   position: absolute;
@@ -205,8 +209,8 @@
 @media (max-width: 640px) {
   .about-stairs {
     /* Scale the card with the viewport so it fits small phones too. */
-    --stair-w: min(240px, 64vw);
-    --stair-h: min(312px, 83vw);
+    --stair-w: calc(min(240px, 64vw) * var(--stair-scale));
+    --stair-h: calc(min(312px, 83vw) * var(--stair-scale));
   }
   .stairs-paragraph-wrap {
     top: 11vh;

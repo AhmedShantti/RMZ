@@ -9,14 +9,16 @@ type Props = {
   kicker: string;
   title: React.ReactNode;
   lede?: string;
+  /** The small accent-square trio beside the kicker (default on). */
+  accent?: boolean;
 };
 
-export default function PageIntro({ kicker, title, lede }: Props) {
+export default function PageIntro({ kicker, title, lede, accent = true }: Props) {
   return (
     <header className="relative px-5 pb-12 pt-32 sm:px-8 sm:pb-16 sm:pt-40">
       <div className="mx-auto max-w-6xl">
         <Reveal className="mb-6 flex items-center gap-4">
-          <AccentBlocks size={12} />
+          {accent && <AccentBlocks size={12} />}
           <span className="font-body text-cream-dim text-xs uppercase tracking-[0.35em]">
             {kicker}
           </span>

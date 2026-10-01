@@ -1,5 +1,13 @@
 import type { Run } from "@/components/RunsText";
 
+/** An About image (banner or section) with its crop focus, as % from the top-left. */
+export type AboutImage = {
+  url: string;
+  alt: string;
+  focalX: number;
+  focalY: number;
+};
+
 /** About page — canonical default + seed source for `aboutContent`. */
 export const aboutContent = {
   pageTitle: [
@@ -21,8 +29,12 @@ export const aboutContent = {
     line2Rest: "EXPRESSION",
     line3: "with Professional Presence",
   },
+  // Banner at the top of the page. TODO: upload a landscape image (≥2400px
+  // wide) in /studio → About → Banner; until then a labelled placeholder shows.
+  banner: null as AboutImage | null,
   sections: [
     {
+      image: null as AboutImage | null, // TODO: upload in /studio → About → Sections (4:5, ~1200×1500)
       kicker: "The idea",
       title: "Creative Rebellion",
       body: [
@@ -31,6 +43,7 @@ export const aboutContent = {
       ],
     },
     {
+      image: null as AboutImage | null,
       kicker: "The character",
       title: "Thoughtful, confident, bold",
       body: [
@@ -39,6 +52,7 @@ export const aboutContent = {
       ],
     },
     {
+      image: null as AboutImage | null,
       kicker: "The personality",
       title: "Calm. Curious. A great listener.",
       body: [

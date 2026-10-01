@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
 import { useAboutProgress } from "./AboutAnimationContext";
+import { logoSquareGap, logoSquareSize, type LogoSquareColor } from "@/lib/logoSquareSize";
 
 /**
  * AboutScrollSquares — a scroll-driven, 7-stage animation of the three brand
@@ -30,10 +31,14 @@ import { useAboutProgress } from "./AboutAnimationContext";
  *
  * prefers-reduced-motion → render Stage 1 permanently (no scroll animation).
  *
+ * SIZE: the keyframe `size` values only drive the PATH (positions, and the
+ * corner-pivot swing of rotated stages). What is drawn is always the shared
+ * logo-square size (lib/logoSquareSize) — the same size as the squares on the
+ * Home page — centred on the keyframe box's centre, so the movement is
+ * unchanged.
+ *
  * NOTE: KF, State, GREEN, RED, YELLOW, and sample() are exported so other
- * components (e.g. ColorPaletteSection) can read the exact same keyframe
- * data and position themselves relative to the real square positions at any
- * given scroll progress, instead of duplicating/guessing positions.
+ * components can read the exact same keyframe data.
  */
 
 export const COLORS = {
@@ -50,20 +55,35 @@ export type KF = {
   pos: (vw: number, vh: number) => Vec; // top-left in px
 };
 
-/** Centred horizontal row helper (resting states). */
+/** Left→right colour order of the two resting rows. */
+const ROW_START: LogoSquareColor[] = ["green", "orange", "yellow"]; // stages 1 & 3
+const ROW_END: LogoSquareColor[] = ["yellow", "orange", "green"]; // stage 7
+
+/**
+ * Centred horizontal row (resting states). The squares drawn in it have the
+ * shared logo-square size and are spaced by the shared logo gaps (same as the
+ * Home logo — lib/logoSquareSize), centred on the viewport. The keyframe `size`
+ * is only the path box (see SIZE note above), so we return the top-left of a
+ * `size` box whose CENTRE is where the drawn square belongs.
+ */
 const row = (
   vw: number,
   vh: number,
   size: number,
-  gap: number,
-  index: number,
+  order: LogoSquareColor[],
+  color: LogoSquareColor,
   offsetY: number,
 ): Vec => {
-  const total = 3 * size + 2 * gap;
-  const startX = (vw - total) / 2;
+  const sizes = order.map((c) => logoSquareSize(c, vw));
+  const gaps = [logoSquareGap(order[0], order[1], vw), logoSquareGap(order[1], order[2], vw)];
+  const total = sizes[0] + sizes[1] + sizes[2] + gaps[0] + gaps[1];
+  const k = order.indexOf(color);
+  let left = (vw - total) / 2;
+  for (let i = 0; i < k; i++) left += sizes[i] + gaps[i];
+  const centreX = left + sizes[k] / 2;
 
   return {
-    x: startX + index * (size + gap),
+    x: centreX - size / 2,
     y: (vh - size) / 2 + offsetY,
   };
 };
@@ -72,36 +92,36 @@ const row = (
 // Order in stage 1 row: Green(0) Red(1) Yellow(2). In stage 7: Yellow(0) Red(1) Green(2).
 
 export const GREEN: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0, 0) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "green", 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: w - 0.02 * w - 70, y: 0.18 * h }) },
-  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 0, 0) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "green", 0) },
   { at: 0.333, size: 100, rotate: 0, pos: (w, h) => ({ x: w + 0.02 * w - 100, y: 0.05 * h }) },
   { at: 0.444, size: 95, rotate: 0, pos: (w, h) => ({ x: 0.08 * w, y: 0.08 * h }) },
   { at: 0.667, size: 100, rotate: 10, pos: (w, h) => ({ x: 0.12 * w, y: 0.05 * h }) },
   { at: 0.778, size: 110, rotate: 45, pos: (w, h) => ({ x: 0.35 * w, y: 0.08 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 2, -250) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, ROW_END, "green", -250) },
 ];
 
 export const RED: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1, 0) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "orange", 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.38 * h }) },
-  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 1, 0) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "orange", 0) },
   { at: 0.333, size: 100, rotate: 22, pos: (w, h) => ({ x: 0.05 * w, y: 0.65 * h }) },
   { at: 0.444, size: 95, rotate: 15, pos: (w, h) => ({ x: 0.18 * w, y: 0.38 * h }) },
   { at: 0.667, size: 100, rotate: 35, pos: (w, h) => ({ x: 0.22 * w, y: 0.3 * h }) },
   { at: 0.778, size: 110, rotate: -15, pos: (w, h) => ({ x: w - 0.05 * w - 110, y: 0.35 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 1, -250) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, ROW_END, "orange", -250) },
 ];
 
 export const YELLOW: KF[] = [
-  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2, 0) },
+  { at: 0.0, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "yellow", 0) },
   { at: 0.111, size: 70, rotate: 0, pos: (w, h) => ({ x: 0.02 * w, y: 0.08 * h }) },
-  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, 20, 2, 0) },
+  { at: 0.222, size: 110, rotate: 0, pos: (w, h) => row(w, h, 110, ROW_START, "yellow", 0) },
   { at: 0.333, size: 100, rotate: 0, pos: (w, h) => ({ x: w - 0.15 * w - 100, y: 0.4 * h }) },
   { at: 0.444, size: 95, rotate: 0, pos: (w, h) => ({ x: 0.03 * w, y: 0.15 * h }) },
   { at: 0.667, size: 100, rotate: 30, pos: (w, h) => ({ x: 0.05 * w, y: 0.5 * h }) },
   { at: 0.778, size: 110, rotate: 32, pos: (w, h) => ({ x: 0.3 * w, y: 0.68 * h }) },
-  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, 20, 0, -250) },
+  { at: 0.889, size: 105, rotate: 0, pos: (w, h) => row(w, h, 105, ROW_END, "yellow", -250) },
 ];
 
 export type State = { x: number; y: number; size: number; rotate: number };
@@ -136,24 +156,31 @@ export default function AboutScrollSquares() {
   const progress = useAboutProgress();
 
   useEffect(() => {
-    const pairs: [HTMLDivElement | null, KF[]][] = [
-      [greenRef.current, GREEN],
-      [redRef.current, RED],
-      [yellowRef.current, YELLOW],
+    // `red` is the logo's orange square.
+    const pairs: [HTMLDivElement | null, KF[], LogoSquareColor][] = [
+      [greenRef.current, GREEN, "green"],
+      [redRef.current, RED, "orange"],
+      [yellowRef.current, YELLOW, "yellow"],
     ];
 
     // Transform-only (translate + scale + rotate) so the browser composites on
     // the GPU — no per-frame layout/paint (animating width/height would thrash
     // layout and stutter the smooth scroll). Base size is 100px; scale to size.
-    const write = (el: HTMLDivElement | null, s: State) => {
+    const write = (el: HTMLDivElement | null, s: State, edge: number) => {
       if (!el) return;
-      el.style.transform = `translate3d(${s.x}px, ${s.y}px, 0) scale(${s.size / 100}) rotate(${s.rotate}deg)`;
+      // Centre of the original keyframe box (which pivoted about its top-left
+      // corner), then draw the fixed-size square around that same centre.
+      const half = s.size / 2;
+      const rad = (s.rotate * Math.PI) / 180;
+      const cx = s.x + half * (Math.cos(rad) - Math.sin(rad));
+      const cy = s.y + half * (Math.sin(rad) + Math.cos(rad));
+      el.style.transform = `translate3d(${cx - 50}px, ${cy - 50}px, 0) scale(${edge / 100}) rotate(${s.rotate}deg)`;
     };
 
     const render = (p: number) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      for (const [el, kfs] of pairs) write(el, sample(kfs, p, vw, vh));
+      for (const [el, kfs, color] of pairs) write(el, sample(kfs, p, vw, vh), logoSquareSize(color, vw));
     };
 
     // Reduced motion → lock to Stage 1, update only on resize.
@@ -173,7 +200,7 @@ export default function AboutScrollSquares() {
     left: 0,
     width: 100,
     height: 100,
-    transformOrigin: "0 0",
+    transformOrigin: "50% 50%",
     borderRadius: 0,
     willChange: "transform",
   };
