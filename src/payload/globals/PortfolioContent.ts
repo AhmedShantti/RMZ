@@ -2,6 +2,7 @@ import type { GlobalConfig } from "payload";
 import { anyone, authenticated } from "../access.ts";
 import { runsField } from "../fields/runs.ts";
 import { seoField } from "../fields/seo.ts";
+import { bannerFields } from "../fields/bannerFields.ts";
 import { revalidate } from "../hooks/revalidate.ts";
 
 /**
@@ -16,6 +17,7 @@ export const PortfolioContent: GlobalConfig = {
   admin: { group: "Pages" },
   hooks: { afterChange: [revalidate(["/portfolio"])] },
   fields: [
+    bannerFields,
     runsField("pageTitle", "Page title"),
     {
       name: "lede",

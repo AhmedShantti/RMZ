@@ -1354,6 +1354,26 @@ export interface CareersContent {
 export interface PortfolioContent {
   id: number;
   /**
+   * Landscape, at least 2400px wide (about 2400×1350 is ideal), JPG/WebP, under about 4 MB (ideally under 500 KB).
+   */
+  bannerImage?: (number | null) | Media;
+  /**
+   * Describes the banner for screen readers. Falls back to the media item's alt text.
+   */
+  bannerAlt?: string | null;
+  /**
+   * 0 = left, 100 = right. Which part stays visible when the banner is cropped.
+   */
+  bannerFocalX?: number | null;
+  /**
+   * 0 = top, 100 = bottom.
+   */
+  bannerFocalY?: number | null;
+  /**
+   * Heading shown on the banner photo. Leave empty to hide. Press Enter for a manual line break (about 2–8 words works best).
+   */
+  bannerTitle?: string | null;
+  /**
    * Each row is one styled fragment of the line, in order. Space is added between runs unless 'No space before' is set.
    */
   pageTitle?:
@@ -1808,6 +1828,11 @@ export interface CareersContentSelect<T extends boolean = true> {
  * via the `definition` "portfolioContent_select".
  */
 export interface PortfolioContentSelect<T extends boolean = true> {
+  bannerImage?: T;
+  bannerAlt?: T;
+  bannerFocalX?: T;
+  bannerFocalY?: T;
+  bannerTitle?: T;
   pageTitle?:
     | T
     | {

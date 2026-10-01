@@ -494,15 +494,33 @@ export const getPortfolioPage = cache(() =>
   safe(
     "portfolioPage",
     async (p) => {
-      const g = await p.findGlobal({ slug: "portfolioContent", depth: 0 });
+      // depth 1 so the banner upload is populated with its media doc.
+      const g = await p.findGlobal({ slug: "portfolioContent", depth: 1 });
+      const m =
+        g.bannerImage && typeof g.bannerImage === "object"
+          ? (g.bannerImage as { url?: string | null; alt?: string | null })
+          : null;
+      const pct = (v: unknown) =>
+        typeof v === "number" && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 50;
       return {
         pageTitle: runs(g.pageTitle, portfolioPageDefault.pageTitle),
         lede: f(g.lede, portfolioPageDefault.lede),
+        banner: m?.url
+          ? {
+              url: m.url,
+              alt: f(g.bannerAlt, m.alt ?? "Portfolio"),
+              focalX: pct(g.bannerFocalX),
+              focalY: pct(g.bannerFocalY),
+            }
+          : null,
+        bannerTitle: f(g.bannerTitle, portfolioPageDefault.bannerTitle).trim(),
       };
     },
     {
       pageTitle: portfolioPageDefault.pageTitle,
       lede: portfolioPageDefault.lede,
+      banner: portfolioPageDefault.banner,
+      bannerTitle: portfolioPageDefault.bannerTitle,
     },
   ),
 );
