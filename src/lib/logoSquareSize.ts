@@ -34,3 +34,15 @@ export type LogoSquareColor = keyof typeof LOGO_TRIO;
  */
 export const logoSquareSize = (color: LogoSquareColor, viewportWidth: number) =>
   Math.round((logoBoxWidth(viewportWidth) * LOGO_TRIO[color].width) / 100);
+
+/**
+ * Edge-to-edge gap (px) between two ADJACENT logo squares (yellow↔orange or
+ * orange↔green, in either order), as drawn in the logo artwork at this
+ * viewport width. Unrounded, so rows built from it match Home's logo to the
+ * sub-pixel. Shared by the About page's scroll squares.
+ */
+export const logoSquareGap = (a: LogoSquareColor, b: LogoSquareColor, viewportWidth: number) => {
+  const [l, r] = LOGO_TRIO[a].left <= LOGO_TRIO[b].left ? [a, b] : [b, a];
+  const gapPct = LOGO_TRIO[r].left - (LOGO_TRIO[l].left + LOGO_TRIO[l].width);
+  return (logoBoxWidth(viewportWidth) * gapPct) / 100;
+};

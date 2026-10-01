@@ -90,7 +90,7 @@ export default async function AboutPage() {
         
       
       
-      <section><ScrollIndicator /></section>
+      
       {/* Animated squares overlay (fixed, z-50) + hero badge (z-60) */}
       <AboutScrollSquares />
 
