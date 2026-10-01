@@ -32,6 +32,10 @@ export const aboutContent = {
   // Banner at the top of the page. TODO: upload a landscape image (≥2400px
   // wide) in /studio → About → Banner; until then a labelled placeholder shows.
   banner: null as AboutImage | null,
+  // Heading at the bottom of the banner; empty = hidden. Suggested text to enter
+  // in /studio → About → Banner title: "Discipline makes\nboldness work." (a
+  // newline becomes a line break).
+  bannerTitle: "",
   sections: [
     {
       image: null as AboutImage | null, // TODO: upload in /studio → About → Sections (4:5, ~1200×1500)

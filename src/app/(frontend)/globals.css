@@ -228,6 +228,16 @@ html.lenis body {
   text-wrap: balance;
 }
 
+/* About banner title — hidden start state for the load animation (GSAP in
+   AboutBannerTitle). Only when motion is allowed, so reduced-motion users see
+   the title immediately, and set in CSS so there is no flash before it plays. */
+@media (prefers-reduced-motion: no-preference) {
+  .about-title-word {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+}
+
 /* ---- Focus visibility (a11y, TASK.md §8) ---- */
 :focus-visible {
   outline: 2px solid var(--rebel-red);

@@ -5,6 +5,7 @@ import AboutAnimationController from "@/components/AboutAnimationController";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import AboutBanner from "@/components/AboutBanner";
+import AboutBannerTitle from "@/components/AboutBannerTitle";
 import Image from "next/image";
 import RunsText from "@/components/RunsText";
 import { getAbout } from "@/lib/cms";
@@ -100,7 +101,9 @@ export default async function AboutPage() {
       {/* SECTION 1 — Hero (squares' Stage 1 stage; no text — the banner sits
           behind it). The colour-palette sentences that used to follow were
           removed; aboutContent.colorPalette is no longer rendered. */}
-      <section id="about-hero" className="relative min-h-screen" />
+      <section id="about-hero" className="relative min-h-screen">
+        <AboutBannerTitle title={about.bannerTitle} />
+      </section>
 
       <PageIntro
         kicker="About"

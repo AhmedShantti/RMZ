@@ -295,6 +295,7 @@ export const getAbout = cache(() =>
           line2Rest: f(cp.line2Rest, aboutDefault.colorPalette.line2Rest),
           line3: f(cp.line3, aboutDefault.colorPalette.line3),
         },
+        bannerTitle: f(g.bannerTitle, aboutDefault.bannerTitle).trim(),
         banner: img(g.bannerImage, g.bannerAlt, g.bannerFocalX, g.bannerFocalY, "Rebel Mind Zone"),
         sections: g.sections?.length
           ? g.sections.map((s) => ({
@@ -315,6 +316,7 @@ export const getAbout = cache(() =>
       lede: aboutDefault.lede,
       colorPalette: aboutDefault.colorPalette,
       banner: aboutDefault.banner,
+      bannerTitle: aboutDefault.bannerTitle,
       sections: aboutDefault.sections,
       closingStatement: aboutDefault.closingStatement,
     },

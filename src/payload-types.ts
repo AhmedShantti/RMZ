@@ -1064,6 +1064,10 @@ export interface AboutContent {
    */
   bannerImage?: (number | null) | Media;
   /**
+   * Heading shown at the bottom of the About banner. Leave empty to hide. Press Enter for a manual line break (about 2–8 words works best).
+   */
+  bannerTitle?: string | null;
+  /**
    * Describes the banner for screen readers.
    */
   bannerAlt?: string | null;
@@ -1611,6 +1615,7 @@ export interface AboutContentSelect<T extends boolean = true> {
       };
   lede?: T;
   bannerImage?: T;
+  bannerTitle?: T;
   bannerAlt?: T;
   bannerFocalX?: T;
   bannerFocalY?: T;
