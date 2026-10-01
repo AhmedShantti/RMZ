@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
 import { useAboutProgress } from "./AboutAnimationContext";
 import { logoSquareGap, logoSquareSize, type LogoSquareColor } from "@/lib/logoSquareSize";
+import { DOCK_VIEWPORT_Y, dockScroll, readDocks, type Dock } from "@/lib/aboutDocking";
 
 /**
  * AboutScrollSquares — a scroll-driven, 7-stage animation of the three brand
@@ -147,6 +148,38 @@ export function sample(kfs: KF[], p: number, vw: number, vh: number): State {
   };
 }
 
+/**
+ * Route one square through its slot in the three-point section.
+ *
+ * Adds ONE keyframe — at the page progress where the slot's top edge is at
+ * DOCK_VIEWPORT_Y of the viewport — whose box is exactly the slot (rotation 0,
+ * slot size), then drops the original keyframes inside a small window around it
+ * (the first and last are always kept), so the square eases (position AND
+ * rotation) into the slot and then carries on with its original journey to the
+ * end of the page. Rebuilt on every render from live slot rects, so resizes and
+ * layout shifts are always accounted for. No slot → the track is untouched.
+ */
+const DOCK_WINDOW = 0.05;
+function withDock(kfs: KF[], dock: Dock | undefined, vh: number): KF[] {
+  if (!dock) return kfs;
+  const max = Math.max(1, document.documentElement.scrollHeight - vh);
+  const at = dockScroll(dock.top, vh) / max;
+  const first = kfs[0];
+  const last = kfs[kfs.length - 1];
+  // Outside the journey (or too close to its end to be reachable) → skip.
+  if (at <= first.at + DOCK_WINDOW || at >= last.at - DOCK_WINDOW) return kfs;
+  const dockKF: KF = {
+    at,
+    size: dock.size,
+    rotate: 0,
+    pos: () => ({ x: dock.left - window.scrollX, y: DOCK_VIEWPORT_Y * vh }),
+  };
+  return [
+    ...kfs.filter((k) => k === first || k === last || k.at <= at - DOCK_WINDOW || k.at >= at + DOCK_WINDOW),
+    dockKF,
+  ].sort((a, b) => a.at - b.at);
+}
+
 export default function AboutScrollSquares() {
   const greenRef = useRef<HTMLDivElement>(null);
   const redRef = useRef<HTMLDivElement>(null);
@@ -180,7 +213,11 @@ export default function AboutScrollSquares() {
     const render = (p: number) => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      for (const [el, kfs, color] of pairs) write(el, sample(kfs, p, vw, vh), logoSquareSize(color, vw));
+      const docks = readDocks();
+      for (const [el, kfs, color] of pairs) {
+        const track = withDock(kfs, docks.find((d) => d.color === color), vh);
+        write(el, sample(track, p, vw, vh), logoSquareSize(color, vw));
+      }
     };
 
     // Reduced motion → lock to Stage 1, update only on resize.
@@ -192,6 +229,10 @@ export default function AboutScrollSquares() {
     }
 
     render(progress);
+    // Slots move with the layout: re-aim on resize even if the scroll is idle.
+    const onResize = () => render(progress);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, [progress]);
 
   const base: React.CSSProperties = {

@@ -262,6 +262,155 @@ html.lenis body {
   }
 }
 
+/* ---- About page: numbered points (AboutPoints) ----
+   Three staggered columns from 1024px (one column below). Percent margins on a
+   grid item resolve against the grid AREA's inline size, so `70%` is exactly 0.7
+   × the column width: column 2 sits one step lower than column 1, column 3 one
+   step lower again, and the step scales fluidly with the container. */
+.about-points {
+  --about-img-ratio: 4 / 5; /* portrait images; override per page if needed */
+}
+.about-points-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(4rem, 12vw, 6rem);
+}
+@media (min-width: 1024px) {
+  .about-points-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 11%; /* 3 cols × 26% + 2 gaps × 11% = 100% */
+    row-gap: 6rem;
+  }
+  .about-point {
+    margin-block-start: calc(var(--i, 0) * 70%);
+  }
+}
+.about-point {
+  container-type: inline-size; /* sizes below are fractions of the column width */
+  color: var(--cream);
+}
+.about-point .pt-head {
+  display: flex;
+  align-items: center; /* number, square and line share one centre line */
+  column-gap: 4cqw;
+}
+.about-point .pt-num {
+  flex: none;
+  font-size: clamp(2.5rem, 16cqw, 5rem);
+  font-weight: 400; /* IvarDisplay's lightest face */
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.about-point .about-dock-slot {
+  position: relative;
+  flex: none;
+  display: block;
+}
+.about-point .about-dock-sq {
+  position: absolute;
+  inset: 0;
+}
+.about-point .pt-line {
+  flex: 0 1 45cqw;
+  height: 1px;
+  margin-inline-start: 4cqw;
+  background: color-mix(in srgb, var(--cream) 45%, transparent);
+  transform-origin: left center;
+}
+.about-point:dir(rtl) .pt-line {
+  transform-origin: right center;
+}
+.about-point .pt-title {
+  margin-block: 6cqw 0;
+  font-size: clamp(1.1rem, 8.5cqw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase; /* CSS only — the stored text is untouched */
+  text-wrap: balance;
+}
+.about-point .pt-body {
+  margin-block-start: 6cqw;
+  font-size: clamp(0.9375rem, 6cqw, 1.125rem);
+  line-height: 1.35;
+}
+.about-point .pt-body p {
+  margin: 0;
+  text-align: justify;
+  hyphens: auto;
+}
+.about-point .pt-body p + p {
+  margin-block-start: 0.9em;
+}
+.about-point .pt-img {
+  margin-block-start: 15%; /* of the column width */
+  aspect-ratio: var(--about-img-ratio);
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+}
+.about-point .pt-img-inner {
+  position: absolute;
+  inset: 0;
+}
+.about-point .pt-img-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+  background: #1a1a1a;
+}
+@media (max-width: 1023px) {
+  .about-point .pt-body p {
+    text-align: start;
+    hyphens: manual;
+  }
+  .about-point .pt-title {
+    margin-block-start: 1.25rem;
+  }
+  .about-point .pt-body {
+    margin-block-start: 1.25rem;
+  }
+  .about-point .pt-img {
+    margin-block-start: 2rem;
+  }
+}
+/* Hidden start states — only when motion is allowed (reduced-motion users and
+   no-JS see everything; AboutPoints plays each column once when its square
+   docks). Set in CSS so there is no flash and no layout shift. */
+@media (prefers-reduced-motion: no-preference) {
+  .about-point .pt-num {
+    opacity: 0;
+  }
+  .about-point .pt-line {
+    transform: scaleX(0);
+  }
+  .about-point .pt-title,
+  .about-point .pt-body {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  .about-point .pt-img {
+    clip-path: inset(0 0 100% 0);
+  }
+  .about-point .pt-img-inner {
+    transform: scale(1.04);
+  }
+  .about-point .about-dock-sq {
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+  .about-point .about-dock-slot:not([data-docked="true"]) .about-dock-sq {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
 /* ---- Focus visibility (a11y, TASK.md §8) ---- */
 :focus-visible {
   outline: 2px solid var(--rebel-red);

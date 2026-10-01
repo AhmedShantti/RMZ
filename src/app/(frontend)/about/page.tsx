@@ -5,7 +5,7 @@ import AboutAnimationController from "@/components/AboutAnimationController";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import PageBanner from "@/components/PageBanner";
-import Image from "next/image";
+import AboutPoints from "@/components/AboutPoints";
 import RunsText from "@/components/RunsText";
 import { getAbout } from "@/lib/cms";
 import ScrollIndicator from "@/components/ScrollIndicator";
@@ -120,89 +120,21 @@ export default async function AboutPage() {
         lede={about.lede}
       />
 
-      <div className="px-5 pb-12 sm:px-8" style={{ zIndex: 2 }}>
-        <div className="mx-auto flex max-w-6xl flex-col">
-          {(() => {
-            // Zigzag: sections WITH an image alternate image-left / image-right
-            // (logical placement via grid `order`, so it flips correctly in
-            // RTL). Sections without an image keep the original text-only layout.
-            let withImage = 0;
-            return about.sections.map((s, i) => {
-              const head = (
-                <div className="flex items-start gap-4">
-                  <span className="font-body text-rebel-red text-xs tabular-nums">
-                    0{i + 1}
-                  </span>
-                  <span className="font-body text-cream-dim text-xs uppercase tracking-[0.3em]">
-                    {s.kicker}
-                  </span>
-                </div>
-              );
-              const title = (
-                <h2 className="font-display text-cream text-[clamp(1.9rem,4.5vw,3.2rem)] italic leading-tight">
-                  {s.title}
-                </h2>
-              );
-              const paras = s.body.map((p) => (
-                <p
-                  key={p.slice(0, 24)}
-                  className="font-body text-cream-dim max-w-2xl text-lg leading-relaxed"
-                >
-                  {p}
-                </p>
-              ));
-
-              if (!s.image) {
-                return (
-                  <Reveal key={s.kicker}>
-                    <section className="grid gap-6 border-t border-cream-dim/15 py-14 sm:py-20 lg:grid-cols-[280px_1fr] lg:gap-16">
-                      {head}
-                      <div className="flex flex-col gap-6">
-                        {title}
-                        {paras}
-                      </div>
-                    </section>
-                  </Reveal>
-                );
-              }
-
-              const imageFirst = withImage++ % 2 === 0;
-              return (
-                <section
-                  key={s.kicker}
-                  // --about-img-ratio: the image aspect ratio (default 4:5).
-                  className="grid items-center gap-8 border-t border-cream-dim/15 py-14 [--about-img-ratio:4/5] sm:py-20 lg:grid-cols-2 lg:gap-16"
-                >
-                  {/* DOM order = image first, so on mobile the image is always above its text */}
-                  <Reveal className={imageFirst ? "" : "lg:order-2"}>
-                    <div
-                      className="relative w-full overflow-hidden rounded-lg"
-                      style={{ aspectRatio: "var(--about-img-ratio)" }}
-                    >
-                      <Image
-                        src={s.image.url}
-                        alt={s.image.alt}
-                        fill
-                        sizes="(min-width: 1024px) min(45vw, 544px), (min-width: 640px) calc(100vw - 4rem), calc(100vw - 2.5rem)"
-                        quality={85}
-                        className="object-cover"
-                        style={{ objectPosition: `${s.image.focalX}% ${s.image.focalY}%` }}
-                      />
-                    </div>
-                  </Reveal>
-                  <Reveal delay={0.1} className={imageFirst ? "" : "lg:order-1"}>
-                    <div className="flex flex-col gap-6">
-                      {head}
-                      {title}
-                      {paras}
-                    </div>
-                  </Reveal>
-                </section>
-              );
-            });
-          })()}
+      {/* The numbered points — staggered three-column layout (AboutPoints). Title
+          = each section's small label, text = its paragraphs, image = its
+          image. The big italic section headline (sections[].title in the CMS)
+          is no longer rendered; its data is untouched. */}
+      <section className="px-5 pb-20 pt-4 sm:px-8 sm:pb-28">
+        <div className="mx-auto max-w-6xl">
+          <AboutPoints
+            points={about.sections.map((s) => ({
+              title: s.kicker,
+              paragraphs: s.body,
+              image: s.image,
+            }))}
+          />
         </div>
-      </div>
+      </section>
 
       {/* full-bleed editorial closer (logo deck p.9) */}
       <section className="relative overflow-hidden px-5 py-28 sm:px-8 sm:py-40">
