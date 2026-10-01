@@ -42,8 +42,30 @@ const serverURL =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : undefined);
 
+/**
+ * Origins allowed to send authenticated (cookie) requests to the API/admin —
+ * Payload's CSRF + CORS allowlists. A request whose `Origin` is not listed has
+ * its login cookie ignored (→ 403 on create, 500 on the admin's form-state
+ * call), so every host the site is served from must be here: the canonical
+ * apex (`serverURL`), www, the production vercel.app alias, the project's
+ * production domain and the current deployment. Exact hosts only — no wildcards.
+ */
+const origin = (v?: string) => (v ? (v.includes("://") ? v : `https://${v}`).replace(/\/+$/, "") : undefined);
+const allowedOrigins = [
+  ...new Set(
+    [
+      serverURL,
+      "https://rmz.solutions",
+      "https://www.rmz.solutions",
+      "https://rmz-psi.vercel.app",
+      origin(process.env.VERCEL_PROJECT_PRODUCTION_URL),
+      origin(process.env.VERCEL_URL),
+    ].filter((o): o is string => Boolean(o)),
+  ),
+];
+
 export default buildConfig({
-  ...(serverURL ? { serverURL, csrf: [serverURL], cors: [serverURL] } : {}),
+  ...(serverURL ? { serverURL, csrf: allowedOrigins, cors: allowedOrigins } : {}),
   // Admin lives at a configurable, non-default path (default /studio).
   routes: { admin: process.env.PAYLOAD_ADMIN_PATH || "/studio" },
   admin: {
