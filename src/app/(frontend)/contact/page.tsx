@@ -33,17 +33,17 @@ export default async function ContactPage() {
       {/* Floating squares — now positioned relative to the whole page,
           not scoped to the form. Blur removed. */}
       <FloatingSquare
-        size={110}
+        size="logo"
         color="yellow"
         className="fixed left-[12%] top-[18%] hidden sm:block filter-none"
       />
       <FloatingSquare
-        size={110}
+        size="logo"
         color="orange"
         className="fixed right-[8%] top-[45%] hidden sm:block filter-none"
       />
       <FloatingSquare
-        size={110}
+        size="logo"
         color="green"
         className="fixed left-[6%] top-[70%] hidden sm:block  filter-none"
       />

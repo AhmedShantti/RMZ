@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
+import { LOGO_BOX_CSS, LOGO_TRIO, logoSquareSize } from "@/lib/logoSquareSize";
 
 /**
  * FloatingSquare — a single decorative brand square with ambient randomized
@@ -17,8 +18,9 @@ import { useId, useMemo } from "react";
 type Color = "orange" | "green" | "yellow";
 
 type Props = {
-  /** edge length of the square in px */
-  size?: number;
+  /** edge length of the square in px, or "logo" for the exact size of the logo /
+   *  Home-page squares (shared source: lib/logoSquareSize — responsive). */
+  size?: number | "logo";
   /** brand color */
   color?: Color;
   /** absolute-position utilities for the wrapper, e.g. "-left-4 -top-6" */
@@ -59,6 +61,28 @@ export default function FloatingSquare({
   className = "",
 }: Props) {
   const uid = useId().replace(/:/g, "");
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const logo = size === "logo";
+
+  // "logo": the same size the Home squares have — the shared calc is the
+  // pre-hydration value, then rounded to px exactly like the traveling squares.
+  useEffect(() => {
+    if (!logo) return;
+    const apply = () => {
+      const n = `${logoSquareSize(color, window.innerWidth)}px`;
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      wrap.style.width = wrap.style.height = n;
+      const sq = wrap.firstElementChild as HTMLElement | null;
+      if (sq) sq.style.width = sq.style.height = n;
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, [logo, color]);
+  const edge = logo
+    ? `calc(${LOGO_BOX_CSS} * ${LOGO_TRIO[color].width / 100})`
+    : `${size}px`;
 
   // Compute once per mount, not per render, so the animation doesn't reset/jump.
   const vars = useMemo(() => randomFloat(), []);
@@ -66,13 +90,13 @@ export default function FloatingSquare({
 
   return (
     <div
+      ref={wrapRef}
       aria-hidden="true"
       className={`pointer-events-none absolute ${className}`}
       style={{
         zIndex: -1,
-        width: size,
-        height: size,
-        
+        width: edge,
+        height: edge,
       }}
     >
       <style jsx>{`
@@ -96,8 +120,8 @@ export default function FloatingSquare({
       <span
         className="rmz-drift absolute block"
         style={{
-          width: size,
-          height: size,
+          width: edge,
+          height: edge,
           top: 0,
           left: 0,
           backgroundColor: COLOR_VAR[color],
