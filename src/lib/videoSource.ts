@@ -57,8 +57,8 @@ export function parseVideoSource(raw: string): VideoSource {
     }
   }
 
-  // Bunny Stream — iframe.mediadelivery.net/(play|embed)/LIBRARY/VIDEO
-  if (host === "iframe.mediadelivery.net" && parts.length >= 3 && ["play", "embed"].includes(parts[0])) {
+  // Bunny Stream — (iframe|player).mediadelivery.net/(play|embed)/LIBRARY/VIDEO
+  if ((host === "iframe.mediadelivery.net" || host === "player.mediadelivery.net") && parts.length >= 3 && ["play", "embed"].includes(parts[0])) {
     const src = `https://iframe.mediadelivery.net/embed/${parts[1]}/${parts[2]}?preload=true&responsive=true`;
     return { kind: "iframe", provider: "bunny", src, autoplaySrc: withParams(src, { autoplay: "true", muted: "true" }) };
   }
