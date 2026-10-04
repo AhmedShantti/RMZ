@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import ServiceRail from "@/components/ServiceRail";
 import ServicesHeroCarousel from "@/components/ServicesHeroCarousel";
 import RunsText from "@/components/RunsText";
-import { getServices, getMeta } from "@/lib/cms";
+import { getServices, getPortfolio, getMeta } from "@/lib/cms";
+import { groupProjectsByCategory } from "@/lib/portfolioGrouping";
+import { slugify } from "@/lib/slug";
 
 export async function generateMetadata(): Promise<Metadata> {
   const m = await getMeta("servicesContent", {
@@ -18,7 +20,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ServicesPage() {
-  const data = await getServices();
+  const [data, projects] = await Promise.all([getServices(), getPortfolio()]);
+  // Only categories that actually render a section on /portfolio can be anchored.
+  const sections = new Set(groupProjectsByCategory(projects).map((g) => g.slug));
+  /** Explore → the service's portfolio category: the one picked in the CMS, else a
+   *  category named like the service, else the whole Portfolio page. */
+  const exploreHref = (title: string, picked: string | null) => {
+    const slug = [picked, slugify(title)].find((c) => c && sections.has(c));
+    return slug ? `/portfolio#category-${slug}` : "/portfolio";
+  };
   const services = data.services.map((s, i) => ({
     index: String(i + 1).padStart(2, "0"),
     title: s.title,
@@ -26,6 +36,7 @@ export default async function ServicesPage() {
     items: s.items,
     workImageUrl: s.workImageUrl,
     workImageAlt: s.workImageAlt,
+    exploreHref: exploreHref(s.title, s.portfolioCategorySlug),
   }));
 
   return (

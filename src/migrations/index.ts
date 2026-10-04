@@ -6,6 +6,7 @@ import * as migration_20260930_140000_about_banner_zigzag_images from './2026093
 import * as migration_20261001_100000_about_banner_title from './20261001_100000_about_banner_title';
 import * as migration_20261001_120000_portfolio_banner from './20261001_120000_portfolio_banner';
 import * as migration_20261004_110000_contact_cms_fields from './20261004_110000_contact_cms_fields';
+import * as migration_20261004_130000_services_portfolio_category from './20261004_130000_services_portfolio_category';
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20261004_110000_contact_cms_fields.up,
     down: migration_20261004_110000_contact_cms_fields.down,
     name: '20261004_110000_contact_cms_fields',
+  },
+  {
+    up: migration_20261004_130000_services_portfolio_category.up,
+    down: migration_20261004_130000_services_portfolio_category.down,
+    name: '20261004_130000_services_portfolio_category',
   },
 ];

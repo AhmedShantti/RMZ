@@ -13,6 +13,8 @@ type RailService = {
   items: string[];
   workImageUrl?: string | null;
   workImageAlt?: string;
+  /** Where the Explore button goes — the service's category on /portfolio. */
+  exploreHref?: string;
 };
 
 /**
@@ -150,7 +152,7 @@ export default function ServiceRail({ services }: { services: RailService[] }) {
 
             {/* Explore button — sharp rectangle (radius 0), dark red (Stage 6) */}
             <Link
-              href="/contact"
+              href={svc.exploreHref ?? "/portfolio"}
               className="font-body text-cream bg-rebel-red mt-10 inline-flex w-fit items-center gap-2 rounded-none px-7 py-3 text-sm uppercase tracking-wider transition-opacity hover:opacity-90"
             >
               Explore

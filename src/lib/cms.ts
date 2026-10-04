@@ -348,6 +348,11 @@ export const getServices = cache(() =>
               workImageUrl: work?.url ?? null,
               workImageAlt: work?.alt ?? "",
               featuredOnHome: s.featuredOnHome ?? true,
+              // Slug of the chosen portfolio category (relationship populated at depth 1).
+              portfolioCategorySlug:
+                s.portfolioCategory && typeof s.portfolioCategory === "object"
+                  ? (s.portfolioCategory.slug ?? slugify(s.portfolioCategory.title))
+                  : null,
             };
           })
         : servicesDefault.map((s) => ({
@@ -355,6 +360,7 @@ export const getServices = cache(() =>
             workImageUrl: null,
             workImageAlt: "",
             featuredOnHome: true,
+            portfolioCategorySlug: null as string | null,
           }));
       return {
         pageTitle: runs(g.pageTitle, servicesPageDefault.pageTitle),
@@ -372,6 +378,7 @@ export const getServices = cache(() =>
         workImageUrl: null,
         workImageAlt: "",
         featuredOnHome: true,
+        portfolioCategorySlug: null as string | null,
       })),
     },
   ),

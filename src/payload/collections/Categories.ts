@@ -21,8 +21,8 @@ export const Categories: CollectionConfig = {
   },
   defaultSort: "sortOrder",
   hooks: {
-    afterChange: [revalidate(["/portfolio"])],
-    afterDelete: [revalidate(["/portfolio"])],
+    afterChange: [revalidate(["/portfolio", "/services"])],
+    afterDelete: [revalidate(["/portfolio", "/services"])],
   },
   fields: [
     { name: "title", type: "text", required: true, unique: true },

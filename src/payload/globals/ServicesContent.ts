@@ -56,6 +56,16 @@ export const ServicesContent: GlobalConfig = {
           },
         },
         {
+          name: "portfolioCategory",
+          type: "relationship",
+          relationTo: "categories",
+          label: "Portfolio category (Explore button)",
+          admin: {
+            description:
+              "The Explore button opens this category on the Portfolio page. Empty = a category named like the service (if one exists), otherwise the whole Portfolio page.",
+          },
+        },
+        {
           name: "featuredOnHome",
           type: "checkbox",
           label: "Show in Home teaser",

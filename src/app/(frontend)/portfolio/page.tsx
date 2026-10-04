@@ -65,7 +65,7 @@ export default async function PortfolioPage() {
                   <Reveal className="flex items-baseline justify-between gap-4">
                     <h2
                       id={headingId}
-                      className="font-display text-cream text-[clamp(24px,2.6vw,36px)] italic"
+                      className="font-display text-cream scroll-mt-28 text-[clamp(24px,2.6vw,36px)] italic"
                     >
                       {group.label}
                     </h2>

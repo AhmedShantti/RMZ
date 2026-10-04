@@ -29,14 +29,14 @@ export const PortfolioProjects: CollectionConfig = {
     // The project's own page, the index it appears on, and the neighbours whose
     // prev/next links point at it.
     afterChange: [
-      revalidate(["/portfolio"]),
+      revalidate(["/portfolio", "/services"]),
       async ({ doc }) => {
         const slug = (doc as { slug?: string }).slug;
         if (slug) await revalidate([`/portfolio/${slug}`])({ doc });
         return doc;
       },
     ],
-    afterDelete: [revalidate(["/portfolio"])],
+    afterDelete: [revalidate(["/portfolio", "/services"])],
   },
   fields: [
     { name: "name", type: "text", required: true },

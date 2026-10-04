@@ -1193,6 +1193,10 @@ export interface ServicesContent {
          * Client work photo shown when this service is active. Leave empty to show the placeholder.
          */
         workImage?: (number | null) | Media;
+        /**
+         * The Explore button opens this category on the Portfolio page. Empty = a category named like the service (if one exists), otherwise the whole Portfolio page.
+         */
+        portfolioCategory?: (number | null) | Category;
         featuredOnHome?: boolean | null;
         id?: string | null;
       }[]
@@ -1755,6 +1759,7 @@ export interface ServicesContentSelect<T extends boolean = true> {
               id?: T;
             };
         workImage?: T;
+        portfolioCategory?: T;
         featuredOnHome?: T;
         id?: T;
       };
