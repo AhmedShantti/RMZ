@@ -133,8 +133,16 @@ export default function BtsVideos({ items }: { items: BtsItem[] }) {
     <div ref={root} className="mx-auto flex max-w-5xl flex-col gap-24 sm:gap-32">
       {items.map((it, i) => (
         <Reveal key={it.slug}>
-          <article id={it.slug} data-bts={it.slug} className="scroll-mt-28">
-            <div className="relative aspect-video w-full overflow-hidden bg-[#0e0e0e]">
+          <article
+            id={it.slug}
+            data-bts={it.slug}
+            // Vertical (default): a centred phone-shaped column that always fits the screen's
+            // height; horizontal: the full-width 16:9 frame.
+            className={`scroll-mt-28 ${it.landscape ? "" : "mx-auto w-full max-w-[min(26rem,calc((100svh-9rem)*9/16))]"}`}
+          >
+            <div
+              className={`relative w-full overflow-hidden bg-[#0e0e0e] ${it.landscape ? "aspect-video" : "aspect-[9/16]"}`}
+            >
               <Player item={it} autoplay={focus === it.slug} onPlay={onPlay} />
             </div>
             <div className="mt-6 flex flex-col gap-3">

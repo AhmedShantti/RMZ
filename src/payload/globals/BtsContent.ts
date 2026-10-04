@@ -62,6 +62,15 @@ export const BtsContent: GlobalConfig = {
           admin: { description: "Portrait 3:4, about 1200×1600px, JPG/WebP ~300 KB. Shown on the Home card." },
         },
         {
+          name: "landscape",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Horizontal video (16:9)",
+          admin: {
+            description: "Leave off for vertical (9:16) videos — the default. Tick it only for horizontal videos.",
+          },
+        },
+        {
           name: "videoUrl",
           type: "text",
           label: "Video link (recommended — use this for 4K / large videos)",

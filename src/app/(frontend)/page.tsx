@@ -59,6 +59,8 @@ export default async function Home() {
           photoUrl: it.imageUrl,
           alt: it.imageAlt,
           href: `/bts#${it.slug}`,
+          videoUrl: it.videoUrl,
+          landscape: it.landscape,
         }))}
       />
       

@@ -3,7 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { ClientCardItem } from "@/content/home";
+import type { ClientCardItem as BaseCardItem } from "@/content/home";
+import { parseVideoSource } from "@/lib/videoSource";
+import { prefersReducedMotion } from "@/lib/reducedMotion";
+
+/** A Home card, plus (for BTS) the video that plays while it is hovered. */
+export type ClientCardItem = BaseCardItem & {
+  videoUrl?: string | null;
+  /** The video is horizontal (default vertical). */
+  landscape?: boolean;
+};
 
 const INTERVAL_MS = 5000;
 const SWEEP_MS = 900;
@@ -34,6 +43,51 @@ function ClientImg({ item }: { item: ClientCardItem }) {
   );
 }
 
+/**
+ * The card's video, played muted + looped while the card is hovered. Sized to
+ * COVER the card (the card is 3:4; the video is 9:16 or 16:9), and faded in
+ * once it has loaded so the photo never flashes away to a black player.
+ */
+function HoverVideo({ item }: { item: ClientCardItem }) {
+  const [ready, setReady] = useState(false);
+  const source = item.videoUrl ? parseVideoSource(item.videoUrl) : null;
+  if (!source || source.kind === "hls") return null;
+  const fit = item.landscape
+    ? "absolute top-0 h-full aspect-video start-1/2 -translate-x-1/2 rtl:translate-x-1/2"
+    : "absolute start-0 top-1/2 w-full aspect-[9/16] -translate-y-1/2";
+  const style = { opacity: ready ? 1 : 0, transition: "opacity 0.4s ease" };
+  if (source.kind === "iframe") {
+    const loop = source.provider === "youtube" ? {} : { loop: source.provider === "vimeo" ? "1" : "true" };
+    const u = new URL(source.autoplaySrc);
+    for (const [k, v] of Object.entries(loop)) u.searchParams.set(k, v);
+    return (
+      <iframe
+        src={u.toString()}
+        title=""
+        aria-hidden="true"
+        tabIndex={-1}
+        allow="autoplay; encrypted-media"
+        onLoad={() => setReady(true)}
+        className={`${fit} pointer-events-none border-0`}
+        style={style}
+      />
+    );
+  }
+  return (
+    <video
+      src={source.src}
+      muted
+      loop
+      autoPlay
+      playsInline
+      aria-hidden="true"
+      onPlaying={() => setReady(true)}
+      className={`${fit} pointer-events-none object-cover`}
+      style={style}
+    />
+  );
+}
+
 function ClientCard({
   clients,
   startOffset,
@@ -54,10 +108,27 @@ function ClientCard({
   // Live `current` for the interval closure (which is created once).
   const currentRef = useRef(current);
   currentRef.current = current;
+  // Hover: the rotation pauses and the shown item's video plays (mouse only).
+  const [hovering, setHovering] = useState(false);
+  const hoverRef = useRef(false);
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const onEnter = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || prefersReducedMotion()) return;
+    hoverRef.current = true;
+    // Small delay so sweeping the mouse across the cards doesn't start every video.
+    hoverTimer.current = setTimeout(() => setHovering(true), 250);
+  };
+  const onLeave = () => {
+    hoverRef.current = false;
+    clearTimeout(hoverTimer.current);
+    setHovering(false);
+  };
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
   useEffect(() => {
     const start = () => {
       intervalRef.current = setInterval(() => {
+        if (hoverRef.current) return; // paused while hovered
         // Load the incoming image at sweep START and HOLD it through the whole
         // sweep — including the upcoming layer's fade-out. Advancing it at sweep
         // end (the old `setNext(c+2)`) flipped this layer to the *next-next*
@@ -89,7 +160,10 @@ function ClientCard({
   const pad = (n: number) => (n + 1).toString().padStart(2, "0");
 
   return (
-    <div className="relative aspect-[3/4] w-[min(360px,calc(100vw-3rem))] sm:w-[min(360px,calc((100vw-4.5rem)/2))] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100">
+    <div className="relative aspect-[3/4] w-[min(360px,calc(100vw-3rem))] sm:w-[min(360px,calc((100vw-4.5rem)/2))] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100"
+      onPointerEnter={onEnter}
+      onPointerLeave={onLeave}
+    >
       <div className="absolute inset-0">
         <ClientImg item={active} />
       </div>
@@ -99,6 +173,12 @@ function ClientCard({
       >
         <ClientImg item={upcoming} />
       </div>
+
+      {hovering && !sweeping && shown.videoUrl && (
+        <div className="absolute inset-0 overflow-hidden">
+          <HoverVideo key={shown.videoUrl} item={shown} />
+        </div>
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/40" />
 

@@ -1487,6 +1487,10 @@ export interface BtsContent {
         /**
          * Paste the link of a video hosted on a video service — Bunny Stream, Cloudflare Stream, Vimeo or YouTube (the share / embed link), or a direct .m3u8 / .mp4 URL. These stream in adaptive quality and have no size limit. If set, it is used instead of the uploaded file below.
          */
+        /**
+         * Leave off for vertical (9:16) videos — the default. Tick it only for horizontal videos.
+         */
+        landscape?: boolean | null;
         videoUrl?: string | null;
         /**
          * MP4/WebM uploaded here must be under about 4 MB (uploads go through the server, which has a 4.5 MB request limit). For 4K or anything bigger, use the video link above.

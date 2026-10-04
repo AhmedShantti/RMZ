@@ -566,6 +566,8 @@ export type BtsItem = {
   imageUrl: string | null;
   imageAlt: string;
   videoUrl: string;
+  /** Horizontal (16:9) video; default is vertical (9:16). */
+  landscape: boolean;
   posterUrl: string | null;
   description: string;
 };
@@ -601,6 +603,7 @@ export const getBts = cache(() =>
               imageUrl: img?.url ?? null,
               imageAlt: img?.alt ?? "",
               videoUrl: video.url,
+              landscape: it.landscape === true,
               posterUrl: poster?.url ?? img?.url ?? null,
               description: f(it.description, ""),
             },

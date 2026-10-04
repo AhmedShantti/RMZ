@@ -9,6 +9,7 @@ import * as migration_20261004_110000_contact_cms_fields from './20261004_110000
 import * as migration_20261004_130000_services_portfolio_category from './20261004_130000_services_portfolio_category';
 import * as migration_20261004_150000_bts_content from './20261004_150000_bts_content';
 import * as migration_20261005_100000_bts_video_link from './20261005_100000_bts_video_link';
+import * as migration_20261006_100000_bts_landscape from './20261006_100000_bts_landscape';
 
 export const migrations = [
   {
@@ -65,5 +66,10 @@ export const migrations = [
     up: migration_20261005_100000_bts_video_link.up,
     down: migration_20261005_100000_bts_video_link.down,
     name: '20261005_100000_bts_video_link',
+  },
+  {
+    up: migration_20261006_100000_bts_landscape.up,
+    down: migration_20261006_100000_bts_landscape.down,
+    name: '20261006_100000_bts_landscape',
   },
 ];
