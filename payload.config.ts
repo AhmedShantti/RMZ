@@ -20,6 +20,7 @@ import { ServicesContent } from "./src/payload/globals/ServicesContent.ts";
 import { ContactContent } from "./src/payload/globals/ContactContent.ts";
 import { CareersContent } from "./src/payload/globals/CareersContent.ts";
 import { PortfolioContent } from "./src/payload/globals/PortfolioContent.ts";
+import { BtsContent } from "./src/payload/globals/BtsContent.ts";
 import { LegalPrivacy, LegalTerms } from "./src/payload/globals/legal.ts";
 
 const filename = fileURLToPath(import.meta.url);
@@ -91,6 +92,7 @@ export default buildConfig({
     ContactContent,
     CareersContent,
     PortfolioContent,
+    BtsContent,
     LegalPrivacy,
     LegalTerms,
   ],

@@ -4,16 +4,17 @@ import HomeLogoStairs from "@/components/HomeLogoStairs";
 import ServicesTeaser from "@/components/ServicesTeaser";
 import VideoSection from "@/components/VideoSection";
 import MarketsBlock from "@/components/MarketsBlock";
-import { getHome, getServices, getContact, getSiteSettings } from "@/lib/cms";
+import { getHome, getServices, getContact, getSiteSettings, getBts } from "@/lib/cms";
 import Gradient from "@/components/gradient/NeatGradient";
-import ClientCard from "@/components/ClientCard";
+import BtsSection from "@/components/BtsSection";
 
 export default async function Home() {
-  const [home, servicesData, contact, settings] = await Promise.all([
+  const [home, servicesData, contact, settings, bts] = await Promise.all([
     getHome(),
     getServices(),
     getContact(),
     getSiteSettings(),
+    getBts(),
   ]);
 
   // Number services 01..N by their full-list order, then keep the featured ones.
@@ -49,7 +50,17 @@ export default async function Home() {
       <HomeLogoStairs stairs={home.stairs} />
       <ServicesTeaser services={featured}  />
      
-      <ClientCard heading={home.clientsHeading} clients={home.clientCards} />
+      {/* BTS section (was Clients): each card opens its video on /bts */}
+      <BtsSection
+        heading={bts.homeHeading}
+        items={bts.items.map((it) => ({
+          name: it.title,
+          category: it.label,
+          photoUrl: it.imageUrl,
+          alt: it.imageAlt,
+          href: `/bts#${it.slug}`,
+        }))}
+      />
       
       <VideoSection videos={home.showreel.videos} />
       <MarketsBlock

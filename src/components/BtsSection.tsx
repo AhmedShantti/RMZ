@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { homeContent, type ClientCardItem } from "@/content/home";
+import type { ClientCardItem } from "@/content/home";
 
 const INTERVAL_MS = 5000;
 const SWEEP_MS = 900;
@@ -142,7 +142,7 @@ function ClientCard({
       {shown.href && (
         <Link
           href={shown.href}
-          aria-label={`${shown.name} — view project`}
+          aria-label={`${shown.name} — watch the video`}
           className="absolute inset-0 focus-visible:rounded-2xl! focus-visible:outline-offset-[-3px]!"
         />
       )}
@@ -151,17 +151,19 @@ function ClientCard({
 }
 
 /**
- * Rotating client showcase — three cards, each cross-fading through the client
- * list on its own stagger. Heading + cards are CMS-driven (homeContent →
- * clientsHeading / clientCards); the defaults keep it rendering standalone.
+ * Rotating BTS (behind-the-scenes) showcase — three cards, each cross-fading
+ * through the BTS items on its own stagger. (This was the Clients section; the
+ * design is unchanged, only the content + links.) Heading + items come from the
+ * CMS (btsContent); each card links to its video on /bts. Renders nothing while
+ * there are no items.
  */
-export default function ClientsSection({
-  heading = homeContent.clientsHeading,
-  clients = homeContent.clientCards,
+export default function BtsSection({
+  heading,
+  items: clients,
 }: {
-  heading?: string;
-  clients?: ClientCardItem[];
-} = {}) {
+  heading: string;
+  items: ClientCardItem[];
+}) {
   if (!clients?.length) return null;
   // Spread the three cards' starting points evenly through the list (6 → 0/2/4,
   // 3 → 0/1/2) so they never all show the same photo at once.
