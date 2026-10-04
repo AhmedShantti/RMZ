@@ -19,14 +19,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// TODO: Move the office address into the CMS (siteSettings) — placeholder for now.
-const OFFICE_ADDRESS = "Office 102: Nasr City, Cairo, Egypt";
-
 export default async function ContactPage() {
   const [contact, settings] = await Promise.all([
     getContact(),
     getSiteSettings(),
   ]);
+
+  // Info bar — all from the Contact page in the CMS (email falls back to the
+  // site email in Site settings when left blank).
+  const email = contact.contactEmail || settings.email;
 
   return (
     <div className="relative px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
@@ -67,18 +68,18 @@ export default async function ContactPage() {
         <Reveal delay={0.1}>
           <div className="border-cream-dim/30 mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b py-5">
             <span className="font-body text-cream-dim text-base underline underline-offset-4">
-              {OFFICE_ADDRESS}
+              {contact.officeAddress}
             </span>
             <span className="font-body text-cream-dim flex items-center gap-3 text-base">
               <a
-                href={`mailto:${settings.email}`}
+                href={`mailto:${email}`}
                 className="underline underline-offset-4 hover:text-cream transition-colors"
               >
-                {settings.email}
+                {email}
               </a>
               <a
-                href={`mailto:${settings.email}`}
-                aria-label="Email us"
+                href={`mailto:${email}`}
+                aria-label={contact.emailLinkLabel}
                 className="hover:text-cream transition-colors"
               >
                 <svg

@@ -17,7 +17,39 @@ export const ContactContent: GlobalConfig = {
   hooks: { afterChange: [revalidate(["/contact", "/"])] },
   fields: [
     runsField("heroStory", "Hero line (STORY)"),
-    { name: "lede", type: "textarea" },
+    { name: "lede", type: "textarea", label: "Intro line (under the hero)" },
+    {
+      type: "collapsible",
+      label: "Info bar (address + email)",
+      admin: {
+        description: "The line between the intro and the form: office address on one side, email on the other.",
+      },
+      fields: [
+        {
+          name: "officeAddress",
+          type: "text",
+          label: "Office address",
+          defaultValue: "Office 102: Nasr City, Cairo, Egypt",
+          admin: { description: "Shown on the left of the info bar. Empty = the built-in address." },
+        },
+        {
+          name: "contactEmail",
+          type: "email",
+          label: "Contact email",
+          admin: {
+            description:
+              "Shown (and used as the mailto link) on the right of the info bar. Empty = the site email from Site settings.",
+          },
+        },
+        {
+          name: "emailLinkLabel",
+          type: "text",
+          label: "Email arrow — accessible label",
+          defaultValue: "Email us",
+          admin: { description: "Read by screen readers for the arrow icon next to the email." },
+        },
+      ],
+    },
     {
       name: "whereWeWorkLabel",
       type: "text",
@@ -63,6 +95,47 @@ export const ContactContent: GlobalConfig = {
           admin: { description: "Where the form sends. Blank = the site email." },
         },
         { name: "submitLabel", type: "text", defaultValue: "Send it" },
+        {
+          name: "sendingLabel",
+          type: "text",
+          label: "Submit button — while sending",
+          defaultValue: "Sending…",
+        },
+        {
+          name: "sendAnotherLabel",
+          type: "text",
+          label: "“Send another” link (after success)",
+          defaultValue: "Send another →",
+        },
+        {
+          name: "submitError",
+          type: "text",
+          label: "Message when sending fails",
+          defaultValue: "Something went wrong sending your message. Please try again in a moment.",
+          admin: { description: "Shown above the form if the server can't be reached or rejects the message." },
+        },
+        {
+          name: "labels",
+          type: "group",
+          label: "Field labels",
+          fields: [
+            { name: "fullName", type: "text", label: "Full name", defaultValue: "Full Name" },
+            { name: "email", type: "text", label: "Email", defaultValue: "Email" },
+            { name: "company", type: "text", label: "Company", defaultValue: "Company Name" },
+            { name: "phone", type: "text", label: "Phone", defaultValue: "Phone Number" },
+            { name: "country", type: "text", label: "Country", defaultValue: "Country" },
+            { name: "countryPlaceholder", type: "text", label: "Country — placeholder option", defaultValue: "Select country" },
+            { name: "message", type: "text", label: "Message (project brief)", defaultValue: "Give us a brief about your project" },
+          ],
+        },
+        {
+          name: "countries",
+          type: "array",
+          label: "Country list",
+          labels: { singular: "Country", plural: "Countries" },
+          admin: { description: "The options in the Country drop-down, in order. Empty = the built-in list." },
+          fields: [{ name: "label", type: "text", required: true }],
+        },
         { name: "successHeading", type: "text" },
         { name: "successBody", type: "textarea" },
         {

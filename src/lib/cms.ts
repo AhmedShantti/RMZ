@@ -383,6 +383,9 @@ export const getContact = cache(() => {
     heroStory: contactDefault.heroStory,
     lede: contactDefault.lede,
     whereWeWorkLabel: contactDefault.whereWeWorkLabel,
+    officeAddress: contactDefault.officeAddress,
+    contactEmail: "",
+    emailLinkLabel: contactDefault.emailLinkLabel,
     markets: marketsDefault,
     form: { ...fd },
   };
@@ -393,6 +396,10 @@ export const getContact = cache(() => {
       return {
         heroStory: runs(g.heroStory, contactDefault.heroStory),
         lede: f(g.lede, contactDefault.lede),
+        officeAddress: f(g.officeAddress, contactDefault.officeAddress),
+        // blank = the site email (resolved on the page from Site settings)
+        contactEmail: f(g.contactEmail, ""),
+        emailLinkLabel: f(g.emailLinkLabel, contactDefault.emailLinkLabel),
         whereWeWorkLabel: f(
           g.whereWeWorkLabel,
           contactDefault.whereWeWorkLabel,
@@ -409,6 +416,21 @@ export const getContact = cache(() => {
         form: {
           recipientEmail: f(g.form?.recipientEmail, fd.recipientEmail),
           submitLabel: f(g.form?.submitLabel, fd.submitLabel),
+          sendingLabel: f(g.form?.sendingLabel, fd.sendingLabel),
+          sendAnotherLabel: f(g.form?.sendAnotherLabel, fd.sendAnotherLabel),
+          submitError: f(g.form?.submitError, fd.submitError),
+          labels: {
+            fullName: f(g.form?.labels?.fullName, fd.labels.fullName),
+            email: f(g.form?.labels?.email, fd.labels.email),
+            company: f(g.form?.labels?.company, fd.labels.company),
+            phone: f(g.form?.labels?.phone, fd.labels.phone),
+            country: f(g.form?.labels?.country, fd.labels.country),
+            countryPlaceholder: f(g.form?.labels?.countryPlaceholder, fd.labels.countryPlaceholder),
+            message: f(g.form?.labels?.message, fd.labels.message),
+          },
+          countries: labels(g.form?.countries).length
+            ? labels(g.form?.countries)
+            : fd.countries,
           successHeading: f(g.form?.successHeading, fd.successHeading),
           successBody: f(g.form?.successBody, fd.successBody),
           errorSummary: f(g.form?.errorSummary, fd.errorSummary),

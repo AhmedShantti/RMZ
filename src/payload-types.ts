@@ -1237,6 +1237,18 @@ export interface ContactContent {
       }[]
     | null;
   lede?: string | null;
+  /**
+   * Shown on the left of the info bar. Empty = the built-in address.
+   */
+  officeAddress?: string | null;
+  /**
+   * Shown (and used as the mailto link) on the right of the info bar. Empty = the site email from Site settings.
+   */
+  contactEmail?: string | null;
+  /**
+   * Read by screen readers for the arrow icon next to the email.
+   */
+  emailLinkLabel?: string | null;
   whereWeWorkLabel?: string | null;
   /**
    * The four markets, in order. Highlight = rendered in red.
@@ -1268,6 +1280,30 @@ export interface ContactContent {
      */
     recipientEmail?: string | null;
     submitLabel?: string | null;
+    sendingLabel?: string | null;
+    sendAnotherLabel?: string | null;
+    /**
+     * Shown above the form if the server can't be reached or rejects the message.
+     */
+    submitError?: string | null;
+    labels?: {
+      fullName?: string | null;
+      email?: string | null;
+      company?: string | null;
+      phone?: string | null;
+      country?: string | null;
+      countryPlaceholder?: string | null;
+      message?: string | null;
+    };
+    /**
+     * The options in the Country drop-down, in order. Empty = the built-in list.
+     */
+    countries?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
     successHeading?: string | null;
     successBody?: string | null;
     /**
@@ -1749,6 +1785,9 @@ export interface ContactContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
+  officeAddress?: T;
+  contactEmail?: T;
+  emailLinkLabel?: T;
   whereWeWorkLabel?: T;
   markets?:
     | T
@@ -1770,6 +1809,26 @@ export interface ContactContentSelect<T extends boolean = true> {
     | {
         recipientEmail?: T;
         submitLabel?: T;
+        sendingLabel?: T;
+        sendAnotherLabel?: T;
+        submitError?: T;
+        labels?:
+          | T
+          | {
+              fullName?: T;
+              email?: T;
+              company?: T;
+              phone?: T;
+              country?: T;
+              countryPlaceholder?: T;
+              message?: T;
+            };
+        countries?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
         successHeading?: T;
         successBody?: T;
         errorSummary?: T;

@@ -14,6 +14,19 @@ import { useId, useRef, useState } from "react";
 type FormConfig = {
   recipientEmail: string;
   submitLabel: string;
+  sendingLabel: string;
+  sendAnotherLabel: string;
+  submitError: string;
+  labels: {
+    fullName: string;
+    email: string;
+    company: string;
+    phone: string;
+    country: string;
+    countryPlaceholder: string;
+    message: string;
+  };
+  countries: string[];
   successHeading: string;
   successBody: string;
   errorSummary: string;
@@ -38,19 +51,6 @@ type Status = "idle" | "loading" | "error" | "success";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const COUNTRIES = [
-  "Egypt",
-  "Saudi Arabia",
-  "United Arab Emirates",
-  "Kuwait",
-  "Qatar",
-  "Bahrain",
-  "Oman",
-  "Jordan",
-  "Lebanon",
-  "Other",
-];
-
 const EMPTY: Values = {
   name: "",
   email: "",
@@ -65,6 +65,8 @@ export default function ContactForm({ form }: { form: FormConfig }) {
   const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
+  // true when the send itself failed (network/server) rather than validation
+  const [sendFailed, setSendFailed] = useState(false);
   const summaryRef = useRef<HTMLParagraphElement>(null);
 
   const validate = (v: Values): Errors => {
@@ -94,6 +96,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
     if (status === "loading") return; // guard against double-submit
     const e2 = validate(values);
     setErrors(e2);
+    setSendFailed(false);
     if (Object.keys(e2).length > 0) {
       setStatus("error");
       requestAnimationFrame(() => summaryRef.current?.focus());
@@ -119,6 +122,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
       setValues(EMPTY);
     } catch (err) {
       console.error("Contact form error:", err);
+      setSendFailed(true);
       setStatus("error");
     }
   };
@@ -141,7 +145,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
           onClick={() => setStatus("idle")}
           className="font-body text-rebel-red hover:text-cream cursor-pointer text-sm transition-colors"
         >
-          Send another →
+          {form.sendAnotherLabel}
         </button>
       </div>
     );
@@ -160,12 +164,12 @@ export default function ContactForm({ form }: { form: FormConfig }) {
           role="alert"
           className="font-body text-rebel-red text-sm md:col-span-2"
         >
-          {form.errorSummary}
+          {sendFailed ? form.submitError : form.errorSummary}
         </p>
       )}
 
       <Field 
-        label="Full Name"
+        label={form.labels.fullName}
         id={id("name")}
         errId={errId("name")}
         error={errors.name}
@@ -185,7 +189,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
       </Field>
 
       <Field
-        label="Email"
+        label={form.labels.email}
         id={id("email")}
         errId={errId("email")}
         error={errors.email}
@@ -203,7 +207,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         />
       </Field>
 
-      <Field label="Company Name" id={id("company")} errId={errId("company")}>
+      <Field label={form.labels.company} id={id("company")} errId={errId("company")}>
         <input
           id={id("company")}
           name="company"
@@ -215,7 +219,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         />
       </Field>
 
-      <Field label="Phone Number" id={id("phone")} errId={errId("phone")}>
+      <Field label={form.labels.phone} id={id("phone")} errId={errId("phone")}>
         <input
           id={id("phone")}
           name="phone"
@@ -227,7 +231,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         />
       </Field>
 
-      <Field label="Country" id={id("country")} errId={errId("country")}>
+      <Field label={form.labels.country} id={id("country")} errId={errId("country")}>
         <select
           id={id("country")}
           name="country"
@@ -235,8 +239,8 @@ export default function ContactForm({ form }: { form: FormConfig }) {
           onChange={field("country")}
           className="rmz-input"
         >
-          <option value="">Select country</option>
-          {COUNTRIES.map((c) => (
+          <option value="">{form.labels.countryPlaceholder}</option>
+          {form.countries.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
@@ -245,7 +249,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
       </Field>
 
       <Field
-        label="Give us a brief about your project"
+        label={form.labels.message}
         id={id("message")}
         errId={errId("message")}
         error={errors.message}
@@ -269,7 +273,7 @@ export default function ContactForm({ form }: { form: FormConfig }) {
         aria-busy={status === "loading"}
         className="font-body bg-cream text-ink mt-2 h-[64px] w-full cursor-pointer rounded-full text-base font-semibold uppercase tracking-wider transition-opacity hover:opacity-90 disabled:opacity-60 md:col-span-2"
       >
-        {status === "loading" ? "Sending…" : form.submitLabel}
+        {status === "loading" ? form.sendingLabel : form.submitLabel}
       </button>
     </form>
   );
