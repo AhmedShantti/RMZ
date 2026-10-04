@@ -11,6 +11,7 @@ import type { Run } from "@/components/RunsText";
 import { site as siteDefault } from "@/content/site";
 import { mainNav } from "@/content/nav";
 import { homeContent as homeDefault, DEFAULT_STAIR_TITLES } from "@/content/home";
+import { btsContent as btsDefault } from "@/content/bts";
 import { aboutContent as aboutDefault, type AboutImage } from "@/content/about";
 import { servicesPage as servicesPageDefault, services as servicesDefault } from "@/content/services";
 import { markets as marketsDefault } from "@/content/markets";
@@ -75,6 +76,7 @@ type SeoSlug =
   | "contactContent"
   | "careersContent"
   | "portfolioContent"
+  | "btsContent"
   | "legalPrivacy"
   | "legalTerms";
 
@@ -550,6 +552,70 @@ export const getPortfolioPage = cache(() =>
       lede: portfolioPageDefault.lede,
       banner: portfolioPageDefault.banner,
       bannerTitle: portfolioPageDefault.bannerTitle,
+    },
+  ),
+);
+
+// ── BTS (Behind the scenes): the /bts page + the Home section ────────────────
+
+export type BtsItem = {
+  /** Anchor id on /bts (and the Home card's link target) — from the title, unique. */
+  slug: string;
+  title: string;
+  label: string;
+  imageUrl: string | null;
+  imageAlt: string;
+  videoUrl: string;
+  posterUrl: string | null;
+  description: string;
+};
+
+export const getBts = cache(() =>
+  safe(
+    "bts",
+    async (p) => {
+      // depth 1 so the card image / video / poster uploads are populated.
+      const g = await p.findGlobal({ slug: "btsContent", depth: 1 });
+      const used = new Map<string, number>();
+      const items: BtsItem[] = (Array.isArray(g.items) ? g.items : []).flatMap(
+        (it, i) => {
+          const media = (v: unknown) =>
+            v && typeof v === "object"
+              ? (v as { url?: string | null; alt?: string | null })
+              : null;
+          const video = media(it.video);
+          if (!video?.url) return []; // an item without a video can't open anything
+          const img = media(it.cardImage);
+          const poster = media(it.poster);
+          const base = slugify(it.title) || `video-${i + 1}`;
+          const n = used.get(base) ?? 0;
+          used.set(base, n + 1);
+          return [
+            {
+              slug: n ? `${base}-${n + 1}` : base,
+              title: it.title,
+              label: f(it.label, "Behind the scenes"),
+              imageUrl: img?.url ?? null,
+              imageAlt: img?.alt ?? "",
+              videoUrl: video.url,
+              posterUrl: poster?.url ?? img?.url ?? null,
+              description: f(it.description, ""),
+            },
+          ];
+        },
+      );
+      return {
+        title: f(g.title, btsDefault.title),
+        lede: f(g.lede, btsDefault.lede),
+        homeHeading: f(g.homeHeading, btsDefault.homeHeading),
+        items,
+      };
+    },
+    {
+      title: btsDefault.title,
+      lede: btsDefault.lede,
+      homeHeading: btsDefault.homeHeading,
+      items: [] as BtsItem[],
     },
   ),
 );

@@ -103,6 +103,7 @@ export interface Config {
     contactContent: ContactContent;
     careersContent: CareersContent;
     portfolioContent: PortfolioContent;
+    btsContent: BtsContent;
     legalPrivacy: LegalPrivacy;
     legalTerms: LegalTerm;
   };
@@ -114,6 +115,7 @@ export interface Config {
     contactContent: ContactContentSelect<false> | ContactContentSelect<true>;
     careersContent: CareersContentSelect<false> | CareersContentSelect<true>;
     portfolioContent: PortfolioContentSelect<false> | PortfolioContentSelect<true>;
+    btsContent: BtsContentSelect<false> | BtsContentSelect<true>;
     legalPrivacy: LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     legalTerms: LegalTermsSelect<false> | LegalTermsSelect<true>;
   };
@@ -1452,6 +1454,73 @@ export interface PortfolioContent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "btsContent".
+ */
+export interface BtsContent {
+  id: number;
+  /**
+   * The heading of the /bts page.
+   */
+  title?: string | null;
+  /**
+   * Shown under the page title.
+   */
+  lede?: string | null;
+  /**
+   * The heading above the cards on the Home page.
+   */
+  homeHeading?: string | null;
+  /**
+   * In order. Each item is a card on the Home page (image + title + label) that opens its video on the BTS page. The Home section is hidden while this list is empty.
+   */
+  items?:
+    | {
+        title: string;
+        /**
+         * Small line under the title on the Home card, e.g. "Product shoot". Empty = "Behind the scenes".
+         */
+        label?: string | null;
+        /**
+         * Portrait 3:4, about 1200×1600px, JPG/WebP ~300 KB. Shown on the Home card.
+         */
+        cardImage: number | Media;
+        /**
+         * MP4/WebM. Keep it under about 4 MB (uploads go through the server, which has a 4.5 MB request limit).
+         */
+        video: number | Media;
+        /**
+         * Shown before the video plays on the BTS page. Empty = the card image.
+         */
+        poster?: (number | null) | Media;
+        /**
+         * Shown under the video on the BTS page.
+         */
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional overrides for this page's metadata. Blank = defaults.
+   */
+  seo?: {
+    /**
+     * Overrides the <title>.
+     */
+    title?: string | null;
+    /**
+     * Overrides the meta description / OG description.
+     */
+    description?: string | null;
+    /**
+     * Overrides the Open Graph image.
+     */
+    ogImage?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legalPrivacy".
  */
 export interface LegalPrivacy {
@@ -1908,6 +1977,36 @@ export interface PortfolioContentSelect<T extends boolean = true> {
         id?: T;
       };
   lede?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "btsContent_select".
+ */
+export interface BtsContentSelect<T extends boolean = true> {
+  title?: T;
+  lede?: T;
+  homeHeading?: T;
+  items?:
+    | T
+    | {
+        title?: T;
+        label?: T;
+        cardImage?: T;
+        video?: T;
+        poster?: T;
+        description?: T;
+        id?: T;
+      };
   seo?:
     | T
     | {
