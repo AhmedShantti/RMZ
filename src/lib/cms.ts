@@ -583,8 +583,11 @@ export const getBts = cache(() =>
             v && typeof v === "object"
               ? (v as { url?: string | null; alt?: string | null })
               : null;
-          const video = media(it.video);
-          if (!video?.url) return []; // an item without a video can't open anything
+          // The pasted video link (Bunny / Cloudflare / Vimeo / YouTube / .m3u8 / .mp4)
+          // wins over an uploaded file; an item with neither can't open anything.
+          const link = (it.videoUrl ?? "").trim();
+          const video = link ? { url: link } : media(it.video);
+          if (!video?.url) return [];
           const img = media(it.cardImage);
           const poster = media(it.poster);
           const base = slugify(it.title) || `video-${i + 1}`;

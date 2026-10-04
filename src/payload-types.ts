@@ -1485,9 +1485,13 @@ export interface BtsContent {
          */
         cardImage: number | Media;
         /**
-         * MP4/WebM. Keep it under about 4 MB (uploads go through the server, which has a 4.5 MB request limit).
+         * Paste the link of a video hosted on a video service — Bunny Stream, Cloudflare Stream, Vimeo or YouTube (the share / embed link), or a direct .m3u8 / .mp4 URL. These stream in adaptive quality and have no size limit. If set, it is used instead of the uploaded file below.
          */
-        video: number | Media;
+        videoUrl?: string | null;
+        /**
+         * MP4/WebM uploaded here must be under about 4 MB (uploads go through the server, which has a 4.5 MB request limit). For 4K or anything bigger, use the video link above.
+         */
+        video?: (number | null) | Media;
         /**
          * Shown before the video plays on the BTS page. Empty = the card image.
          */
@@ -2002,6 +2006,7 @@ export interface BtsContentSelect<T extends boolean = true> {
         title?: T;
         label?: T;
         cardImage?: T;
+        videoUrl?: T;
         video?: T;
         poster?: T;
         description?: T;
