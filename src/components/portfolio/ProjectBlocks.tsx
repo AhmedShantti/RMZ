@@ -210,7 +210,7 @@ function TextBreak({ block }: { block: Extract<ProjectBlock, { type: "textBreak"
   return (
     <Section className="sm:py-32">
       <Reveal>
-        <blockquote className="mx-auto max-w-3xl text-center">
+        <blockquote className="w-full">
           <p className="display-statement text-cream text-[clamp(1.6rem,3.4vw,2.6rem)] italic">
             {block.text}
           </p>
@@ -363,13 +363,13 @@ function Summary({ block }: { block: Extract<ProjectBlock, { type: "summary" }> 
         <Kicker>{block.heading ?? "In the end"}</Kicker>
       </Reveal>
       <Reveal delay={0.05}>
-        <p className="display-statement text-cream max-w-3xl text-[clamp(1.5rem,3vw,2.2rem)]">
+        <p className="display-statement text-cream w-full text-[clamp(1.5rem,3vw,2.2rem)]">
           {block.body}
         </p>
       </Reveal>
       {block.quote && (
         <Reveal delay={0.1}>
-          <figure className="mt-12 max-w-2xl border-l-2 border-[var(--rebel-red)] pl-6">
+          <figure className="mt-12 w-full border-l-2 border-[var(--rebel-red)] pl-6">
             <blockquote className="font-display text-cream text-xl italic leading-relaxed">
               “{block.quote}”
             </blockquote>
