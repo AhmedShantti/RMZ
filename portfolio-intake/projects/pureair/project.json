@@ -1,0 +1,34 @@
+{
+  "name": "PureAir",
+  "client": "PureAir",
+  "market": "TODO",
+  "discipline": "Campaign",
+  "category": "Social Media Campaign",
+  "resultLine": "COMFORT, REIMAGINED",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "PureAir entered a category where everyone talks about performance, power, and specifications. But comfort has never been a number on a box. It is the quiet shift from noticing the heat to forgetting it was ever there. That became the space worth exploring. A technical product could speak through feeling, familiarity, and a little imagination, without losing the reason people choose it in the first place. For PureAir, creativity became a way to move the conversation beyond what an air conditioner does and closer to what people actually want from it: a home that simply feels right, no matter what is happening outside."
+    },
+    {
+      "type": "overview",
+      "heading": "COMFORT, REIMAGINED",
+      "idea": "Turn a technical category into a more human conversation, where comfort is felt before performance is explained.",
+      "goal": "Give PureAir a creative language that makes everyday comfort more visual, relatable, and memorable.",
+      "challenge": "Stand apart in a market built around specs and features without losing the practical value people expect from the category."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Campaign Creative Concept",
+        "Visual Direction & Key Visual",
+        "Campaign Communication System"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "PureAir gave us an opportunity to make comfort visible without reducing it to specifications. The creative language moved away from the expected technical world of air conditioning and into something more human, imaginative, and instantly understood. Familiar spaces met unexpected ideas, turning an everyday product into a feeling people could recognise before a single feature was explained. The result was a direction that stayed grounded in what PureAir offers, while giving the brand a more distinctive way to live in a category where everyone tends to say the same thing."
+    }
+  ]
+}

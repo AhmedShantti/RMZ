@@ -1,0 +1,34 @@
+{
+  "name": "Eddekhar",
+  "client": "Eddekhar",
+  "market": "Saudi Arabia",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "COMPLEXITY, MADE CLEAR",
+  "sortOrder": 3,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Eddekhar operates in a world where financial decisions can easily feel more complicated than they need to be. As a Saudi fintech platform offering employee savings and investment programs, clarity and trust had to become part of the digital experience itself. RMZ shaped the website around that responsibility, organising complex information into a bilingual journey that feels simple to navigate and easy to understand. From structure and interface to responsive behaviour across devices, every decision was made to reduce friction between the platform and its users. The result is a website where the technology stays sophisticated behind the scenes, while the experience in front of the user stays clear, confident, and effortless."
+    },
+    {
+      "type": "overview",
+      "heading": "COMPLEXITY, MADE CLEAR",
+      "idea": "Turn a complex fintech platform into a clear bilingual experience built around simplicity, trust, and intuitive navigation.",
+      "goal": "Make Eddekhar’s savings and investment programs easier to explore, understand, and access across every device.",
+      "challenge": "Simplify financial information without losing the credibility, depth, and confidence expected from a fintech platform."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX Architecture",
+        "Bilingual UI/UX Design",
+        "Responsive Web Development"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Eddekhar, RMZ focused on making complexity disappear from the user’s side of the screen. Savings programs, investment information, and platform details were structured into a journey that feels clear without feeling simplified. The bilingual experience was designed to move naturally across languages and devices, keeping navigation intuitive and information easy to absorb. Behind that simplicity sits a carefully considered digital structure one that lets Eddekhar communicate the depth of its platform without asking users to navigate the complexity behind it."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "ELIRA",
+  "client": "ELIRA",
+  "market": "TODO",
+  "discipline": "Branding",
+  "category": "Branding",
+  "resultLine": "QUIETLY DISTINCT",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "ELIRA began with a character before it became an identity: feminine, confident, refined, and quietly expressive. For RMZ, the opportunity was to translate that character into a brand world where luxury never needed to feel excessive. We built the identity around balance softness with presence, elegance with individuality, and timeless details with a contemporary point of view. From the mark and typography to colour, packaging, and every visual application, each element was designed to feel like part of the same woman. The result is an identity that does not simply dress the product, but reflects the personality ELIRA was created to carry."
+    },
+    {
+      "type": "overview",
+      "heading": "QUIETLY DISTINCT",
+      "idea": "Translate ELIRA’s feminine confidence into an identity where softness and presence exist in equal measure.",
+      "goal": "Build a refined brand world that feels consistent from the handbag itself to every detail surrounding it.",
+      "challenge": "Express luxury without relying on excess, creating something distinctive enough to be remembered and subtle enough to feel timeless."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Brand Strategy & Creative Direction",
+        "Visual Identity System",
+        "Packaging & Brand Applications"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With ELIRA, RMZ wasn’t simply designing how a handbag brand should look. We were defining how its character should feel at every encounter. The identity grew from contrasts that naturally belonged together: confidence and softness, presence and restraint, contemporary expression and timeless elegance. Every choice from the mark and typography to colour, packaging, and application became part of one coherent language. The result is a brand world that feels considered rather than decorated, where every detail carries the same quiet confidence as the woman ELIRA was created for."
+    }
+  ]
+}

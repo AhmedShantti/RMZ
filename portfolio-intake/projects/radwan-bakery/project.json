@@ -1,0 +1,34 @@
+{
+  "name": "Radwan Bakery",
+  "client": "Radwan Bakery",
+  "market": "TODO",
+  "discipline": "Branding",
+  "category": "Branding",
+  "resultLine": "MORE RADWAN, BY DESIGN",
+  "sortOrder": 3,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Radwan Bakery didn’t need a new personality. It already had one warm, familiar, generous, and shaped by the everyday ritual of fresh baking. RMZ’s role was to bring that character forward and give it a visual system strong enough to grow with the brand. We rebuilt the identity around what already felt true to Radwan, translating freshness and familiarity into typography, colour, illustration, pattern, and application. Every element was designed to feel connected, expressive, and unmistakably part of the same bakery. The result wasn’t Radwan becoming something new. It was Radwan becoming more recognisably itself."
+    },
+    {
+      "type": "overview",
+      "heading": "MORE RADWAN, BY DESIGN",
+      "idea": "Rebuild Radwan around the warmth, familiarity, and freshness that already made the bakery feel like itself.",
+      "goal": "Create a cohesive identity system that carries Radwan naturally across every brand touchpoint.",
+      "challenge": "Refresh a familiar bakery without losing the character and warmth people already associate with it."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Brand Strategy & Repositioning",
+        "Visual Identity System",
+        "Brand Applications & Guidelines"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Radwan Bakery, RMZ wasn’t looking for a new story to tell. The right one was already there. We took the warmth, familiarity, and everyday character people naturally associate with a bakery and gave it a clearer visual structure. Typography, colour, illustration, and pattern began working as one language, allowing the identity to feel richer without feeling unfamiliar. The result is a system that gives Radwan room to grow while keeping its most important ingredient intact: the feeling that it has always been Radwan."
+    }
+  ]
+}

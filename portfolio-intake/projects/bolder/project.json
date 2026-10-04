@@ -1,0 +1,34 @@
+{
+  "name": "Bolder",
+  "client": "Bolder",
+  "market": "TODO",
+  "discipline": "Social Content",
+  "category": "Social Media",
+  "resultLine": "A MOOD IN EVERY CUP",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Bolder is built around the idea that coffee is never just about what is in the cup. It follows people through different hours, different moods, and different versions of the day. That gave us a brand with more to explore than flavour alone. Each product carried its own character, creating room for a visual language that could shift in feeling while remaining part of the same world. Together, we shaped that variety into something expressive and cohesive, allowing Bolder to move between energy, focus, comfort, and indulgence without losing the personality that connects it all."
+    },
+    {
+      "type": "overview",
+      "heading": "A MOOD IN EVERY CUP",
+      "idea": "Turn Bolder’s variety into a visual world where every blend carries its own mood and character.",
+      "goal": "Give each product room to feel different while keeping the entire range unmistakably part of Bolder.",
+      "challenge": "Create enough variety to keep the brand expressive without losing the visual thread that holds everything together."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Product Storytelling Concepts",
+        "Mood-Led Visual Direction",
+        "Social Content Creation"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Bolder gave us more than a product range to communicate. It gave us a collection of moods to translate. The creative direction grew from the personality behind each blend, letting every product speak differently without ever feeling disconnected from the brand around it. Rather than repeating one visual formula, the world of Bolder became flexible enough to shift with the moment from energy and focus to comfort and indulgence. Different feelings, different expressions, all held together by one idea: coffee can change with the day, while the brand behind it stays unmistakably Bolder."
+    }
+  ]
+}

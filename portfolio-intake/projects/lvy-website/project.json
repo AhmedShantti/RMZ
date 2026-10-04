@@ -1,0 +1,34 @@
+{
+  "name": "LVY — Website",
+  "client": "LVY",
+  "market": "Egypt",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "CRAFTED TO BREATHE",
+  "sortOrder": 2,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "LVY is built around patience, texture, and the human touch qualities that could easily disappear inside a conventional online store. RMZ approached the website by translating that same sense of calm into the way people explore the brand digitally. Generous space, considered layouts, and a slower visual rhythm give every handcrafted piece room to be noticed, while an intuitive e-commerce journey keeps discovery and shopping effortless. The result is a website that doesn’t simply display LVY’s work. It carries the feeling behind the craft into every scroll, interaction, and product encounter."
+    },
+    {
+      "type": "overview",
+      "heading": "CRAFTED TO BREATHE",
+      "idea": "Translate the calm, tactile character of LVY into a digital experience with space, rhythm, and intention.",
+      "goal": "Create an e-commerce journey where every handcrafted piece has room to be explored while shopping remains effortless.",
+      "challenge": "Bring the warmth of handmade craft into a digital store without making the experience feel busy, cold, or overly commercial."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX",
+        "UI/UX Design & Digital Art Direction",
+        "E-commerce Design & Development"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With LVY, RMZ treated the website with the same patience found in the craft itself. Instead of filling every screen, we gave the products space to breathe and made discovery part of the experience. The interface moves quietly between story, detail, and shopping, allowing texture and craftsmanship to remain at the centre. Every interaction was kept intentional, creating an e-commerce journey that feels less like browsing a catalogue and more like stepping into the world of LVY calm, tactile, and considered from the first scroll to the final selection."
+    }
+  ]
+}

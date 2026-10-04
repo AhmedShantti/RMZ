@@ -1,0 +1,34 @@
+{
+  "name": "Salo",
+  "client": "Salo",
+  "market": "TODO",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "EVERYDAY, MADE EFFORTLESS",
+  "sortOrder": 5,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Salo lives in the background of everyday life, through products designed to make daily routines simpler, cleaner, and more reliable. RMZ brought that same sense of ease into the website, creating a digital experience where a broad product range never feels overwhelming. Brand story, company credibility, and product discovery were structured into one bilingual journey, giving users a clear way to move from understanding Salo to exploring what it offers. The result is a website that turns everyday functionality into an experience that feels considered, organised, and effortless to navigate."
+    },
+    {
+      "type": "overview",
+      "heading": "EVERYDAY, MADE EFFORTLESS",
+      "idea": "Turn Salo’s broad everyday product range into a clear digital experience built around simplicity and easy discovery.",
+      "goal": "Bring products, brand story, and company credibility together in one seamless bilingual journey.",
+      "challenge": "Organise a diverse product portfolio without letting the website feel crowded, overly corporate, or difficult to navigate."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX",
+        "Bilingual UI/UX Design",
+        "Product Catalogue & Web Development"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Salo, RMZ designed the website around the same role the brand plays in everyday life: useful, dependable, and easy to reach. A wide range of home and personal care products was brought into a digital structure that makes discovery feel simple rather than overwhelming. The experience moves naturally between the company, its standards, and its catalogue, giving each part enough space without breaking the journey. The result is a bilingual website where clarity does the heavy lifting helping Salo present the scale behind the brand while keeping every interaction straightforward, familiar, and easy to navigate."
+    }
+  ]
+}

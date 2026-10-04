@@ -54,3 +54,7 @@ next-env.d.ts
 
 # Content/data audits — working notes, not project source
 /content-audit
+
+# portfolio intake: raw dump + media stay local
+/portfolio-intake/_inbox/*
+!/portfolio-intake/_inbox/.gitkeep

@@ -1,0 +1,34 @@
+{
+  "name": "Orith — Branding",
+  "client": "Orith",
+  "market": "TODO",
+  "discipline": "Branding",
+  "category": "Branding",
+  "resultLine": "A SIGNATURE FOR EVERY SCENT",
+  "sortOrder": 2,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Orith began with an ambition to feel distinctive before a single fragrance was experienced. RMZ translated that ambition into a complete brand identity built around elegance, mystery, and confident presence. From the symbol and typography to colour, packaging, and visual applications, every element was designed as part of one recognisable system. The identity balances restraint with richness, giving Orith a premium character without relying on the familiar codes of fragrance branding. What emerged was more than a look for the brand it was a signature designed to stay consistent, recognisable, and unmistakably Orith wherever it appears."
+    },
+    {
+      "type": "overview",
+      "heading": "A SIGNATURE FOR EVERY SCENT",
+      "idea": "Build Orith around a distinctive identity where elegance, mystery, and confident presence become instantly recognisable.",
+      "goal": "Create one cohesive brand system that can carry different fragrances, products, and applications without losing its signature.",
+      "challenge": "Establish a premium fragrance identity that feels distinctive without falling into the familiar visual codes of the category."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Brand Strategy & Positioning",
+        "Logo & Visual Identity System",
+        "Packaging & Brand Applications"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Orith, RMZ set out to create more than a visual identity. We built a signature capable of holding an entire fragrance world together. Every element was shaped to carry the same sense of elegance, mystery, and confidence from the symbol and typography to colour, packaging, and application. The system gives each fragrance room to develop its own character without ever drifting away from the brand behind it. What emerged is an identity designed not around a single product or moment, but around a presence that remains recognisable wherever Orith chooses to go."
+    }
+  ]
+}

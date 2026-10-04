@@ -1,0 +1,34 @@
+{
+  "name": "Pureger",
+  "client": "Pureger",
+  "market": "TODO",
+  "discipline": "Campaign",
+  "category": "Social Media Campaign",
+  "resultLine": "PURE ENOUGH TO TRUST. PLAYFUL ENOUGH TO LOVE.",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Pureger is built around a simple promise: real food made from clean, honest ingredients. But a promise like that has to live beyond the menu. It has to shape how the brand looks, speaks, and connects with different people. That gave us room to explore a visual language where purity could still feel playful, and responsibility could still have personality. As Pureger grows into new products and new audiences, the creative direction grows with it keeping what parents can trust and what families can enjoy part of the same unmistakable world."
+    },
+    {
+      "type": "overview",
+      "heading": "PURE ENOUGH TO TRUST. PLAYFUL ENOUGH TO LOVE.",
+      "idea": "Bring Pureger’s honest approach to food into a creative world with more personality, warmth, and room to play.",
+      "goal": "Let the brand connect with different audiences while keeping its promise of real, clean ingredients at the heart of every expression.",
+      "challenge": "Make purity feel exciting and playful without losing the trust and simplicity that define Pureger."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Kids’ Campaign Concept",
+        "Character & Packaging Direction",
+        "Campaign Visual Storytelling"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Pureger gave us a chance to explore how far a brand can stretch without losing what makes it believable. The visual world became brighter, more playful, and more expressive, while the honesty at the heart of the brand stayed untouched. Every creative choice had to work on two levels creating something people could enjoy instantly, while preserving the simplicity and trust Pureger is built on. The result was a direction where fun never felt forced and responsibility never felt serious, proving that a brand can grow into new worlds without leaving its character behind."
+    }
+  ]
+}

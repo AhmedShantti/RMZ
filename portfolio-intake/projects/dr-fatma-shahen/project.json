@@ -1,0 +1,34 @@
+{
+  "name": "Dr. Fatma Shahen",
+  "client": "Dr. Fatma Shahen",
+  "market": "TODO",
+  "discipline": "Video Editing",
+  "category": "Cut To Impact",
+  "resultLine": "LET THE RESULT SPEAK",
+  "sortOrder": 3,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Dr. Fatma Shahen works in a field where the smallest detail can tell the biggest story. In aesthetics, people do not just want to hear about a treatment they want to see what changed. That made our role less about adding to the transformation and more about giving it the clarity it deserved. Together, we shaped treatment and before-and-after footage into a cleaner social experience, removing what distracted, highlighting what mattered, and letting every result feel natural rather than overstated. The expertise remained at the centre, while the creative work stepped back just enough for the outcome to speak for itself."
+    },
+    {
+      "type": "overview",
+      "heading": "LET THE RESULT SPEAK",
+      "idea": "Turn real treatment results into clear visual stories without overproducing the transformation.",
+      "goal": "Present Dr. Fatma’s work in a way that feels polished, credible, and naturally convincing.",
+      "challenge": "Make every change easy to notice without exaggerating the result or letting the edit become the story."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Treatment Content Direction",
+        "Before & After Visual Editing",
+        "Social Content Production"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Dr. Fatma Shahen, the strongest story was already visible in the result. Our role was to give that transformation the space and clarity to speak for itself. Every edit was shaped around what mattered most the treatment, the detail, and the difference it made removing anything that competed for attention. The creative work stayed deliberately restrained, allowing her expertise to remain at the centre and every result to feel as natural as it looked. Because sometimes the most convincing content is not the one that adds more, but the one that knows exactly what to leave untouched."
+    }
+  ]
+}

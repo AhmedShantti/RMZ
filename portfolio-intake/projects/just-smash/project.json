@@ -1,0 +1,34 @@
+{
+  "name": "Just Smash",
+  "client": "Just Smash",
+  "market": "Egypt",
+  "discipline": "Creative Campaign",
+  "category": "Master Visual",
+  "resultLine": "BUILT TO STAY BOLD",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Just Smash came with a personality already impossible to tone down. A fast-casual burger brand that is bold, messy, playful, and unapologetic about what it serves. Its world is built around indulgence without the polish, food that looks as satisfying as it feels, and an attitude that never takes itself too seriously. Working with a character this distinctive meant understanding what already made Just Smash feel like Just Smash, then finding new ways to express it without losing its edge. The kind of client that doesn’t ask creativity to behave, but gives it room to get a little messy."
+    },
+    {
+      "type": "overview",
+      "heading": "BUILT TO STAY BOLD",
+      "idea": "Give a fearless food brand a visual language with the same appetite for breaking the expected.",
+      "goal": "Keep the creativity moving forward while every expression still feels naturally, unmistakably Just Smash.",
+      "challenge": "Find new ways to surprise without cleaning up the bold, messy attitude that makes the brand what it is."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Creative Campaign Concepts",
+        "Food Styling & Visual Direction",
+        "Social Content & Campaign Visuals"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Just Smash already knew how to make an entrance. The opportunity was to keep that energy moving without letting it become predictable. Every creative direction became a chance to explore a different side of the brand sometimes louder, sometimes stranger, sometimes unexpectedly simple, but always rooted in the same fearless character. The result is a visual world that can change its mood without changing its identity, giving the brand room to evolve, experiment, and still feel unmistakably Just Smash."
+    }
+  ]
+}

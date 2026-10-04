@@ -1,0 +1,34 @@
+{
+  "name": "Mazaj",
+  "client": "Mazaj",
+  "market": "TODO",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "HERITAGE, MADE DIGITAL",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Mazaj came with decades of experience, but the website needed to make that story feel immediate. RMZ translated the depth of the brand into a digital experience built around how people actually explore moving naturally between the story, menu, products, branches, and ordering. The bilingual interface was shaped to keep a large amount of information easy to navigate without making the experience feel heavy. Clear structure, intuitive interactions, and a consistent visual language brought every part of Mazaj into one connected journey. A website designed not simply to contain the brand, but to make experiencing it feel effortless."
+    },
+    {
+      "type": "overview",
+      "heading": "HERITAGE, MADE DIGITAL",
+      "idea": "Translate Mazaj’s heritage into a modern bilingual website that connects its story, menu, products, and ordering experience.",
+      "goal": "Create an intuitive digital journey that makes discovering Mazaj, exploring its menu, and placing an order feel effortless.",
+      "challenge": "Bring a wide range of products, information, and services into one seamless experience without sacrificing simplicity or the brand’s character."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX",
+        "Bilingual UI/UX Design",
+        "Menu & Ordering Experience"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Mazaj, RMZ turned years of brand experience into a website designed for the way people interact today. The work went beyond arranging pages; it was about creating a clear path through everything Mazaj has to offer. Story, products, menu, branches, and ordering were brought into one connected bilingual experience, with every screen designed to make the next step feel natural. The result is a digital home that carries the depth of Mazaj without carrying the weight of it familiar in character, modern in experience, and effortless to move through."
+    }
+  ]
+}

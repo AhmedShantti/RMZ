@@ -1,0 +1,34 @@
+{
+  "name": "Dr. Ahmed Elansary",
+  "client": "Dr. Ahmed Elansary",
+  "market": "TODO",
+  "discipline": "Video Editing",
+  "category": "Cut To Impact",
+  "resultLine": "CLARITY BEFORE THE DECISION",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Dr. Ahmed Elansary works in a field where clarity can shape one of the most personal decisions a patient makes. As a consultant and lecturer in bariatric and laparoscopic surgery, his expertise carries both medical depth and academic authority. For RMZ, the opportunity was to translate that depth into a social presence people could actually enter turning complicated procedures, common fears, and difficult choices into content that feels clear without feeling simplified. The result is a meeting point between medical authority and creative communication, where the expertise remains untouched, but the distance between doctor and audience becomes smaller."
+    },
+    {
+      "type": "overview",
+      "heading": "CLARITY BEFORE THE DECISION",
+      "idea": "Turn complex obesity procedures into clear conversations built around the questions patients are actually asking.",
+      "goal": "Make Dr. Ahmed’s medical expertise easier to understand while preserving the authority and credibility behind it.",
+      "challenge": "Simplify choices, fears, and misconceptions without oversimplifying the medicine behind them."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Medical Content Strategy",
+        "Educational Video Direction",
+        "Social Content Editing & Production"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Dr. Ahmed Elansary, the work was never about making medicine sound simpler than it is. It was about making the path to understanding it clearer. Together, we shaped complex procedures, common fears, and difficult choices into content built around the questions patients are actually asking. Every edit, hook, and visual cue had one job: remove friction between expertise and understanding. The medical authority stayed exactly where it belonged, while the way people experienced it became clearer, more direct, and easier to trust."
+    }
+  ]
+}

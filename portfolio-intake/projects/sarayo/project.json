@@ -1,0 +1,34 @@
+{
+  "name": "Sarayo",
+  "client": "Sarayo",
+  "market": "Egypt",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "BUILT TO BE EXPLORED",
+  "sortOrder": 4,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Sarayo brings together the scale of an established Egyptian manufacturer with the energy of a consumer snack brand. RMZ translated that contrast into a website where credibility and product personality could live in the same experience. Instead of treating the range like a static catalogue, we built the journey around discovery using bold layouts, movement, interactive product moments, and clear navigation to give every flavour its own space. The result is a responsive digital experience that communicates the strength behind Sarayo while making the products themselves the most engaging part of the screen."
+    },
+    {
+      "type": "overview",
+      "heading": "BUILT TO BE EXPLORED",
+      "idea": "Turn Sarayo’s product range into an interactive digital experience where every flavour becomes part of the journey.",
+      "goal": "Balance the credibility of an established manufacturer with the bold, energetic personality of a consumer snack brand.",
+      "challenge": "Present a wide product portfolio without letting the website feel like a conventional corporate catalogue."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX",
+        "Interactive UI/UX Design",
+        "Responsive Development & Motion"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Sarayo, RMZ turned product variety into the rhythm of the website itself. Instead of placing every flavour inside the same predictable grid, the experience uses movement, interaction, and bold visual moments to keep discovery active from one section to the next. The brand’s manufacturing credibility remains present, but it never slows the experience down. What emerges is a website that feels as energetic as the products it presents structured enough to inform, playful enough to explore, and built to keep the range moving across the screen."
+    }
+  ]
+}

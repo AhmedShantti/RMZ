@@ -1,0 +1,34 @@
+{
+  "name": "SafeGrow",
+  "client": "SafeGrow",
+  "market": "Palestine",
+  "discipline": "Campaign",
+  "category": "Social Media Campaign",
+  "resultLine": "PROGRESS TAKES SHAPE",
+  "sortOrder": 2,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "SafeGrow works with Palestinian entrepreneurs at a point where a small idea can become something much bigger: a source of independence, stability, and possibility. The initiative creates space for people to develop their skills, strengthen their projects, and take meaningful steps forward. For us, that meant telling stories through progress rather than hardship focusing on the work being done, the ideas taking shape, and the people behind them. A creative language built around potential, where support is not the end of the story, but the beginning of what comes next."
+    },
+    {
+      "type": "overview",
+      "heading": "PROGRESS TAKES SHAPE",
+      "idea": "Tell stories of Palestinian entrepreneurs through what they are creating, building, and moving toward.",
+      "goal": "Give SafeGrow a visual language that makes support feel empowering, practical, and rooted in real progress.",
+      "challenge": "Communicate difficult circumstances with honesty while keeping the people, their work, and their potential at the centre of the story."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Impact Led Campaign Concept",
+        "Human Centred Visual Storytelling",
+        "Workshop & Initiative Content"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "SafeGrow gave us a story where the strongest message was already happening in real life. Every workshop, every skill learned, and every small project moving forward carried more weight than a campaign could manufacture. So the creative direction stayed close to that progress, showing ideas as they became tangible and people through what they were building next. The result was a language that felt hopeful without becoming sentimental, and human without turning anyone into a symbol giving SafeGrow a way to communicate impact through possibility, independence, and forward motion."
+    }
+  ]
+}

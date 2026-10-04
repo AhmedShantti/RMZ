@@ -1,0 +1,34 @@
+{
+  "name": "Coffee Stud",
+  "client": "Coffee Stud",
+  "market": "TODO",
+  "discipline": "Social Content",
+  "category": "Social Media",
+  "resultLine": "BUILT TO KEEP MOVING",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Coffee Stud is a specialty coffee brand that needed to stay present without becoming repetitive. The opportunity was never simply to fill a feed, but to create a visual world flexible enough to move with the brand. Products could change, offers could come and go, and occasions could shift, while the identity remained familiar. What began as an ongoing need for content became something more considered: a system designed to grow, adapt, and keep every new expression connected to the one before it. Because consistency should never mean standing still."
+    },
+    {
+      "type": "overview",
+      "heading": "BUILT TO KEEP MOVING",
+      "idea": "Turn everyday content into a flexible visual system that could evolve with Coffee Stud instead of starting over every time.",
+      "goal": "Keep the brand fresh across products, offers, and occasions while making every new expression feel connected.",
+      "challenge": "Create constant variety without sacrificing the consistency that makes Coffee Stud instantly recognisable."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Content Strategy & Creative Direction",
+        "Flexible Visual Content System",
+        "Ongoing Social Content"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Coffee Stud was never about creating more content for the sake of staying visible. It was about making every new piece feel like another chapter of the same brand. The visual language was designed to stretch across changing products, offers, and moments without losing its identity along the way. That flexibility gave the brand space to experiment while keeping a familiar rhythm running through everything. So as the content keeps moving, the identity keeps building not through repetition, but through a system that knows how to change without forgetting where it came from."
+    }
+  ]
+}

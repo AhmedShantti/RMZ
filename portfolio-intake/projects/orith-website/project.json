@@ -1,0 +1,34 @@
+{
+  "name": "Orith — Website",
+  "client": "Orith",
+  "market": "TODO",
+  "discipline": "Website",
+  "category": "Websites",
+  "resultLine": "LUXURY, MADE DIGITAL",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Orith was already built around presence, mystery, and a refined fragrance world. The website needed to carry that same character without letting the mechanics of e-commerce take over. RMZ translated the brand into a digital experience where discovery and shopping become part of the same journey. From the way each fragrance is introduced to the movement between collections, product details, and purchase, every interaction was designed to feel considered. The result is an e-commerce experience that does more than sell Orith it gives the brand a digital space that feels unmistakably its own."
+    },
+    {
+      "type": "overview",
+      "heading": "LUXURY, MADE DIGITAL",
+      "idea": "Translate Orith’s refined fragrance world into an immersive e-commerce experience built around discovery and desire.",
+      "goal": "Create a seamless journey where exploring fragrances, understanding each scent, and shopping feel like one continuous experience.",
+      "challenge": "Make e-commerce effortless without losing the mystery, elegance, and premium character that define Orith."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Website Strategy & UX",
+        "UI/UX Design & Art Direction",
+        "Front-End Development & E-commerce Integration"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Orith, RMZ approached the website as an extension of the fragrance experience itself. The interface was designed to slow the journey down just enough for each scent to create its own moment, while keeping discovery and shopping effortless. Rich visuals, deliberate pacing, and intuitive interactions turned browsing into something more atmospheric than transactional. From first impression to final purchase, every screen carries the same mystery and refinement as the brand creating a digital experience where luxury is not added as decoration, but built into the way the website feels and moves."
+    }
+  ]
+}

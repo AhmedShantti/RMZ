@@ -1,0 +1,34 @@
+{
+  "name": "Dr. Abdulmajeed Al-Hathlaq",
+  "client": "Dr. Abdulmajeed Al-Hathlaq",
+  "market": "TODO",
+  "discipline": "Video Editing",
+  "category": "Cut To Impact",
+  "resultLine": "EXPERTISE, MADE FOR ATTENTION",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Dr. Abdulmajeed Al-Hathlaq brings medical expertise into a space where attention moves fast. As a plastic surgeon and medical educator, his content carries knowledge that deserves more than a passing scroll. The opportunity was to make that expertise easier to experience without making it feel less expert. Together, we shaped a clearer, sharper social language where complex information could become accessible, engaging, and easy to follow while preserving the credibility behind every word. Because expertise should never have to compete with the format the format should know how to carry it."
+    },
+    {
+      "type": "overview",
+      "heading": "EXPERTISE, MADE FOR ATTENTION",
+      "idea": "Translate medical expertise into a social language that feels clear, engaging, and effortless to follow.",
+      "goal": "Help Dr. Abdulmajeed’s knowledge reach people in a format built for how they actually consume content today.",
+      "challenge": "Hold attention without simplifying the medicine or compromising the credibility behind it."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Medical Content Strategy",
+        "Short Form Video Direction",
+        "Social Content Editing System"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Working with Dr. Abdulmajeed meant finding the balance between two very different worlds: the depth of medical expertise and the speed of social media. Rather than changing his voice to fit the platform, we shaped the platform around his voice. His knowledge stayed precise, credible, and unmistakably his, while the content around it became sharper, clearer, and more engaging. Together, we turned recorded medical insights into a social presence built to hold attention without chasing it proving that expertise does not need to become entertainment to earn an audience."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "361°",
+  "client": "361°",
+  "market": "TODO",
+  "discipline": "Campaign",
+  "category": "Social Media Campaign",
+  "resultLine": "MADE TO MOVE WITH LIFE",
+  "sortOrder": 3,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "361° lives at the intersection of movement, performance, and everyday life. As a sportswear brand, its products are made to move with people beyond a single moment or setting. That opened the door to a creative language where function could meet feeling, and the product could become part of the experience rather than simply sit inside it. For us, the opportunity was to find the human thought behind each moment and let the product belong there naturally giving 361° a world that feels active, relevant, and connected to the way people actually move through life."
+    },
+    {
+      "type": "overview",
+      "heading": "MADE TO MOVE WITH LIFE",
+      "idea": "Place 361° where movement naturally happens, turning everyday moments into a space for the brand to feel relevant.",
+      "goal": "Give the product a role within the experience, so it feels connected to how people actually move, live, and unwind.",
+      "challenge": "Keep the communication fresh and human in a category where sportswear is often shown through the same predictable settings."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Product Launch Campaign",
+        "Lifestyle Creative Direction",
+        "Campaign Visual Storytelling"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "361° gave us a product made for movement and a season built around freedom. Rather than treating summer as a backdrop, the creative direction looked for the feeling behind it lighter days, fewer complications, and the instinct to keep only what matters close. That thinking gave the product a natural place in the story, where function became part of the lifestyle instead of the headline. The result was a visual language that felt relaxed, active, and distinctly seasonal, allowing 361° to step into summer with a reason to be there, not simply a setting to appear in."
+    }
+  ]
+}

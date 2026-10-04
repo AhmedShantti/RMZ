@@ -1,0 +1,34 @@
+{
+  "name": "Orith — Campaign",
+  "client": "Orith",
+  "market": "TODO",
+  "discipline": "Campaign Photography",
+  "category": "Master Visual",
+  "resultLine": "A WORLD BEYOND SCENT",
+  "sortOrder": 0,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Orith came to us with a fragrance collection that needed more than beautiful visuals. It needed a visual language capable of expressing what scent leaves to the imagination. We moved beyond the familiar codes of fragrance advertising, building each visual around mood, atmosphere, texture, and character turning something you can only smell into something you can almost feel."
+    },
+    {
+      "type": "overview",
+      "heading": "A WORLD BEYOND SCENT",
+      "idea": "Translate Orith’s fragrances into visual worlds shaped by mood, texture, light, and atmosphere.",
+      "goal": "Give Orith a visual language that makes every fragrance feel distinctive, expressive, and instantly recognizable.",
+      "challenge": "Turn something as invisible as scent into imagery people can almost feel without relying on the familiar language of fragrance advertising."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Creative & Visual Direction",
+        "Art Direction & Styling",
+        "Campaign Photography"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Orith, the starting point was never the bottle. It was the feeling that exists around the fragrance the mood it creates, the character it carries, and the memory it can leave behind. We translated those invisible qualities into a visual language built through light, texture, colour, and atmosphere. Every creative decision was shaped to give the fragrance a presence beyond scent, while keeping the world distinctly Orith. The result is imagery that doesn’t simply present the product, but gives people a sense of it before they ever experience the fragrance itself"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Royal Scent",
+  "client": "Royal Scent",
+  "market": "TODO",
+  "discipline": "Product Video",
+  "category": "Social Media",
+  "resultLine": "MAKING SCENT VISIBLE",
+  "sortOrder": 3,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Royal Scent is built around something you cannot photograph: atmosphere. Its diffusers and fragrance oils are designed to change the way a space feels, which gave RMZ an interesting creative problem how do you make scent visible? Together, we turned product footage into a more sensory social experience, using movement, detail, environment, and rhythm to suggest what the camera could never capture directly. The product remained present, but the feeling around it became the story. Because with Royal Scent, fragrance does more than fill a room. It changes the way the room is experienced."
+    },
+    {
+      "type": "overview",
+      "heading": "MAKING SCENT VISIBLE",
+      "idea": "Turn Royal Scent’s products into sensory content that shows how fragrance can transform the feeling of a space.",
+      "goal": "Make viewers feel the atmosphere around the product, not simply see the diffuser or fragrance oil.",
+      "challenge": "Communicate something completely invisible through movement, environment, product detail, and visual rhythm."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Sensory Content Direction",
+        "Product Video Editing",
+        "Social Content Production"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Working with Royal Scent gave RMZ the chance to create around something the camera could never actually capture. The product was visible, but its real value lived in the atmosphere it created. So instead of treating the footage as a simple product showcase, we shaped it around sensation using movement, detail, space, and rhythm to suggest the presence of fragrance without ever needing to show it. Royal Scent brought the scent into the room; RMZ gave that invisible experience a visual language. The result was content designed not only to show what the product is, but to make people imagine what the space becomes once it is there."
+    }
+  ]
+}

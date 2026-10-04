@@ -1,0 +1,34 @@
+{
+  "name": "Ayman Target",
+  "client": "Ayman Target",
+  "market": "TODO",
+  "discipline": "Social Content",
+  "category": "Social Media",
+  "resultLine": "COMPLEXITY, MADE CLEAR",
+  "sortOrder": 2,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Ayman Target works in a world where precision is essential, but complexity often gets in the way of understanding. Supporting academic researchers from sample sizing and data analysis through to publication meant the expertise was already there; the opportunity was to make it feel more approachable. Together, we shaped a clearer and more human way to communicate technical services, translating difficult statistical ideas into moments researchers could recognise instantly. The science stayed rigorous. The language around it became simpler, more visual, and easier to connect with because complex work does not have to feel complicated."
+    },
+    {
+      "type": "overview",
+      "heading": "COMPLEXITY, MADE CLEAR",
+      "idea": "Turn technical expertise into a visual language that makes complex statistical thinking feel simpler and more human.",
+      "goal": "Help Ayman Target communicate its services with the same clarity and confidence it brings to academic research.",
+      "challenge": "Make a highly technical field approachable without oversimplifying the precision and expertise behind it."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Service Communication Strategy",
+        "Concept-Driven Visual Content",
+        "Social Content System"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Ayman Target gave us a technical world that needed a more human way in. Instead of letting statistics feel distant or intimidating, the creative direction translated complexity into familiar moments and visual ideas researchers could connect with instantly. Precision remained at the centre, but the way it was communicated became lighter, clearer, and easier to navigate. The result was a language that respected the intelligence behind the work without making people work harder to understand it turning expertise into something that feels supportive from the first question to the final publication."
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "Project name",
+  "client": "Client name",
+  "market": "KSA",
+  "discipline": "Branding",
+  "category": "Branding",
+  "sortOrder": 0,
+  "year": "2025",
+  "resultLine": "TODO — the one-line result, e.g. +180% retail sell-through",
+  "cover": { "file": "cover/cover.jpg", "ratio": "16/9", "alt": "TODO — what the image shows" },
+  "blocks": [
+    { "type": "overview", "idea": "TODO", "goal": "TODO", "challenge": "TODO" },
+    { "type": "services", "items": ["Brand identity", "Packaging"] },
+    { "type": "imageFull", "image": { "file": "gallery/01.jpg", "ratio": "16/9", "alt": "TODO" } },
+    { "type": "galleryTwo", "images": [
+      { "file": "gallery/02.jpg", "ratio": "4/5", "alt": "TODO" },
+      { "file": "gallery/03.jpg", "ratio": "4/5", "alt": "TODO" }
+    ] },
+    { "type": "mockups", "kind": "packaging", "images": [
+      { "file": "mockups/01.jpg", "ratio": "1/1", "alt": "TODO" }
+    ] },
+    { "type": "stats", "items": [ { "value": "+180%", "label": "Retail sell-through" } ] },
+    { "type": "video", "url": "https://player.mediadelivery.net/play/LIBRARY/VIDEO", "poster": { "file": "video/poster.jpg", "ratio": "16/9", "alt": "TODO" } },
+    { "type": "summary", "body": "TODO", "quote": "", "quoteAuthor": "" }
+  ]
+}

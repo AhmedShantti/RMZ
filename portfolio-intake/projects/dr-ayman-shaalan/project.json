@@ -1,0 +1,34 @@
+{
+  "name": "Dr. Ayman Shaalan",
+  "client": "Dr. Ayman Shaalan",
+  "market": "Egypt",
+  "discipline": "Video Editing",
+  "category": "Cut To Impact",
+  "resultLine": "EXPERTISE, BUILT FOR ATTENTION",
+  "sortOrder": 2,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Dr. Ayman Shaalan brings years of cardiothoracic expertise into a space where even the most valuable information can disappear in seconds. His medical authority was already established; the opportunity was to rethink how that knowledge lives on social media. Together, we turned raw medical footage into a sharper, more intentional content experience shaping the rhythm, emphasis, and visual language around the way people actually watch. The medicine stayed precise and the expertise stayed untouched, while every piece became easier to enter, follow, and absorb. Because when the knowledge carries weight, the creative work should help it land not compete with it."
+    },
+    {
+      "type": "overview",
+      "heading": "EXPERTISE, BUILT FOR ATTENTION",
+      "idea": "Reshape raw medical footage into a sharper social experience without changing the authority behind it.",
+      "goal": "Help Dr. Ayman’s expertise hold attention long enough for the knowledge to truly land.",
+      "challenge": "Adapt complex medical information to the pace of social media without reducing its depth or credibility."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Medical Content Direction",
+        "Video Editing & Retention Design",
+        "Social First Content System"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With Dr. Ayman Shaalan, the expertise was already established. Our role was to make sure the way it reached people carried the same precision. Raw medical footage became a more intentional social experience, shaped through stronger openings, sharper pacing, and visual emphasis that guided attention without distracting from the message. Nothing needed to make the medicine louder; it needed to make it easier to stay with. The result kept Dr. Ayman’s authority at the centre while giving his knowledge a format designed for the way people watch, understand, and remember today."
+    }
+  ]
+}

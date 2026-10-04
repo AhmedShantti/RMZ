@@ -1,0 +1,34 @@
+{
+  "name": "Dr. Mohamed Ghareeb",
+  "client": "Dr. Mohamed Ghareeb",
+  "market": "TODO",
+  "discipline": "Video Editing",
+  "category": "Cut To Impact",
+  "resultLine": "START WITH WHAT THEY FEEL",
+  "sortOrder": 4,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "Dr. Mohamed Ghareeb works in a field where every conversation begins with something people can already feel: pain. As a consultant in pain management, his expertise addresses questions patients often arrive with long before they press play. That gave us a clear place to begin. Together, we shaped medical knowledge around real concerns, turning complex conditions into focused social content that moves naturally from question to understanding. The creative work brought structure, pace, and visual clarity to the conversation, while his medical authority remained at its centre. Because when someone is already looking for an answer, good communication should make the path to it feel clearer."
+    },
+    {
+      "type": "overview",
+      "heading": "START WITH WHAT THEY FEEL",
+      "idea": "Build every conversation around the real questions and concerns people already have about pain.",
+      "goal": "Make Dr. Mohamed’s medical expertise easier to follow, understand, and trust through social content.",
+      "challenge": "Turn complex pain conditions into clear, focused communication without reducing the medical depth behind them."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Patient-Led Content Direction",
+        "Medical Video Editing & Pacing",
+        "Social Content Production"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "Working with Dr. Mohamed Ghareeb gave RMZ a different starting point: not the medical topic, but the question behind the pain. Together, we shaped his expertise into social content built around the concerns patients already carry with them. RMZ brought structure to each conversation sharpening the opening, controlling the pace, and using visual cues to guide attention while Dr. Mohamed remained the authority behind every answer. The result was a meeting point between medical depth and creative communication, where complex information became easier to enter, follow, and understand without losing the expertise that gives it weight."
+    }
+  ]
+}

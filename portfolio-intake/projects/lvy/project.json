@@ -1,0 +1,34 @@
+{
+  "name": "LVY",
+  "client": "LVY",
+  "market": "Egypt",
+  "discipline": "Branding",
+  "category": "Branding",
+  "resultLine": "CRAFTED CALM",
+  "sortOrder": 1,
+  "blocks": [
+    {
+      "type": "textBreak",
+      "text": "LVY began with a craft built slowly, knot by knot, and a feeling that needed the same restraint. For RMZ, the identity had to reflect more than the handmade nature of macramé; it had to capture what those pieces bring into a space. We translated texture, warmth, and quiet presence into a visual language where every element feels intentional rather than ornamental. The typography stays refined, the imagery lets material and shadow speak, and the identity leaves room for the craft itself to breathe. The result is a brand world shaped around the same idea as every LVY piece: calm, carefully crafted into form."
+    },
+    {
+      "type": "overview",
+      "heading": "CRAFTED CALM",
+      "idea": "Turn the patience and texture of macramé into a brand identity that feels as considered as the craft itself.",
+      "goal": "Give LVY a visual world where craftsmanship, warmth, and quiet presence come together naturally.",
+      "challenge": "Create an identity distinctive enough to own its space while preserving the simplicity and calm at the heart of LVY."
+    },
+    {
+      "type": "services",
+      "items": [
+        "Brand Strategy & Creative Direction",
+        "Visual Identity & Logo System",
+        "Brand Applications & Art Direction"
+      ]
+    },
+    {
+      "type": "textBreak",
+      "text": "With LVY, RMZ looked beyond the object and into the feeling it leaves behind. Macramé is built through repetition, patience, and the human touch, so the identity had to carry that same sense of intention. We shaped a brand language where texture meets restraint, and craftsmanship feels contemporary without losing its roots. From the mark to the imagery and every visual application, each element was given room to breathe. The result is an identity that feels much like an LVY piece itself handcrafted, considered, and quietly present in the space around it."
+    }
+  ]
+}
