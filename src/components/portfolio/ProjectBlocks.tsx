@@ -211,7 +211,7 @@ function TextBreak({ block }: { block: Extract<ProjectBlock, { type: "textBreak"
     <Section className="sm:py-32">
       <Reveal>
         <blockquote className="w-full">
-          <p className="display-statement text-cream text-[clamp(1.6rem,3.4vw,2.6rem)] italic">
+          <p className="display-statement text-cream text-[clamp(1.15rem,1.9vw,1.6rem)] italic">
             {block.text}
           </p>
           {block.attribution && (
@@ -363,7 +363,7 @@ function Summary({ block }: { block: Extract<ProjectBlock, { type: "summary" }> 
         <Kicker>{block.heading ?? "In the end"}</Kicker>
       </Reveal>
       <Reveal delay={0.05}>
-        <p className="display-statement text-cream w-full text-[clamp(1.5rem,3vw,2.2rem)]">
+        <p className="display-statement text-cream w-full text-[clamp(1.15rem,1.9vw,1.6rem)]">
           {block.body}
         </p>
       </Reveal>
