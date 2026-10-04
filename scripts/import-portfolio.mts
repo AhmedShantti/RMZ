@@ -7,6 +7,9 @@
  *   --dry      validate the files only; no database connection at all
  *   --publish  create as published (default: DRAFT — review in /studio, then publish)
  *   --update   overwrite projects whose slug already exists (default: skip them)
+ *   --remote=<site url>  talk to the site's REST API over HTTPS instead of the
+ *              database (use this when port 5432 is blocked on your network).
+ *              Needs IMPORT_EMAIL + IMPORT_PASSWORD (an admin login) in the env.
  *
  * Idempotent: matched by slug, never duplicates. Categories are matched by title
  * (created from portfolio-intake/categories.json if missing). Images referenced by
@@ -21,6 +24,7 @@ const args = new Set(process.argv.slice(2));
 const DRY = args.has("--dry");
 const PUBLISH = args.has("--publish");
 const UPDATE = args.has("--update");
+const REMOTE = process.argv.find((a) => a.startsWith("--remote="))?.slice(9).replace(/\/$/, "");
 
 const root = path.resolve(process.cwd(), "portfolio-intake");
 type AnyObj = Record<string, unknown>;
@@ -72,13 +76,79 @@ if (DRY) {
   process.exit(0);
 }
 
-// ── connect (env first, config second — same as scripts/seed.mts) ──────
-const require = createRequire(import.meta.url);
-const { loadEnvConfig } = require("@next/env") as typeof import("@next/env");
-loadEnvConfig(process.cwd(), true);
-const { default: configPromise } = await import("../payload.config.ts");
-const { getPayload } = await import("payload");
-const payload = await getPayload({ config: await configPromise });
+// ── backend: Payload local API (database) or the site's REST API ───────
+type Doc = { id: number };
+type Backend = {
+  find(collection: string, field: string, value: string): Promise<Doc | undefined>;
+  create(collection: string, data: AnyObj, draft?: boolean): Promise<Doc>;
+  update(collection: string, id: number, data: AnyObj, draft: boolean): Promise<void>;
+  media(filePath: string, alt: string): Promise<number>;
+};
+
+async function localBackend(): Promise<Backend> {
+  const require = createRequire(import.meta.url);
+  const { loadEnvConfig } = require("@next/env") as typeof import("@next/env");
+  loadEnvConfig(process.cwd(), true);
+  const { default: configPromise } = await import("../payload.config.ts");
+  const { getPayload } = await import("payload");
+  const payload = await getPayload({ config: await configPromise });
+  return {
+    async find(collection, field, value) {
+      const r = await payload.find({ collection: collection as never, where: { [field]: { equals: value } }, limit: 1, depth: 0, draft: true });
+      return r.docs[0] as unknown as Doc | undefined;
+    },
+    async create(collection, data, draft) {
+      return (await payload.create({ collection: collection as never, data: data as never, draft })) as unknown as Doc;
+    },
+    async update(collection, id, data, draft) {
+      await payload.update({ collection: collection as never, id, data: data as never, draft });
+    },
+    async media(filePath, alt) {
+      return (await payload.create({ collection: "media", data: { alt }, filePath })).id as number;
+    },
+  };
+}
+
+async function remoteBackend(site: string): Promise<Backend> {
+  const email = process.env.IMPORT_EMAIL;
+  const password = process.env.IMPORT_PASSWORD;
+  if (!email || !password) throw new Error("--remote needs IMPORT_EMAIL and IMPORT_PASSWORD in the environment.");
+  const login = await fetch(`${site}/api/users/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const { token } = (await login.json()) as { token?: string };
+  if (!login.ok || !token) throw new Error(`Login failed (${login.status}).`);
+  const auth = { Authorization: `JWT ${token}` };
+  const call = async (url: string, init: RequestInit) => {
+    const res = await fetch(`${site}/api/${url}`, { ...init, headers: { ...auth, ...(init.headers as object) } });
+    const body = (await res.json()) as AnyObj;
+    if (!res.ok) throw new Error(`${init.method ?? "GET"} ${url} → ${res.status} ${JSON.stringify(body).slice(0, 300)}`);
+    return body;
+  };
+  const json = { "content-type": "application/json" };
+  return {
+    async find(collection, field, value) {
+      const q = `where[${field}][equals]=${encodeURIComponent(value)}&limit=1&depth=0&draft=true`;
+      return ((await call(`${collection}?${q}`, {})).docs as Doc[])[0];
+    },
+    async create(collection, data, draft) {
+      return (await call(`${collection}${draft ? "?draft=true" : ""}`, { method: "POST", headers: json, body: JSON.stringify(data) })).doc as Doc;
+    },
+    async update(collection, id, data, draft) {
+      await call(`${collection}/${id}${draft ? "?draft=true" : ""}`, { method: "PATCH", headers: json, body: JSON.stringify(data) });
+    },
+    async media(filePath, alt) {
+      const form = new FormData();
+      form.append("_payload", JSON.stringify({ alt }));
+      form.append("file", new Blob([readFileSync(filePath)]), path.basename(filePath));
+      return ((await call("media", { method: "POST", body: form })).doc as Doc).id;
+    },
+  };
+}
+
+const api = REMOTE ? await remoteBackend(REMOTE) : await localBackend();
 
 // ── helpers ─────────────────────────────────────────────────────────────
 const mediaCache = new Map<string, number>();
@@ -89,13 +159,9 @@ async function upload(slug: string, img: Img | undefined): Promise<number | unde
   if (!existsSync(filePath)) return undefined;
   const hit = mediaCache.get(filePath);
   if (hit) return hit;
-  const doc = await payload.create({
-    collection: "media",
-    data: { alt: img.alt && img.alt !== "TODO" ? img.alt : slug.replace(/-/g, " ") },
-    filePath,
-  });
-  mediaCache.set(filePath, doc.id as number);
-  return doc.id as number;
+  const id = await api.media(filePath, img.alt && img.alt !== "TODO" ? img.alt : slug.replace(/-/g, " "));
+  mediaCache.set(filePath, id);
+  return id;
 }
 const vis = async (slug: string, img?: Img) => ({
   image: await upload(slug, img),
@@ -148,11 +214,11 @@ async function toBlock(slug: string, b: Block): Promise<AnyObj> {
 // ── categories ──────────────────────────────────────────────────────────
 const catId = new Map<string, number>();
 for (const c of categories) {
-  const found = await payload.find({ collection: "categories", where: { title: { equals: c.title } }, limit: 1, depth: 0 });
-  if (found.docs[0]) catId.set(c.title, found.docs[0].id as number);
+  const found = await api.find("categories", "title", c.title);
+  if (found) catId.set(c.title, found.id);
   else {
-    const made = await payload.create({ collection: "categories", data: c });
-    catId.set(c.title, made.id as number);
+    const made = await api.create("categories", c);
+    catId.set(c.title, made.id);
     console.log(`+ category ${c.title}`);
   }
 }
@@ -160,8 +226,7 @@ for (const c of categories) {
 // ── projects ────────────────────────────────────────────────────────────
 let created = 0, updated = 0, skipped = 0;
 for (const { slug, p } of projects) {
-  const existing = await payload.find({ collection: "portfolioProjects", where: { slug: { equals: slug } }, limit: 1, depth: 0, draft: true });
-  const doc = existing.docs[0];
+  const doc = await api.find("portfolioProjects", "slug", slug);
   if (doc && !UPDATE) {
     console.log(`= ${slug} exists — skipped (use --update to overwrite)`);
     skipped++;
@@ -183,11 +248,11 @@ for (const { slug, p } of projects) {
     _status: PUBLISH ? "published" : "draft",
   };
   if (doc) {
-    await payload.update({ collection: "portfolioProjects", id: doc.id, data: data as never, draft: !PUBLISH });
+    await api.update("portfolioProjects", doc.id, data, !PUBLISH);
     updated++;
     console.log(`~ ${slug} updated`);
   } else {
-    await payload.create({ collection: "portfolioProjects", data: data as never, draft: !PUBLISH });
+    await api.create("portfolioProjects", data, !PUBLISH);
     created++;
     console.log(`+ ${slug}`);
   }
