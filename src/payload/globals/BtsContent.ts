@@ -62,14 +62,28 @@ export const BtsContent: GlobalConfig = {
           admin: { description: "Portrait 3:4, about 1200×1600px, JPG/WebP ~300 KB. Shown on the Home card." },
         },
         {
+          name: "videoUrl",
+          type: "text",
+          label: "Video link (recommended — use this for 4K / large videos)",
+          // Either this link or an uploaded file is required (checked here, not
+          // `required`, so each can be left empty on its own).
+          validate: ((v: unknown, o: { siblingData?: Record<string, unknown> }) =>
+            (typeof v === "string" && v.trim()) || o?.siblingData?.video
+              ? true
+              : "Add a video link or upload a video file.") as never,
+          admin: {
+            description:
+              "Paste the link of a video hosted on a video service — Bunny Stream, Cloudflare Stream, Vimeo or YouTube (the share / embed link), or a direct .m3u8 / .mp4 URL. These stream in adaptive quality and have no size limit. If set, it is used instead of the uploaded file below.",
+          },
+        },
+        {
           name: "video",
           type: "upload",
           relationTo: "media",
-          required: true,
-          label: "Video (BTS page)",
+          label: "Video file (only for small clips)",
           admin: {
             description:
-              "MP4/WebM. Keep it under about 4 MB (uploads go through the server, which has a 4.5 MB request limit).",
+              "MP4/WebM uploaded here must be under about 4 MB (uploads go through the server, which has a 4.5 MB request limit). For 4K or anything bigger, use the video link above.",
           },
         },
         {
