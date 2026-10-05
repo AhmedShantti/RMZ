@@ -392,6 +392,33 @@ function Summary({ block }: { block: Extract<ProjectBlock, { type: "summary" }> 
   );
 }
 
+/* ── Row of vertical videos (up to three, side by side) ────────────────────── */
+type VideoBlock = Extract<ProjectBlock, { type: "video" }>;
+
+function VideoRow({ blocks }: { blocks: VideoBlock[] }) {
+  return (
+    <Section label="Videos">
+      <div className="flex flex-wrap justify-center gap-6 sm:flex-nowrap">
+        {blocks.map((b, i) => (
+          <Reveal key={i} delay={i * 0.06} className="w-full max-w-[26rem] sm:w-1/3 sm:max-w-none">
+            {b.heading && <Kicker>{b.heading}</Kicker>}
+            <div className="relative aspect-[9/16] w-full overflow-hidden bg-[#0e0e0e]">
+              <VideoPlayer
+                url={b.url as string}
+                title={b.heading ?? b.caption ?? "Project video"}
+                poster={b.poster?.src}
+              />
+            </div>
+            {b.caption && (
+              <p className="font-body text-cream-dim mt-3 text-xs leading-relaxed">{b.caption}</p>
+            )}
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
 /* ── Renderer ──────────────────────────────────────────────────────────────── */
 function renderBlock(block: ProjectBlock, key: string) {
   switch (block.type) {
@@ -424,7 +451,23 @@ function renderBlock(block: ProjectBlock, key: string) {
   }
 }
 
+const isVertical = (b: ProjectBlock): b is VideoBlock =>
+  b.type === "video" && b.vertical === true && !!b.url;
+
 export default function ProjectBlocks({ blocks }: { blocks: ProjectBlock[] }) {
   if (!blocks.length) return null;
-  return <>{blocks.map((block, i) => renderBlock(block, `${block.type}-${i}`))}</>;
+  // Every run of vertical videos is laid out three to a row, side by side.
+  const out: React.ReactNode[] = [];
+  for (let i = 0; i < blocks.length; ) {
+    const b = blocks[i];
+    if (isVertical(b)) {
+      const row: VideoBlock[] = [];
+      while (row.length < 3 && i < blocks.length && isVertical(blocks[i])) row.push(blocks[i++] as VideoBlock);
+      out.push(<VideoRow key={`videos-${i}`} blocks={row} />);
+    } else {
+      out.push(renderBlock(b, `${b.type}-${i}`));
+      i++;
+    }
+  }
+  return <>{out}</>;
 }
