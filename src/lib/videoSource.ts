@@ -23,7 +23,10 @@ const withParams = (url: string, params: Record<string, string>) => {
 };
 
 export function parseVideoSource(raw: string): VideoSource {
-  const input = raw.trim();
+  let input = raw.trim();
+  // An embed snippet (<iframe src="…">) pasted from the video host — use its src.
+  const embed = /<iframe[^>]*?\ssrc\s*=\s*["']([^"']+)["']/i.exec(input);
+  if (embed) input = embed[1].replace(/&amp;/g, "&").trim();
   let u: URL;
   try {
     u = new URL(input, "https://placeholder.invalid");
