@@ -62,7 +62,9 @@ export function parseVideoSource(raw: string): VideoSource {
 
   // Bunny Stream — (iframe|player).mediadelivery.net/(play|embed)/LIBRARY/VIDEO
   if ((host === "iframe.mediadelivery.net" || host === "player.mediadelivery.net") && parts.length >= 3 && ["play", "embed"].includes(parts[0])) {
-    const src = `https://iframe.mediadelivery.net/embed/${parts[1]}/${parts[2]}?preload=true&responsive=true`;
+    // autoplay/loop are set explicitly so the player never starts on its own (several
+    // videos on a page would all play at once); `autoplaySrc` turns autoplay on, muted.
+    const src = `https://iframe.mediadelivery.net/embed/${parts[1]}/${parts[2]}?autoplay=false&loop=false&preload=false&responsive=true`;
     return { kind: "iframe", provider: "bunny", src, autoplaySrc: withParams(src, { autoplay: "true", muted: "true" }) };
   }
 
