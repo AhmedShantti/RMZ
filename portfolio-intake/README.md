@@ -45,7 +45,7 @@ the folder to the project's slug, fill `project.json`.
 | Video poster | JPG/WebP | same ratio as the video |
 
 Large videos do NOT go in this folder: upload them to Bunny and paste the link
-in `project.json` (`video.url`). Every image gets `alt` text (what is in it).
+in a `video` block of `project.json` (`url`; add `"vertical": true` for 9:16 videos). A project can have several `video` blocks, anywhere in the page. Every image gets `alt` text (what is in it).
 
 ## project.json fields
 

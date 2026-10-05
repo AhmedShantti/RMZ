@@ -203,6 +203,7 @@ async function toBlock(slug: string, b: Block): Promise<AnyObj> {
         blockType: "video",
         heading: b.heading,
         url: b.url,
+        vertical: b.vertical === true,
         poster: await vis(slug, b.poster as Img),
         caption: b.caption,
       };

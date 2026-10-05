@@ -1,106 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Reveal from "./Reveal";
 import { prefersReducedMotion } from "@/lib/reducedMotion";
-import { parseVideoSource } from "@/lib/videoSource";
+import VideoPlayer from "./VideoPlayer";
 import type { BtsItem } from "@/lib/cms";
 
 /**
  * The BTS page's videos — one section per item, each with an anchor id (its
  * slug) so a Home card can deep-link to it (/bts#<slug>). Arriving on an anchor
- * scrolls that video to the middle of the screen and starts it.
- *
- * Each item's "video link" can be a hosted player (Bunny / Cloudflare / Vimeo /
- * YouTube → iframe, started muted), an HLS stream (.m3u8 → our <video> + hls.js
- * where the browser lacks native HLS), or a plain file (<video>). Large 4K
- * videos belong on a video host; the CMS upload only fits small clips.
- * Only one <video> plays at a time. Reduced motion: scroll only, no autoplay.
+ * scrolls that video to the middle of the screen and starts it (muted for hosted
+ * iframes). Only one <video> plays at a time. Reduced motion: scroll only.
  */
-function Player({
-  item,
-  autoplay,
-  onPlay,
-}: {
-  item: BtsItem;
-  autoplay: boolean;
-  onPlay: (e: React.SyntheticEvent<HTMLVideoElement>) => void;
-}) {
-  const source = useMemo(() => parseVideoSource(item.videoUrl), [item.videoUrl]);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const wantPlay = useRef(false);
-  useEffect(() => {
-    wantPlay.current = autoplay;
-  }, [autoplay]);
-
-  const play = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.play().catch(() => {
-      v.muted = true; // sound first (the visit came from a click), else muted
-      v.play().catch(() => {});
-    });
-  };
-
-  // HLS: native in Safari; elsewhere hls.js, loaded only when this item needs it.
-  useEffect(() => {
-    if (source.kind !== "hls") return;
-    const v = videoRef.current;
-    if (!v) return;
-    let hls: { destroy: () => void } | null = null;
-    let cancelled = false;
-    if (v.canPlayType("application/vnd.apple.mpegurl")) {
-      v.src = source.src;
-    } else {
-      import("hls.js").then(({ default: Hls }) => {
-        if (cancelled || !Hls.isSupported()) return;
-        const h = new Hls();
-        hls = h;
-        h.loadSource(source.src);
-        h.attachMedia(v);
-        h.on(Hls.Events.MANIFEST_PARSED, () => {
-          if (wantPlay.current) play();
-        });
-      });
-    }
-    return () => {
-      cancelled = true;
-      hls?.destroy();
-    };
-  }, [source]);
-
-  useEffect(() => {
-    if (autoplay && source.kind !== "iframe") play();
-  }, [autoplay, source.kind]);
-
-  if (source.kind === "iframe") {
-    return (
-      <iframe
-        // The muted-autoplay variant only for a click-through link; otherwise a plain player.
-        src={autoplay ? source.autoplaySrc : source.src}
-        title={item.title}
-        loading="lazy"
-        allow="autoplay; fullscreen; picture-in-picture; encrypted-media; accelerometer; gyroscope"
-        allowFullScreen
-        className="absolute inset-0 h-full w-full border-0"
-      />
-    );
-  }
-  return (
-    <video
-      ref={videoRef}
-      className="absolute inset-0 h-full w-full object-cover"
-      src={source.kind === "file" ? source.src : undefined}
-      poster={item.posterUrl ?? undefined}
-      controls
-      playsInline
-      preload="metadata"
-      onPlay={onPlay}
-      aria-label={item.title}
-    />
-  );
-}
-
 export default function BtsVideos({ items }: { items: BtsItem[] }) {
   const root = useRef<HTMLDivElement>(null);
   const [focus, setFocus] = useState<string | null>(null);
@@ -143,7 +54,7 @@ export default function BtsVideos({ items }: { items: BtsItem[] }) {
             <div
               className={`relative w-full overflow-hidden bg-[#0e0e0e] ${it.landscape ? "aspect-video" : "aspect-[9/16]"}`}
             >
-              <Player item={it} autoplay={focus === it.slug} onPlay={onPlay} />
+              <VideoPlayer url={it.videoUrl} title={it.title} poster={it.posterUrl} autoplay={focus === it.slug} onPlay={onPlay} />
             </div>
             <div className="mt-6 flex flex-col gap-3">
               <p className="font-body text-cream-dim text-xs uppercase tracking-[0.3em]">

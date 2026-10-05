@@ -408,9 +408,13 @@ export interface PortfolioProject {
              */
             heading?: string | null;
             /**
-             * Direct video file URL. Leave empty to show the poster with the play mark.
+             * Paste the link of a video on Bunny Stream, Cloudflare Stream, Vimeo or YouTube, or a direct .m3u8 / .mp4 URL. Leave empty to show the poster with the play mark.
              */
             url?: string | null;
+            /**
+             * Tick for a vertical (phone-shaped) video. Off = horizontal 16:9.
+             */
+            vertical?: boolean | null;
             poster?: {
               image?: (number | null) | Media;
               /**
@@ -779,6 +783,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
           | {
               heading?: T;
               url?: T;
+              vertical?: T;
               poster?:
                 | T
                 | {
@@ -1485,12 +1490,12 @@ export interface BtsContent {
          */
         cardImage: number | Media;
         /**
-         * Paste the link of a video hosted on a video service — Bunny Stream, Cloudflare Stream, Vimeo or YouTube (the share / embed link), or a direct .m3u8 / .mp4 URL. These stream in adaptive quality and have no size limit. If set, it is used instead of the uploaded file below.
-         */
-        /**
          * Leave off for vertical (9:16) videos — the default. Tick it only for horizontal videos.
          */
         landscape?: boolean | null;
+        /**
+         * Paste the link of a video hosted on a video service — Bunny Stream, Cloudflare Stream, Vimeo or YouTube (the share / embed link), or a direct .m3u8 / .mp4 URL. These stream in adaptive quality and have no size limit. If set, it is used instead of the uploaded file below.
+         */
         videoUrl?: string | null;
         /**
          * MP4/WebM uploaded here must be under about 4 MB (uploads go through the server, which has a 4.5 MB request limit). For 4K or anything bigger, use the video link above.
@@ -2010,6 +2015,7 @@ export interface BtsContentSelect<T extends boolean = true> {
         title?: T;
         label?: T;
         cardImage?: T;
+        landscape?: T;
         videoUrl?: T;
         video?: T;
         poster?: T;

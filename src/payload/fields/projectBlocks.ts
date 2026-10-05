@@ -203,10 +203,18 @@ export const projectBlocks: Block[] = [
       {
         name: "url",
         type: "text",
+        label: "Video link",
         admin: {
           description:
-            "Direct video file URL. Leave empty to show the poster with the play mark.",
+            "Paste the link of a video on Bunny Stream, Cloudflare Stream, Vimeo or YouTube, or a direct .m3u8 / .mp4 URL. Leave empty to show the poster with the play mark.",
         },
+      },
+      {
+        name: "vertical",
+        type: "checkbox",
+        defaultValue: false,
+        label: "Vertical video (9:16)",
+        admin: { description: "Tick for a vertical (phone-shaped) video. Off = horizontal 16:9." },
       },
       visual("poster", "Poster"),
       { name: "caption", type: "text" },

@@ -720,7 +720,8 @@ function toBlock(b: CmsBlock): ProjectBlock | null {
       return {
         type: "video",
         heading,
-        url: (b.url as string | null) ?? undefined,
+        url: (b.url as string | null)?.trim() || undefined,
+        vertical: b.vertical === true,
         poster: visual(b.poster as CmsVisual),
         caption: (b.caption as string | null) ?? undefined,
       };

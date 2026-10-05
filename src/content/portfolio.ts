@@ -78,7 +78,7 @@ export type ProjectBlock =
       before: Visual;
       after: Visual;
     }
-  | { type: "video"; heading?: string; url?: string; poster?: Visual; caption?: string }
+  | { type: "video"; heading?: string; url?: string; vertical?: boolean; poster?: Visual; caption?: string }
   | { type: "summary"; heading?: string; body: string; quote?: string; quoteAuthor?: string };
 
 /** The `categories` collection doc a project belongs to, as /portfolio groups by. */

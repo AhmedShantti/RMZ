@@ -1,5 +1,6 @@
 import Reveal from "@/components/Reveal";
 import ProjectImage from "./ProjectImage";
+import VideoPlayer from "@/components/VideoPlayer";
 import type { MockupKind, ProjectBlock, Visual } from "@/content/portfolio";
 
 /**
@@ -306,15 +307,21 @@ function Video({ block }: { block: Extract<ProjectBlock, { type: "video" }> }) {
       )}
       <Reveal delay={0.05}>
         {block.url ? (
-          <video
-            controls
-            preload="none"
-            poster={block.poster?.src ?? undefined}
-            className="aspect-video w-full bg-[#0e0e0e] object-cover"
+          // Horizontal: the full-width 16:9 frame. Vertical: a centred phone-shaped
+          // column that always fits the screen's height.
+          <div
+            className={`relative overflow-hidden bg-[#0e0e0e] ${
+              block.vertical
+                ? "mx-auto aspect-[9/16] w-full max-w-[min(26rem,calc((100svh-9rem)*9/16))]"
+                : "aspect-video w-full"
+            }`}
           >
-            <source src={block.url} />
-            Your browser does not support the video tag.
-          </video>
+            <VideoPlayer
+              url={block.url}
+              title={block.heading ?? block.caption ?? "Project video"}
+              poster={block.poster?.src}
+            />
+          </div>
         ) : (
           <div className="relative aspect-video w-full overflow-hidden bg-[#0e0e0e]">
             {block.poster?.src && (
