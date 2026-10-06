@@ -119,7 +119,8 @@ function Services({ block }: { block: Extract<ProjectBlock, { type: "services" }
 /* ── Full-width image ──────────────────────────────────────────────────────── */
 function ImageFull({ block }: { block: Extract<ProjectBlock, { type: "imageFull" }> }) {
   return (
-    <Section>
+    // `flush` (CMS checkbox): no space above/below, so images can sit edge to edge.
+    <Section className={block.flush ? "py-0! sm:py-0!" : ""}>
       <Reveal>
         <ProjectImage visual={block.image} ratio={block.image.ratio ?? "16/9"} sizes={SIZES.full} />
       </Reveal>

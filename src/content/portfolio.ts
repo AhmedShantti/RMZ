@@ -65,7 +65,7 @@ export type ProjectBlock =
       challenge?: string;
     }
   | { type: "services"; heading?: string; items: string[] }
-  | { type: "imageFull"; image: Visual }
+  | { type: "imageFull"; image: Visual; flush?: boolean }
   | { type: "galleryTwo"; images: Visual[]; flush?: boolean }
   | { type: "galleryThree"; images: Visual[]; flush?: boolean }
   | { type: "mockups"; heading?: string; kind: MockupKind; images: Visual[] }

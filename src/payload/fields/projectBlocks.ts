@@ -129,7 +129,17 @@ export const projectBlocks: Block[] = [
   {
     slug: "imageFull",
     labels: { singular: "Full-width image", plural: "Full-width images" },
-    fields: [visual("image", "Image")],
+    fields: [visual("image", "Image"),
+      {
+        name: "flush",
+        type: "checkbox",
+        defaultValue: false,
+        label: "No space around this block",
+        admin: {
+          description:
+            "Tick to remove the space above and below this image, so it sits flush against the blocks next to it. Off = the normal spacing.",
+        },
+      }],
   },
   {
     slug: "galleryTwo",

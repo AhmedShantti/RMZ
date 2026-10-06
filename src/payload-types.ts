@@ -309,6 +309,10 @@ export interface PortfolioProject {
                */
               url?: string | null;
             };
+            /**
+             * Tick to remove the space above and below this image, so it sits flush against the blocks next to it. Off = the normal spacing.
+             */
+            flush?: boolean | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'imageFull';
@@ -731,6 +735,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     caption?: T;
                     url?: T;
                   };
+              flush?: T;
               id?: T;
               blockName?: T;
             };

@@ -15,6 +15,7 @@ import * as migration_20261008_100000_home_sections from './20261008_100000_home
 import * as migration_20261009_100000_image_links from './20261009_100000_image_links';
 import * as migration_20261010_100000_cta_image_link from './20261010_100000_cta_image_link';
 import * as migration_20261011_100000_gallery_flush from './20261011_100000_gallery_flush';
+import * as migration_20261012_100000_image_full_flush from './20261012_100000_image_full_flush';
 
 export const migrations = [
   {
@@ -101,5 +102,10 @@ export const migrations = [
     up: migration_20261011_100000_gallery_flush.up,
     down: migration_20261011_100000_gallery_flush.down,
     name: '20261011_100000_gallery_flush',
+  },
+  {
+    up: migration_20261012_100000_image_full_flush.up,
+    down: migration_20261012_100000_image_full_flush.down,
+    name: '20261012_100000_image_full_flush',
   },
 ];
