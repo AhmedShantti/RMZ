@@ -116,11 +116,16 @@ function Services({ block }: { block: Extract<ProjectBlock, { type: "services" }
   );
 }
 
+/* A flush block ("No space around this block" in the CMS): no padding above, and a
+   2px strip below — the same hairline that separates the columns of a gallery, so
+   stacked flush blocks are divided by it horizontally too. */
+const FLUSH = "pt-0! pb-[2px]! sm:pt-0! sm:pb-[2px]!";
+
 /* ── Full-width image ──────────────────────────────────────────────────────── */
 function ImageFull({ block }: { block: Extract<ProjectBlock, { type: "imageFull" }> }) {
   return (
     // `flush` (CMS checkbox): no space above/below, so images can sit edge to edge.
-    <Section className={block.flush ? "py-0! sm:py-0!" : ""}>
+    <Section className={block.flush ? FLUSH : ""}>
       <Reveal>
         <ProjectImage visual={block.image} ratio={block.image.ratio ?? "16/9"} sizes={SIZES.full} />
       </Reveal>
@@ -138,7 +143,7 @@ function Gallery({ images, cols, flush = false }: { images: Visual[]; cols: 2 | 
 
   return (
     // `flush` (CMS checkbox): no space above/below, so galleries can sit edge to edge.
-    <Section className={flush ? "py-0! sm:py-0!" : ""}>
+    <Section className={flush ? FLUSH : ""}>
       <div className={`grid grid-cols-1 items-start gap-[2px] ${grid}`}>
         {images.map((image, i) => (
           <Reveal key={`${image.alt}-${i}`} delay={i * 0.05}>
