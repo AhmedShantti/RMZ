@@ -13,7 +13,8 @@ import { isExternalImage } from "@/lib/imageUrl";
  *     no `src` renders the site's existing placeholder tile (#1a1a1a + label) at
  *     the same ratio — the layout is identical the day the images land.
  *
- * Images run through Next's optimizer (AVIF/WebP + device-sized) — the CMS media
+ * Link images (Bunny / CDN) with no ratio set render at their natural size — see
+ * `natural` below. Uploaded images run through Next's optimizer (AVIF/WebP + device-sized) — the CMS media
  * host is allowlisted in next.config `images.remotePatterns`.
  */
 /**
@@ -51,6 +52,29 @@ export default function ProjectImage({
   const zoom = zoomOnHover
     ? "transition-transform duration-300 ease-out group-hover:scale-[1.03]"
     : "";
+
+  // An image pasted as a link (Bunny / CDN) with no ratio chosen in the CMS is shown
+  // exactly as it is: full column width, its OWN height — never cropped or boxed.
+  const natural = isExternalImage(visual.src) && !visual.ratio;
+  if (natural && visual.src) {
+    return (
+      <figure className={`m-0 ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- deliberately unoptimized: original quality/size */}
+        <img
+          src={visual.src}
+          alt={visual.alt}
+          loading={priority ? undefined : "lazy"}
+          decoding="async"
+          className={`block h-auto w-full ${zoom}`}
+        />
+        {visual.caption && (
+          <figcaption className="font-body text-cream-dim mt-3 text-xs leading-relaxed">
+            {visual.caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
 
   return (
     <figure className={`m-0 ${className}`}>

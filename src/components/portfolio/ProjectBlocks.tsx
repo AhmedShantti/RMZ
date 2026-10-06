@@ -137,7 +137,7 @@ function Gallery({ images, cols }: { images: Visual[]; cols: 2 | 3 }) {
 
   return (
     <Section>
-      <div className={`grid grid-cols-1 gap-[2px] ${grid}`}>
+      <div className={`grid grid-cols-1 items-start gap-[2px] ${grid}`}>
         {images.map((image, i) => (
           <Reveal key={`${image.alt}-${i}`} delay={i * 0.05}>
             <ProjectImage
@@ -191,7 +191,7 @@ function Mockups({ block }: { block: Extract<ProjectBlock, { type: "mockups" }> 
       <Reveal>
         <Kicker>{block.heading ?? MOCKUP_LABEL[block.kind]}</Kicker>
       </Reveal>
-      <div className={`grid gap-[2px] ${cols}`}>
+      <div className={`grid items-start gap-[2px] ${cols}`}>
         {block.images.map((image, i) => (
           <Reveal key={`${image.alt}-${i}`} delay={i * 0.05}>
             <ProjectImage
