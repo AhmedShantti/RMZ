@@ -60,6 +60,10 @@ function HoverVideo({ item }: { item: ClientCardItem }) {
     const loop = source.provider === "youtube" ? {} : { loop: source.provider === "vimeo" ? "1" : "true" };
     const u = new URL(source.autoplaySrc);
     for (const [k, v] of Object.entries(loop)) u.searchParams.set(k, v);
+    // The hover preview always starts by itself, muted, and preloads so it begins
+    // at once (the plain player URL is the opposite: no autoplay, no preload).
+    u.searchParams.set("autoplay", source.provider === "vimeo" || source.provider === "youtube" ? "1" : "true");
+    if (source.provider === "bunny") u.searchParams.set("preload", "true");
     return (
       <iframe
         src={u.toString()}
