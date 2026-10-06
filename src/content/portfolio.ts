@@ -66,8 +66,8 @@ export type ProjectBlock =
     }
   | { type: "services"; heading?: string; items: string[] }
   | { type: "imageFull"; image: Visual }
-  | { type: "galleryTwo"; images: Visual[] }
-  | { type: "galleryThree"; images: Visual[] }
+  | { type: "galleryTwo"; images: Visual[]; flush?: boolean }
+  | { type: "galleryThree"; images: Visual[]; flush?: boolean }
   | { type: "mockups"; heading?: string; kind: MockupKind; images: Visual[] }
   | { type: "textBreak"; text: string; attribution?: string }
   | { type: "stats"; heading?: string; items: Stat[] }

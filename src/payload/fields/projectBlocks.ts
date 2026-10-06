@@ -134,12 +134,32 @@ export const projectBlocks: Block[] = [
   {
     slug: "galleryTwo",
     labels: { singular: "Gallery — two columns", plural: "Galleries — two columns" },
-    fields: [visualList(2, 2)],
+    fields: [visualList(2, 2),
+      {
+        name: "flush",
+        type: "checkbox",
+        defaultValue: false,
+        label: "No space around this block",
+        admin: {
+          description:
+            "Tick to remove the space above and below this gallery, so it sits flush against the blocks next to it. Off = the normal spacing.",
+        },
+      }],
   },
   {
     slug: "galleryThree",
     labels: { singular: "Gallery — three columns", plural: "Galleries — three columns" },
-    fields: [visualList(3, 3)],
+    fields: [visualList(3, 3),
+      {
+        name: "flush",
+        type: "checkbox",
+        defaultValue: false,
+        label: "No space around this block",
+        admin: {
+          description:
+            "Tick to remove the space above and below this gallery, so it sits flush against the blocks next to it. Off = the normal spacing.",
+        },
+      }],
   },
   {
     slug: "mockups",

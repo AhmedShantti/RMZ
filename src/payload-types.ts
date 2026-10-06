@@ -326,6 +326,10 @@ export interface PortfolioProject {
                   id?: string | null;
                 }[]
               | null;
+            /**
+             * Tick to remove the space above and below this gallery, so it sits flush against the blocks next to it. Off = the normal spacing.
+             */
+            flush?: boolean | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'galleryTwo';
@@ -343,6 +347,10 @@ export interface PortfolioProject {
                   id?: string | null;
                 }[]
               | null;
+            /**
+             * Tick to remove the space above and below this gallery, so it sits flush against the blocks next to it. Off = the normal spacing.
+             */
+            flush?: boolean | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'galleryThree';
@@ -738,6 +746,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     url?: T;
                     id?: T;
                   };
+              flush?: T;
               id?: T;
               blockName?: T;
             };
@@ -753,6 +762,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     url?: T;
                     id?: T;
                   };
+              flush?: T;
               id?: T;
               blockName?: T;
             };

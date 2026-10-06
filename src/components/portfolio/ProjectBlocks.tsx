@@ -128,7 +128,7 @@ function ImageFull({ block }: { block: Extract<ProjectBlock, { type: "imageFull"
 }
 
 /* ── Two- and three-column galleries ───────────────────────────────────────── */
-function Gallery({ images, cols }: { images: Visual[]; cols: 2 | 3 }) {
+function Gallery({ images, cols, flush = false }: { images: Visual[]; cols: 2 | 3; flush?: boolean }) {
   if (!images.length) return null;
 
   // Falls back to a single column on mobile, so a missing image never leaves a
@@ -136,7 +136,8 @@ function Gallery({ images, cols }: { images: Visual[]; cols: 2 | 3 }) {
   const grid = cols === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
 
   return (
-    <Section>
+    // `flush` (CMS checkbox): no space above/below, so galleries can sit edge to edge.
+    <Section className={flush ? "py-0! sm:py-0!" : ""}>
       <div className={`grid grid-cols-1 items-start gap-[2px] ${grid}`}>
         {images.map((image, i) => (
           <Reveal key={`${image.alt}-${i}`} delay={i * 0.05}>
@@ -429,9 +430,9 @@ function renderBlock(block: ProjectBlock, key: string) {
     case "imageFull":
       return <ImageFull key={key} block={block} />;
     case "galleryTwo":
-      return <Gallery key={key} images={block.images} cols={2} />;
+      return <Gallery key={key} images={block.images} cols={2} flush={block.flush} />;
     case "galleryThree":
-      return <Gallery key={key} images={block.images} cols={3} />;
+      return <Gallery key={key} images={block.images} cols={3} flush={block.flush} />;
     case "mockups":
       return <Mockups key={key} block={block} />;
     case "textBreak":

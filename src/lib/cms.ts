@@ -786,9 +786,9 @@ function toBlock(b: CmsBlock): ProjectBlock | null {
     case "imageFull":
       return { type: "imageFull", image: requiredVisual(b.image as CmsVisual) };
     case "galleryTwo":
-      return { type: "galleryTwo", images: visuals(b.images as CmsVisual[]) };
+      return { type: "galleryTwo", images: visuals(b.images as CmsVisual[]), flush: b.flush === true };
     case "galleryThree":
-      return { type: "galleryThree", images: visuals(b.images as CmsVisual[]) };
+      return { type: "galleryThree", images: visuals(b.images as CmsVisual[]), flush: b.flush === true };
     case "mockups":
       return {
         type: "mockups",
