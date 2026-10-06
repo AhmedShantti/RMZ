@@ -49,20 +49,24 @@ function ClientImg({ item }: { item: ClientCardItem }) {
  * COVER the card (the card is 3:4; the video is 9:16 or 16:9), and faded in
  * once it has loaded so the photo never flashes away to a black player.
  */
-function HoverVideo({ item }: { item: ClientCardItem }) {
-  const [ready, setReady] = useState(false);
+function HoverVideo({ item, active }: { item: ClientCardItem; active: boolean }) {
+  const [playing, setPlaying] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
+  const playerReady = useRef(false);
+  const activeRef = useRef(active);
   const source = item.videoUrl ? parseVideoSource(item.videoUrl) : null;
 
-  // Hosted players (Bunny speaks the player.js protocol) take a second or two to
-  // spin up, and show their own paused UI meanwhile — so keep the photo visible
-  // until the video is REALLY playing (first `timeupdate` past 0s), and nudge it
-  // to play muted as soon as it reports ready.
+  const send = (msg: Record<string, unknown>) =>
+    frame.current?.contentWindow?.postMessage(JSON.stringify({ context: "player.js", version: "0.0.11", ...msg }), "*");
+
+  // Hosted players (Bunny speaks the player.js protocol) take a few seconds to
+  // spin up, and show their own paused UI meanwhile. So the card keeps its photo
+  // until the video is REALLY playing (a `timeupdate` past 0s). The player is
+  // mounted ahead of the hover (see ClientCard), held paused, and started the
+  // moment the card is hovered.
   useEffect(() => {
     const f = frame.current;
     if (!f) return;
-    const send = (msg: Record<string, unknown>) =>
-      f.contentWindow?.postMessage(JSON.stringify({ context: "player.js", version: "0.0.11", ...msg }), "*");
     const onMessage = (e: MessageEvent) => {
       if (e.source !== f.contentWindow || typeof e.data !== "string") return;
       let d: { event?: string; value?: { seconds?: number } };
@@ -72,16 +76,30 @@ function HoverVideo({ item }: { item: ClientCardItem }) {
         return;
       }
       if (d.event === "ready") {
+        playerReady.current = true;
         send({ method: "addEventListener", value: "timeupdate" });
         send({ method: "mute" });
-        send({ method: "play" });
-      } else if (d.event === "timeupdate" && (d.value?.seconds ?? 0) > 0) {
-        setReady(true);
+        send({ method: activeRef.current ? "play" : "pause" });
+      } else if (d.event === "timeupdate") {
+        setPlaying((d.value?.seconds ?? 0) > 0 && activeRef.current);
       }
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, []);
+
+  useEffect(() => {
+    activeRef.current = active;
+    if (!playerReady.current) return;
+    if (active) send({ method: "play" });
+    else {
+      send({ method: "pause" });
+      send({ method: "setCurrentTime", value: 0 });
+    }
+  }, [active]);
+
+  // Shown only while hovered AND really playing (non-hosted players reveal on load).
+  const ready = playing && active;
 
   if (!source || source.kind === "hls") return null;
   const fit = item.landscape
@@ -105,7 +123,7 @@ function HoverVideo({ item }: { item: ClientCardItem }) {
         tabIndex={-1}
         allow="autoplay; encrypted-media"
         // Providers without player.js timing events: reveal on load.
-        onLoad={() => source.provider !== "bunny" && setReady(true)}
+        onLoad={() => source.provider !== "bunny" && setPlaying(true)}
         className={`${fit} pointer-events-none border-0`}
         style={style}
       />
@@ -119,7 +137,7 @@ function HoverVideo({ item }: { item: ClientCardItem }) {
       autoPlay
       playsInline
       aria-hidden="true"
-      onPlaying={() => setReady(true)}
+      onPlaying={() => setPlaying(true)}
       className={`${fit} pointer-events-none object-cover`}
       style={style}
     />
@@ -163,6 +181,18 @@ function ClientCard({
   };
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
+  // Bunny previews are mounted (paused, hidden) shortly before the card is seen, so
+  // the video is already loaded when the mouse arrives. Mouse devices only.
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el || !window.matchMedia("(hover: hover) and (pointer: fine)").matches || prefersReducedMotion()) return;
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), { rootMargin: "300px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     const start = () => {
       intervalRef.current = setInterval(() => {
@@ -195,10 +225,15 @@ function ClientCard({
   // The client whose photo is on screen: `upcoming` is what's showing for the
   // whole sweep, `active` otherwise. Derived every render, never captured.
   const shown = sweeping ? upcoming : active;
+  const warm = (() => {
+    if (!near || !shown.videoUrl) return false;
+    const src = parseVideoSource(shown.videoUrl);
+    return src.kind === "iframe" && src.provider === "bunny";
+  })();
   const pad = (n: number) => (n + 1).toString().padStart(2, "0");
 
   return (
-    <div className="relative aspect-[3/4] w-[min(360px,calc(100vw-3rem))] sm:w-[min(360px,calc((100vw-4.5rem)/2))] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100"
+    <div ref={cardRef} className="relative aspect-[3/4] w-[min(360px,calc(100vw-3rem))] sm:w-[min(360px,calc((100vw-4.5rem)/2))] rounded-2xl border border-white/10 overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform hover:scale-[1.04] hover:z-10 motion-reduce:hover:scale-100"
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
     >
@@ -212,9 +247,9 @@ function ClientCard({
         <ClientImg item={upcoming} />
       </div>
 
-      {hovering && !sweeping && shown.videoUrl && (
-        <div className="absolute inset-0 overflow-hidden">
-          <HoverVideo key={shown.videoUrl} item={shown} />
+      {(hovering || warm) && shown.videoUrl && (
+        <div className="absolute inset-0 overflow-hidden" style={{ visibility: hovering ? "visible" : "hidden" }}>
+          <HoverVideo key={shown.videoUrl} item={shown} active={hovering} />
         </div>
       )}
 
