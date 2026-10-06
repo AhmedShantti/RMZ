@@ -8,6 +8,8 @@ import { getHome, getServices, getContact, getSiteSettings, getBts } from "@/lib
 import Gradient from "@/components/gradient/NeatGradient";
 import BtsSection from "@/components/BtsSection";
 
+const SHOW_SHOWREEL = false;
+
 export default async function Home() {
   const [home, servicesData, contact, settings, bts] = await Promise.all([
     getHome(),
@@ -64,7 +66,8 @@ export default async function Home() {
         }))}
       />
       
-      <VideoSection videos={home.showreel.videos} />
+      {/* Showreel is switched off for now (kept in the codebase) — flip SHOW_SHOWREEL to bring it back. */}
+      {SHOW_SHOWREEL && <VideoSection videos={home.showreel.videos} />}
       <MarketsBlock
         asTeaser
         story={contact.heroStory}
