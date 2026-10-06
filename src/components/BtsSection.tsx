@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { preconnect } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import type { ClientCardItem as BaseCardItem } from "@/content/home";
 import { parseVideoSource } from "@/lib/videoSource";
@@ -50,7 +51,38 @@ function ClientImg({ item }: { item: ClientCardItem }) {
  */
 function HoverVideo({ item }: { item: ClientCardItem }) {
   const [ready, setReady] = useState(false);
+  const frame = useRef<HTMLIFrameElement>(null);
   const source = item.videoUrl ? parseVideoSource(item.videoUrl) : null;
+
+  // Hosted players (Bunny speaks the player.js protocol) take a second or two to
+  // spin up, and show their own paused UI meanwhile — so keep the photo visible
+  // until the video is REALLY playing (first `timeupdate` past 0s), and nudge it
+  // to play muted as soon as it reports ready.
+  useEffect(() => {
+    const f = frame.current;
+    if (!f) return;
+    const send = (msg: Record<string, unknown>) =>
+      f.contentWindow?.postMessage(JSON.stringify({ context: "player.js", version: "0.0.11", ...msg }), "*");
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== f.contentWindow || typeof e.data !== "string") return;
+      let d: { event?: string; value?: { seconds?: number } };
+      try {
+        d = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+      if (d.event === "ready") {
+        send({ method: "addEventListener", value: "timeupdate" });
+        send({ method: "mute" });
+        send({ method: "play" });
+      } else if (d.event === "timeupdate" && (d.value?.seconds ?? 0) > 0) {
+        setReady(true);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
   if (!source || source.kind === "hls") return null;
   const fit = item.landscape
     ? "absolute top-0 h-full aspect-video start-1/2 -translate-x-1/2 rtl:translate-x-1/2"
@@ -66,12 +98,14 @@ function HoverVideo({ item }: { item: ClientCardItem }) {
     if (source.provider === "bunny") u.searchParams.set("preload", "true");
     return (
       <iframe
+        ref={frame}
         src={u.toString()}
         title=""
         aria-hidden="true"
         tabIndex={-1}
         allow="autoplay; encrypted-media"
-        onLoad={() => setReady(true)}
+        // Providers without player.js timing events: reveal on load.
+        onLoad={() => source.provider !== "bunny" && setReady(true)}
         className={`${fit} pointer-events-none border-0`}
         style={style}
       />
@@ -120,7 +154,7 @@ function ClientCard({
     if (e.pointerType !== "mouse" || prefersReducedMotion()) return;
     hoverRef.current = true;
     // Small delay so sweeping the mouse across the cards doesn't start every video.
-    hoverTimer.current = setTimeout(() => setHovering(true), 250);
+    hoverTimer.current = setTimeout(() => setHovering(true), 120);
   };
   const onLeave = () => {
     hoverRef.current = false;
@@ -249,6 +283,9 @@ export default function BtsSection({
   items: ClientCardItem[];
 }) {
   if (!clients?.length) return null;
+  // The hover previews load a hosted player — open the connections early.
+  preconnect("https://iframe.mediadelivery.net");
+  preconnect("https://assets.mediadelivery.net");
   // Spread the three cards' starting points evenly through the list (6 → 0/2/4,
   // 3 → 0/1/2) so they never all show the same photo at once.
   const offset = (i: number) => Math.floor((clients.length * i) / 3);
