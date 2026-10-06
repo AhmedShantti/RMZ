@@ -261,7 +261,7 @@ export default function EmergeSquares({
           { at: PHASE.STAIRS_C, get: () => cellIn(stairsSection ?? teaser, hs3, sizeOf(anchor)) },
           { at: PHASE.TEASER, get: () => cellIn(teaser, home, sizeOf(anchor)) },
           { at: PHASE.CLIENTS, get: () => cellIn(clients ?? teaser, hc, sizeOf(anchor)) },
-          { at: PHASE.VIDEO, get: () => cellIn(video ?? teaser, hv, sizeOf(anchor)) },
+          { at: PHASE.VIDEO, get: () => cellIn(video ?? clients ?? teaser, hv, sizeOf(anchor)) },
           { at: PHASE.MARKETS, get: () => cellIn(markets ?? video ?? teaser, hm, sizeOf(anchor)) },
         ];
 
@@ -441,7 +441,7 @@ export default function EmergeSquares({
           [pinEnd, PHASE.STAIRS_C],
           [center(teaser), PHASE.TEASER],
           [center(clients ?? teaser), PHASE.CLIENTS],
-          [center(video ?? teaser), PHASE.VIDEO],
+          [center(video ?? clients ?? teaser), PHASE.VIDEO],
           [center(markets ?? video ?? teaser), PHASE.MARKETS],
         ];
         // Keep scroll values strictly increasing so the piecewise map is sane.
