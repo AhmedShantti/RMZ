@@ -626,6 +626,109 @@ export const getBts = cache(() =>
   ),
 );
 
+// ── Home sections: Selected work · Client logos · CTA banner ─────────────────
+
+export type HomeSectionsData = {
+  featured: {
+    enabled: boolean;
+    kicker: string;
+    heading: string;
+    buttonLabel: string;
+    buttonLink: string;
+    /** Resolved at render time — see getHomeSections. */
+    slugs: string[];
+  };
+  logos: {
+    enabled: boolean;
+    heading: string;
+    items: { name: string; url: string | null; alt: string }[];
+  };
+  cta: {
+    enabled: boolean;
+    kicker: string;
+    heading: string;
+    text: string;
+    buttonLabel: string;
+    buttonLink: string;
+    imageUrl: string | null;
+  };
+};
+
+const homeSectionsDefault: HomeSectionsData = {
+  featured: {
+    enabled: true,
+    kicker: "Selected work",
+    heading: "Work we are proud of",
+    buttonLabel: "See all work",
+    buttonLink: "/portfolio",
+    slugs: [],
+  },
+  logos: { enabled: true, heading: "Brands we have built with", items: [] },
+  cta: {
+    enabled: true,
+    kicker: "Have a project in mind?",
+    heading: "Let’s make something bold.",
+    text: "",
+    buttonLabel: "Start a project",
+    buttonLink: "/contact",
+    imageUrl: null,
+  },
+};
+
+export const getHomeSections = cache(() =>
+  safe(
+    "homeSections",
+    async (p): Promise<HomeSectionsData> => {
+      // depth 1: the picked projects + the logo / banner uploads are populated.
+      const g = await p.findGlobal({ slug: "homeSections", depth: 1 });
+      const d = homeSectionsDefault;
+      const media = (v: unknown) =>
+        v && typeof v === "object" ? (v as { url?: string | null; alt?: string | null }) : null;
+      const fw = g.featuredWork ?? {};
+      const cl = g.clientLogos ?? {};
+      const cta = g.ctaBanner ?? {};
+      return {
+        featured: {
+          enabled: fw.enabled !== false,
+          kicker: f(fw.kicker, d.featured.kicker),
+          heading: f(fw.heading, d.featured.heading),
+          buttonLabel: f(fw.buttonLabel, d.featured.buttonLabel),
+          buttonLink: f(fw.buttonLink, d.featured.buttonLink),
+          slugs: (Array.isArray(fw.projects) ? fw.projects : []).flatMap((x) =>
+            x && typeof x === "object" && typeof x.slug === "string" ? [x.slug] : [],
+          ),
+        },
+        logos: {
+          enabled: cl.enabled !== false,
+          heading: f(cl.heading, d.logos.heading),
+          items: (Array.isArray(cl.logos) ? cl.logos : []).map((l) => {
+            const m = media(l.logo);
+            return { name: l.name, url: m?.url ?? null, alt: m?.alt || l.name };
+          }),
+        },
+        cta: {
+          enabled: cta.enabled !== false,
+          kicker: f(cta.kicker, d.cta.kicker),
+          heading: f(cta.heading, d.cta.heading),
+          text: f(cta.text, d.cta.text),
+          buttonLabel: f(cta.buttonLabel, d.cta.buttonLabel),
+          buttonLink: f(cta.buttonLink, d.cta.buttonLink),
+          imageUrl: media(cta.image)?.url ?? null,
+        },
+      };
+    },
+    homeSectionsDefault,
+  ),
+);
+
+/** The projects the Selected-work section shows: the ones picked in the CMS (published
+ *  only, in the picked order), else the first six of the Portfolio. */
+export const getFeaturedProjects = cache(async (slugs: string[]) => {
+  const all = await getPortfolio();
+  const picked = slugs.flatMap((s) => all.find((p) => p.slug === s) ?? []);
+  return (picked.length ? picked : all).slice(0, 6);
+});
+
 // ── Portfolio projects + case studies ────────────────────────────────────────
 
 /** A populated `media` doc, once depth ≥ 1 has resolved the upload. */

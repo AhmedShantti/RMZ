@@ -104,6 +104,7 @@ export interface Config {
     careersContent: CareersContent;
     portfolioContent: PortfolioContent;
     btsContent: BtsContent;
+    homeSections: HomeSection;
     legalPrivacy: LegalPrivacy;
     legalTerms: LegalTerm;
   };
@@ -116,6 +117,7 @@ export interface Config {
     careersContent: CareersContentSelect<false> | CareersContentSelect<true>;
     portfolioContent: PortfolioContentSelect<false> | PortfolioContentSelect<true>;
     btsContent: BtsContentSelect<false> | BtsContentSelect<true>;
+    homeSections: HomeSectionsSelect<false> | HomeSectionsSelect<true>;
     legalPrivacy: LegalPrivacySelect<false> | LegalPrivacySelect<true>;
     legalTerms: LegalTermsSelect<false> | LegalTermsSelect<true>;
   };
@@ -1534,6 +1536,70 @@ export interface BtsContent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homeSections".
+ */
+export interface HomeSection {
+  id: number;
+  /**
+   * A grid of featured projects, below the services list.
+   */
+  featuredWork?: {
+    enabled?: boolean | null;
+    kicker?: string | null;
+    heading?: string | null;
+    /**
+     * Pick up to 6 projects, in the order they should appear. Left empty, the first 6 projects of the Portfolio are shown. Unpublished projects are skipped.
+     */
+    projects?: (number | PortfolioProject)[] | null;
+    buttonLabel?: string | null;
+    /**
+     * Where the button goes.
+     */
+    buttonLink?: string | null;
+  };
+  /**
+   * A slowly scrolling row of the brands you have worked with. Hidden while there are no logos.
+   */
+  clientLogos?: {
+    enabled?: boolean | null;
+    heading?: string | null;
+    logos?:
+      | {
+          /**
+           * Brand name — shown as text if there is no logo image, and read by screen readers.
+           */
+          name: string;
+          /**
+           * Optional. A white or light logo on a transparent background (PNG/SVG/WebP) looks best.
+           */
+          logo?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * A big closing banner with a button, just above the contact block.
+   */
+  ctaBanner?: {
+    enabled?: boolean | null;
+    kicker?: string | null;
+    heading?: string | null;
+    /**
+     * Optional line under the heading.
+     */
+    text?: string | null;
+    buttonLabel?: string | null;
+    buttonLink?: string | null;
+    /**
+     * Optional. Shown dimmed behind the text. Wide, about 2400×1200px.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legalPrivacy".
  */
 export interface LegalPrivacy {
@@ -2028,6 +2094,49 @@ export interface BtsContentSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homeSections_select".
+ */
+export interface HomeSectionsSelect<T extends boolean = true> {
+  featuredWork?:
+    | T
+    | {
+        enabled?: T;
+        kicker?: T;
+        heading?: T;
+        projects?: T;
+        buttonLabel?: T;
+        buttonLink?: T;
+      };
+  clientLogos?:
+    | T
+    | {
+        enabled?: T;
+        heading?: T;
+        logos?:
+          | T
+          | {
+              name?: T;
+              logo?: T;
+              id?: T;
+            };
+      };
+  ctaBanner?:
+    | T
+    | {
+        enabled?: T;
+        kicker?: T;
+        heading?: T;
+        text?: T;
+        buttonLabel?: T;
+        buttonLink?: T;
+        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;

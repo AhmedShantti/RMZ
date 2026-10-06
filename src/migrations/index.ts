@@ -11,6 +11,7 @@ import * as migration_20261004_150000_bts_content from './20261004_150000_bts_co
 import * as migration_20261005_100000_bts_video_link from './20261005_100000_bts_video_link';
 import * as migration_20261006_100000_bts_landscape from './20261006_100000_bts_landscape';
 import * as migration_20261007_100000_project_video_vertical from './20261007_100000_project_video_vertical';
+import * as migration_20261008_100000_home_sections from './20261008_100000_home_sections';
 
 export const migrations = [
   {
@@ -26,7 +27,7 @@ export const migrations = [
   {
     up: migration_20260922_101455_add_categories.up,
     down: migration_20260922_101455_add_categories.down,
-    name: '20260922_101455_add_categories'
+    name: '20260922_101455_add_categories',
   },
   {
     up: migration_20260930_100000_home_stairs_title_showreel_hd.up,
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261007_100000_project_video_vertical.up,
     down: migration_20261007_100000_project_video_vertical.down,
     name: '20261007_100000_project_video_vertical',
+  },
+  {
+    up: migration_20261008_100000_home_sections.up,
+    down: migration_20261008_100000_home_sections.down,
+    name: '20261008_100000_home_sections',
   },
 ];

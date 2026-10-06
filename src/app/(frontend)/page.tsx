@@ -4,20 +4,25 @@ import HomeLogoStairs from "@/components/HomeLogoStairs";
 import ServicesTeaser from "@/components/ServicesTeaser";
 import VideoSection from "@/components/VideoSection";
 import MarketsBlock from "@/components/MarketsBlock";
-import { getHome, getServices, getContact, getSiteSettings, getBts } from "@/lib/cms";
+import { getHome, getServices, getContact, getSiteSettings, getBts, getHomeSections, getFeaturedProjects } from "@/lib/cms";
 import Gradient from "@/components/gradient/NeatGradient";
 import BtsSection from "@/components/BtsSection";
+import FeaturedWork from "@/components/FeaturedWork";
+import ClientLogos from "@/components/ClientLogos";
+import CtaBanner from "@/components/CtaBanner";
 
 const SHOW_SHOWREEL = false;
 
 export default async function Home() {
-  const [home, servicesData, contact, settings, bts] = await Promise.all([
+  const [home, servicesData, contact, settings, bts, sections] = await Promise.all([
     getHome(),
     getServices(),
     getContact(),
     getSiteSettings(),
     getBts(),
+    getHomeSections(),
   ]);
+  const featuredProjects = sections.featured.enabled ? await getFeaturedProjects(sections.featured.slugs) : [];
 
   // Number services 01..N by their full-list order, then keep the featured ones.
   const featured = servicesData.services
@@ -51,6 +56,17 @@ export default async function Home() {
       {/* Wordmark + logo squares → emerge → stairs (pinned) */}
       <HomeLogoStairs stairs={home.stairs} />
       <ServicesTeaser services={featured}  />
+
+      {/* Selected work — featured projects (CMS: Home sections) */}
+      {sections.featured.enabled && (
+        <FeaturedWork
+          kicker={sections.featured.kicker}
+          heading={sections.featured.heading}
+          projects={featuredProjects}
+          buttonLabel={sections.featured.buttonLabel}
+          buttonLink={sections.featured.buttonLink}
+        />
+      )}
      
       {/* BTS section (was Clients): each card opens its video on /bts */}
       <BtsSection
@@ -66,6 +82,12 @@ export default async function Home() {
         }))}
       />
       
+      {/* Client logos + closing call-to-action (CMS: Home sections) */}
+      {sections.logos.enabled && (
+        <ClientLogos heading={sections.logos.heading} items={sections.logos.items} />
+      )}
+      {sections.cta.enabled && <CtaBanner {...sections.cta} />}
+
       {/* Showreel is switched off for now (kept in the codebase) — flip SHOW_SHOWREEL to bring it back. */}
       {SHOW_SHOWREEL && <VideoSection videos={home.showreel.videos} />}
       <MarketsBlock
