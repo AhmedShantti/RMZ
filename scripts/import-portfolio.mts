@@ -14,7 +14,8 @@
  * Idempotent: matched by slug, never duplicates. Categories are matched by title
  * (created from portfolio-intake/categories.json if missing). Images referenced by
  * a `file` that exists on disk are uploaded to the media library; a missing file is
- * skipped (the page shows its placeholder tile). An empty/`TODO` market → "Egypt".
+ * skipped (the page shows its placeholder tile). An image given as `"url"` (Bunny / CDN)
+ * is stored as that link and shown straight from it — nothing is uploaded. An empty/`TODO` market → "Egypt".
  */
 import { createRequire } from "node:module";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -28,7 +29,7 @@ const REMOTE = process.argv.find((a) => a.startsWith("--remote="))?.slice(9).rep
 
 const root = path.resolve(process.cwd(), "portfolio-intake");
 type AnyObj = Record<string, unknown>;
-type Img = { file?: string; ratio?: string; alt?: string; caption?: string };
+type Img = { file?: string; url?: string; ratio?: string; alt?: string; caption?: string };
 type Block = AnyObj & { type: string };
 type Project = {
   name: string;
@@ -163,8 +164,10 @@ async function upload(slug: string, img: Img | undefined): Promise<number | unde
   mediaCache.set(filePath, id);
   return id;
 }
+// An image is either `url` (a Bunny / CDN link, shown straight from there) or `file` (uploaded).
 const vis = async (slug: string, img?: Img) => ({
-  image: await upload(slug, img),
+  image: img?.url ? undefined : await upload(slug, img),
+  url: img?.url,
   ratio: img?.ratio,
   caption: img?.caption,
 });
@@ -243,7 +246,8 @@ for (const { slug, p } of projects) {
     sortOrder: p.sortOrder ?? 0,
     year: p.year,
     resultLine: p.resultLine,
-    coverImage: await upload(slug, p.cover),
+    coverImage: p.cover?.url ? undefined : await upload(slug, p.cover),
+    coverImageUrl: p.cover?.url,
     coverRatio: p.cover?.ratio ?? "16/9",
     blocks: await Promise.all((p.blocks ?? []).map((b) => toBlock(slug, b))),
     _status: PUBLISH ? "published" : "draft",

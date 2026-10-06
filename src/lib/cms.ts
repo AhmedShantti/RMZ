@@ -739,6 +739,8 @@ type CmsVisual = {
   image?: unknown;
   ratio?: string | null;
   caption?: string | null;
+  /** A pasted image link (Bunny / CDN) — wins over the upload. */
+  url?: string | null;
 } | null;
 
 const visual = (v: CmsVisual): Visual | undefined => {
@@ -746,8 +748,8 @@ const visual = (v: CmsVisual): Visual | undefined => {
   const media =
     v.image && typeof v.image === "object" ? (v.image as MediaDoc) : null;
   return {
-    src: media?.url ?? null,
-    alt: media?.alt ?? "",
+    src: v.url?.trim() || media?.url || null,
+    alt: media?.alt ?? v.caption ?? "",
     ratio: (v.ratio ?? undefined) as VisualRatio | undefined,
     caption: v.caption ?? undefined,
   };
@@ -897,8 +899,8 @@ export const getPortfolio = cache(() =>
 
       return res.docs.map((d): Project => {
         const cover = visual(
-          d.coverImage && typeof d.coverImage === "object"
-            ? { image: d.coverImage, ratio: d.coverRatio }
+          (d.coverImage && typeof d.coverImage === "object") || d.coverImageUrl
+            ? { image: d.coverImage, ratio: d.coverRatio, url: d.coverImageUrl }
             : null,
         );
 

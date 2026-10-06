@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Visual, VisualRatio } from "@/content/portfolio";
+import { isExternalImage } from "@/lib/imageUrl";
 
 /**
  * The one image primitive every case-study block draws through.
@@ -64,6 +65,7 @@ export default function ProjectImage({
             fill
             sizes={sizes}
             priority={priority}
+            unoptimized={isExternalImage(visual.src)}
             loading={priority ? undefined : "lazy"}
             className={`object-cover ${zoom}`}
           />

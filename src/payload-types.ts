@@ -261,6 +261,10 @@ export interface PortfolioProject {
    */
   coverRatio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
   /**
+   * Paste the link of a cover image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded — and takes priority over the upload above.
+   */
+  coverImageUrl?: string | null;
+  /**
    * The case study. Add, remove and reorder freely — the page renders exactly what's here, in this order.
    */
   blocks?:
@@ -300,6 +304,10 @@ export interface PortfolioProject {
                */
               ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
               caption?: string | null;
+              /**
+               * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+               */
+              url?: string | null;
             };
             id?: string | null;
             blockName?: string | null;
@@ -311,6 +319,10 @@ export interface PortfolioProject {
                   image?: (number | null) | Media;
                   ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
                   caption?: string | null;
+                  /**
+                   * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+                   */
+                  url?: string | null;
                   id?: string | null;
                 }[]
               | null;
@@ -324,6 +336,10 @@ export interface PortfolioProject {
                   image?: (number | null) | Media;
                   ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
                   caption?: string | null;
+                  /**
+                   * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+                   */
+                  url?: string | null;
                   id?: string | null;
                 }[]
               | null;
@@ -342,6 +358,10 @@ export interface PortfolioProject {
                   image?: (number | null) | Media;
                   ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
                   caption?: string | null;
+                  /**
+                   * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+                   */
+                  url?: string | null;
                   id?: string | null;
                 }[]
               | null;
@@ -390,6 +410,10 @@ export interface PortfolioProject {
                */
               ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
               caption?: string | null;
+              /**
+               * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+               */
+              url?: string | null;
             };
             after?: {
               image?: (number | null) | Media;
@@ -398,6 +422,10 @@ export interface PortfolioProject {
                */
               ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
               caption?: string | null;
+              /**
+               * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+               */
+              url?: string | null;
             };
             note?: string | null;
             id?: string | null;
@@ -424,6 +452,10 @@ export interface PortfolioProject {
                */
               ratio?: ('21/9' | '16/9' | '3/2' | '4/3' | '1/1' | '4/5' | '9/16') | null;
               caption?: string | null;
+              /**
+               * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.
+               */
+              url?: string | null;
             };
             caption?: string | null;
             id?: string | null;
@@ -653,6 +685,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
   resultLine?: T;
   coverImage?: T;
   coverRatio?: T;
+  coverImageUrl?: T;
   blocks?:
     | T
     | {
@@ -688,6 +721,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                   };
               id?: T;
               blockName?: T;
@@ -701,6 +735,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                     id?: T;
                   };
               id?: T;
@@ -715,6 +750,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                     id?: T;
                   };
               id?: T;
@@ -731,6 +767,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                     id?: T;
                   };
               id?: T;
@@ -768,6 +805,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                   };
               after?:
                 | T
@@ -775,6 +813,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                   };
               note?: T;
               id?: T;
@@ -792,6 +831,7 @@ export interface PortfolioProjectsSelect<T extends boolean = true> {
                     image?: T;
                     ratio?: T;
                     caption?: T;
+                    url?: T;
                   };
               caption?: T;
               id?: T;

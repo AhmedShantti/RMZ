@@ -6,6 +6,7 @@ import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import RunsText from "@/components/RunsText";
 import { getPortfolio, getPortfolioPage, getMeta } from "@/lib/cms";
+import { isExternalImage } from "@/lib/imageUrl";
 import { groupProjectsByCategory } from "@/lib/portfolioGrouping";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -93,6 +94,7 @@ export default async function PortfolioPage() {
                             {p.cover?.src ? (
                               <Image
                                 src={p.cover.src}
+                                unoptimized={isExternalImage(p.cover.src)}
                                 alt={`${p.name} cover image`}
                                 fill
                                 sizes="(max-width: 640px) 88vw, (max-width: 1279px) 45vw, 30vw"

@@ -36,6 +36,16 @@ the folder to the project's slug, fill `project.json`.
    projects. Run first against a local scratch DB, then the live one — only when
    you say so. Re-running updates by slug, it never duplicates.
 
+## Images hosted on Bunny (links instead of files)
+
+Images too big for the CMS upload can live on Bunny (Storage + a Pull Zone) and be
+referenced by link: in `project.json` use `"url"` instead of `"file"`, e.g.
+`"cover": { "url": "https://rmz.b-cdn.net/orith/cover.jpg", "ratio": "16/9", "alt": "…" }`
+(same for any block image, gallery image, mockup, before/after and video poster).
+The site shows that link as-is — no download, no re-encoding, original quality/size.
+In `/studio` the same is the **Image link** / **Cover image link** field next to each
+upload (the link wins over an upload).
+
 ## Image rules
 
 | What | Format | Size |

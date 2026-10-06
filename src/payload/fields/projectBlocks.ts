@@ -47,6 +47,15 @@ const visual = (name: string, label: string): Field => ({
       ],
     },
     { name: "caption", type: "text" },
+    {
+      name: "url",
+      type: "text",
+      label: "Image link (optional)",
+      admin: {
+        description:
+          "Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.",
+      },
+    },
   ],
 });
 
@@ -75,6 +84,15 @@ const visualList = (min: number, max: number): Field => ({
       ],
     },
     { name: "caption", type: "text" },
+    {
+      name: "url",
+      type: "text",
+      label: "Image link (optional)",
+      admin: {
+        description:
+          "Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded here — and takes priority over the upload above.",
+      },
+    },
   ],
 });
 

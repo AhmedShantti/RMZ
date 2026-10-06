@@ -133,6 +133,15 @@ export const PortfolioProjects: CollectionConfig = {
       ],
     },
     {
+      name: "coverImageUrl",
+      type: "text",
+      label: "Cover image link (optional)",
+      admin: {
+        description:
+          "Paste the link of a cover image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded — and takes priority over the upload above.",
+      },
+    },
+    {
       name: "blocks",
       type: "blocks",
       blocks: projectBlocks,

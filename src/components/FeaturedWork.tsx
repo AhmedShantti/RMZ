@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
+import { isExternalImage } from "@/lib/imageUrl";
 import type { Project } from "@/content/portfolio";
 
 /**
@@ -51,6 +52,7 @@ export default function FeaturedWork({
                     {p.cover?.src ? (
                       <Image
                         src={p.cover.src}
+                        unoptimized={isExternalImage(p.cover.src)}
                         alt={`${p.name} cover image`}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1023px) 50vw, 360px"
