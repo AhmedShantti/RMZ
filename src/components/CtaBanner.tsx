@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
+import { isExternalImage } from "@/lib/imageUrl";
 
 /**
  * Home closing call-to-action banner — kicker, big heading, optional line, a
@@ -32,7 +33,14 @@ export default function CtaBanner({
     >
       {imageUrl && (
         <>
-          <Image src={imageUrl} alt="" fill sizes="100vw" className="-z-10 object-cover" />
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            sizes="100vw"
+            unoptimized={isExternalImage(imageUrl)}
+            className="-z-10 object-cover"
+          />
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/65" />
         </>
       )}

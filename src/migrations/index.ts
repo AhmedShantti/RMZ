@@ -13,6 +13,7 @@ import * as migration_20261006_100000_bts_landscape from './20261006_100000_bts_
 import * as migration_20261007_100000_project_video_vertical from './20261007_100000_project_video_vertical';
 import * as migration_20261008_100000_home_sections from './20261008_100000_home_sections';
 import * as migration_20261009_100000_image_links from './20261009_100000_image_links';
+import * as migration_20261010_100000_cta_image_link from './20261010_100000_cta_image_link';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261009_100000_image_links.up,
     down: migration_20261009_100000_image_links.down,
     name: '20261009_100000_image_links',
+  },
+  {
+    up: migration_20261010_100000_cta_image_link.up,
+    down: migration_20261010_100000_cta_image_link.down,
+    name: '20261010_100000_cta_image_link',
   },
 ];

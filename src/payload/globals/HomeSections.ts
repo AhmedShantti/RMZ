@@ -82,6 +82,15 @@ export const HomeSections: GlobalConfig = {
           label: "Background image",
           admin: { description: "Optional. Shown dimmed behind the text. Wide, about 2400×1200px." },
         },
+        {
+          name: "imageUrl",
+          type: "text",
+          label: "Background image link (optional)",
+          admin: {
+            description:
+              "Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded — and takes priority over the upload above.",
+          },
+        },
       ],
     },
   ],

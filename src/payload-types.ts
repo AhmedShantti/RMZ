@@ -1634,6 +1634,10 @@ export interface HomeSection {
      * Optional. Shown dimmed behind the text. Wide, about 2400×1200px.
      */
     image?: (number | null) | Media;
+    /**
+     * Paste the link of an image hosted on Bunny (or any CDN). When set it is shown straight from that link — nothing is uploaded — and takes priority over the upload above.
+     */
+    imageUrl?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2177,6 +2181,7 @@ export interface HomeSectionsSelect<T extends boolean = true> {
         buttonLabel?: T;
         buttonLink?: T;
         image?: T;
+        imageUrl?: T;
       };
   updatedAt?: T;
   createdAt?: T;

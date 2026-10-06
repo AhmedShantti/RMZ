@@ -713,7 +713,7 @@ export const getHomeSections = cache(() =>
           text: f(cta.text, d.cta.text),
           buttonLabel: f(cta.buttonLabel, d.cta.buttonLabel),
           buttonLink: f(cta.buttonLink, d.cta.buttonLink),
-          imageUrl: media(cta.image)?.url ?? null,
+          imageUrl: cta.imageUrl?.trim() || media(cta.image)?.url || null,
         },
       };
     },
