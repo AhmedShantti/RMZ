@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useReducedMotion } from "@/lib/reducedMotion";
+import { slugify } from "@/lib/slug";
 
 type RailService = {
   index: string;
@@ -29,6 +30,26 @@ export default function ServiceRail({ services }: { services: RailService[] }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const svc = services[active];
+  const stage = useRef<HTMLDivElement>(null);
+
+  // Deep link: /services#<service-slug> (the Home list) opens that service and
+  // brings the stage into view. Runs after mount (the hash isn't known on the server).
+  useEffect(() => {
+    const open = (scroll: boolean) => {
+      const slug = decodeURIComponent(window.location.hash.slice(1));
+      const i = slug ? services.findIndex((s) => slugify(s.title) === slug) : -1;
+      if (i < 0) return;
+      setActive(i);
+      if (scroll) stage.current?.scrollIntoView({ block: "start" });
+    };
+    const t = window.setTimeout(() => open(true), 150); // after Next's own hash scroll
+    const onHash = () => open(true);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("hashchange", onHash);
+    };
+  }, [services]);
 
   const onKeyNav = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown" || e.key === "ArrowRight") {
@@ -89,9 +110,10 @@ export default function ServiceRail({ services }: { services: RailService[] }) {
 
       {/* active stage */}
       <div
+        ref={stage}
         role="tabpanel"
         aria-label={svc.title}
-        className="relative min-h-[60vh] overflow-hidden"
+        className="relative min-h-[60vh] scroll-mt-24 overflow-hidden"
       >
         {/* defocused large sub-items backdrop */}
         <AnimatePresence mode="wait">

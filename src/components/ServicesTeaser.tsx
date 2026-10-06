@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Reveal from "./Reveal";
+import { slugify } from "@/lib/slug";
 
 type TeaserService = {
   index: string;
@@ -43,7 +44,8 @@ export default function ServicesTeaser({
             <Reveal key={s.index} delay={i * 0.04}>
               <li className="group">
                 <Link
-                  href="/services"
+                  // Opens the Services page on THIS service (ServiceRail reads the hash).
+                  href={`/services#${slugify(s.title)}`}
                   className="flex items-baseline gap-5 py-5 sm:gap-10"
                 >
                   <span className="font-body text-cream-dim w-8 shrink-0 text-xs tabular-nums">
